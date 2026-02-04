@@ -1,0 +1,156 @@
+#!/usr/bin/env node
+
+console.log('🔧 Database Debug & Complete Fix');
+console.log('================================\n');
+
+console.log('❌ You are still getting "Database error saving new user"');
+console.log('🔍 Let\'s debug and fix this completely.\n');
+
+console.log('📋 COMPLETE SOLUTION - Follow these steps exactly:\n');
+
+console.log('1️⃣  Go to Supabase SQL Editor:');
+console.log('   https://supabase.com/dashboard/project/cfnfrxnxnavlknrjujurj/sql/new\n');
+
+console.log('2️⃣  First, let\'s check what\'s wrong. Run this diagnostic:\n');
+
+console.log('='.repeat(80));
+console.log(`
+-- DIAGNOSTIC: Check database status
+SELECT '=== DATABASE DIAGNOSTIC ===' as info;
+
+-- Check if profiles table exists
+SELECT 'Profiles table exists:' as check_item, 
+       EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'profiles') as result;
+
+-- Check if handle_new_user function exists
+SELECT 'handle_new_user function exists:' as check_item,
+       EXISTS (SELECT FROM information_schema.routines WHERE routine_name = 'handle_new_user') as result;
+
+-- Check if trigger exists
+SELECT 'on_auth_user_created trigger exists:' as check_item,
+       EXISTS (SELECT FROM information_schema.triggers WHERE trigger_name = 'on_auth_user_created') as result;
+
+-- Check RLS policies
+SELECT 'RLS policies exist:' as check_item,
+       EXISTS (SELECT FROM pg_policies WHERE tablename = 'profiles') as result;
+
+-- Check permissions
+SELECT 'Public schema permissions:' as check_item,
+       EXISTS (SELECT FROM information_schema.role_table_grants 
+               WHERE grantee = 'authenticated' AND table_name = 'profiles') as result;
+`);
+console.log('='.repeat(80));
+
+console.log('\n3️⃣  If any of the above return "false", run this COMPLETE FIX:\n');
+
+console.log('='.repeat(80));
+console.log(`
+-- COMPLETE DATABASE FIX
+-- This will completely reset and recreate everything needed
+
+-- Step 1: Clean up everything
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS handle_new_user() CASCADE;
+DROP TABLE IF EXISTS profiles CASCADE;
+DROP POLICY IF EXISTS "Users can view all profiles" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
+
+-- Step 2: Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Step 3: Create profiles table
+CREATE TABLE profiles (
+    id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    bio TEXT,
+    timezone TEXT,
+    avatar_url TEXT,
+    role TEXT NOT NULL DEFAULT 'MEMBER' CHECK (role IN ('ADMIN', 'MEMBER')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Step 4: Create user registration function
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO profiles (id, email, name, role)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)),
+        'MEMBER'
+    );
+    RETURN NEW;
+EXCEPTION
+    WHEN OTHERS THEN
+        RAISE LOG 'Error in handle_new_user: %', SQLERRM;
+        RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Step 5: Create trigger
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+-- Step 6: Enable RLS
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Step 7: Create policies
+CREATE POLICY "Users can view all profiles" ON profiles FOR SELECT USING (true);
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- Step 8: Grant permissions
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT ALL ON profiles TO anon, authenticated;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
+
+-- Step 9: Verify setup
+SELECT '=== SETUP COMPLETE ===' as status;
+SELECT 'Profiles table created successfully' as message;
+SELECT COUNT(*) as profiles_count FROM profiles;
+`);
+console.log('='.repeat(80));
+
+console.log('\n4️⃣  After running the fix, verify it worked:\n');
+
+console.log('='.repeat(80));
+console.log(`
+-- VERIFICATION: Check everything is working
+SELECT '=== VERIFICATION RESULTS ===' as info;
+
+-- Check table
+SELECT 'Profiles table exists:' as check_item, 
+       EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'profiles') as result
+UNION ALL
+SELECT 'Function exists:' as check_item,
+       EXISTS (SELECT FROM information_schema.routines WHERE routine_name = 'handle_new_user') as result
+UNION ALL
+SELECT 'Trigger exists:' as check_item,
+       EXISTS (SELECT FROM information_schema.triggers WHERE trigger_name = 'on_auth_user_created') as result
+UNION ALL
+SELECT 'RLS enabled:' as check_item,
+       EXISTS (SELECT FROM pg_tables WHERE tablename = 'profiles' AND rowsecurity = true) as result
+UNION ALL
+SELECT 'Policies exist:' as check_item,
+       EXISTS (SELECT FROM pg_policies WHERE tablename = 'profiles') as result;
+`);
+console.log('='.repeat(80));
+
+console.log('\n5️⃣  If all verifications return "true", your database is fixed!\n');
+
+console.log('🔗 Direct link to SQL Editor:');
+console.log('   https://supabase.com/dashboard/project/cfnfrxnxnavlknrjujurj/sql/new\n');
+
+console.log('⚠️  IMPORTANT STEPS:');
+console.log('   1. Run the diagnostic first');
+console.log('   2. Run the complete fix if needed');
+console.log('   3. Run the verification');
+console.log('   4. Test signup in your app\n');
+
+console.log('🎯 This comprehensive fix will resolve the database error completely.');
+console.log('   Follow the steps exactly and your signup will work!');

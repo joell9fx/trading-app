@@ -1,0 +1,7 @@
+-- Ensure trade replay fields
+ALTER TABLE user_trades ADD COLUMN IF NOT EXISTS pair TEXT;
+ALTER TABLE user_trades ADD COLUMN IF NOT EXISTS entry_time TIMESTAMPTZ;
+ALTER TABLE user_trades ADD COLUMN IF NOT EXISTS exit_time TIMESTAMPTZ;
+ALTER TABLE user_trades ADD COLUMN IF NOT EXISTS stop_loss NUMERIC;
+ALTER TABLE user_trades ADD COLUMN IF NOT EXISTS take_profit NUMERIC;
+

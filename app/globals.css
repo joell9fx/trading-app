@@ -1,0 +1,275 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 43 96% 56%;
+    --primary-foreground: 0 0% 10%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 43 96% 56%;
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 43 96% 56%;
+    --radius: 0.5rem;
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --gold: 43 96% 56%;
+    --gold-dark: 43 96% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-black text-white antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Better typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+    letter-spacing: -0.02em;
+  }
+  
+  /* Smooth transitions for all interactive elements */
+  a, button {
+    @apply transition-all duration-300;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent font-semibold;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  .gradient-bg {
+    @apply bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600;
+  }
+  
+  .luxury-gradient {
+    @apply bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600;
+  }
+  
+  .slick-card {
+    @apply rounded-xl border border-gray-800/50 bg-gray-900/40 backdrop-blur-xl;
+    @apply transition-all duration-500 ease-out;
+    @apply hover:border-yellow-500/30 hover:bg-gray-900/60;
+    @apply hover:shadow-2xl hover:shadow-yellow-500/10;
+    @apply hover:-translate-y-1 hover:scale-[1.02];
+  }
+  
+  .card-hover {
+    @apply transition-all duration-500 ease-out;
+    @apply hover:shadow-2xl hover:shadow-yellow-500/15;
+    @apply hover:-translate-y-2 hover:scale-[1.01];
+  }
+  
+  .luxury-border {
+    @apply border border-yellow-500/30;
+    @apply transition-all duration-300;
+  }
+  
+  .luxury-glow {
+    @apply shadow-xl shadow-yellow-500/30;
+    @apply transition-shadow duration-500;
+  }
+  
+  .luxury-glow-hover {
+    @apply hover:shadow-2xl hover:shadow-yellow-500/40;
+  }
+  
+  .slick-button {
+    @apply relative overflow-hidden;
+    @apply transition-all duration-300 ease-out;
+    @apply before:absolute before:inset-0 before:bg-gradient-to-r before:from-yellow-400 before:to-yellow-600;
+    @apply before:opacity-0 before:transition-opacity before:duration-300;
+    @apply hover:before:opacity-100;
+    @apply hover:scale-105 hover:shadow-xl hover:shadow-yellow-500/30;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-yellow-500 to-yellow-600 text-black;
+    @apply hover:from-yellow-400 hover:to-yellow-500;
+    @apply inline-flex items-center justify-center rounded-lg text-sm font-semibold;
+    @apply transition-all duration-300 ease-out;
+    @apply hover:scale-105 hover:shadow-xl hover:shadow-yellow-500/30;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply disabled:opacity-50 disabled:pointer-events-none disabled:scale-100;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-800/80 text-gray-100 hover:bg-gray-700/80;
+    @apply inline-flex items-center justify-center rounded-lg text-sm font-medium;
+    @apply transition-all duration-300 ease-out;
+    @apply hover:scale-105 hover:shadow-lg;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2;
+    @apply disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .btn-outline {
+    @apply border border-gray-700 bg-transparent hover:bg-gray-800/50;
+    @apply hover:border-yellow-500/50;
+    @apply inline-flex items-center justify-center rounded-lg text-sm font-medium;
+    @apply transition-all duration-300 ease-out;
+    @apply hover:scale-105 hover:shadow-lg;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2;
+    @apply disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .input-field {
+    @apply flex h-11 w-full rounded-lg border border-gray-700 bg-gray-900/50 backdrop-blur-sm;
+    @apply px-4 py-2.5 text-sm ring-offset-background;
+    @apply file:border-0 file:bg-transparent file:text-sm file:font-medium;
+    @apply placeholder:text-gray-500;
+    @apply transition-all duration-300;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply focus-visible:border-yellow-500/50 focus-visible:bg-gray-900/70;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  
+  .glass-effect {
+    @apply bg-gray-900/40 backdrop-blur-xl border border-gray-800/50;
+  }
+  
+  .slick-link {
+    @apply relative transition-all duration-300;
+    @apply hover:text-yellow-500;
+  }
+  
+  .slick-link::after {
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-yellow-500;
+    @apply transition-all duration-300;
+    content: '';
+  }
+  
+  .slick-link:hover::after {
+    @apply w-full;
+  }
+}
+
+/* Custom scrollbar - Slick Design */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-black;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-800 rounded-full;
+  @apply border-2 border-black;
+  @apply transition-all duration-300;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-yellow-500/30;
+}
+
+/* Focus styles */
+.focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection color */
+::selection {
+  @apply bg-yellow-500/30 text-yellow-100;
+}
+
+/* Better focus styles */
+*:focus-visible {
+  @apply outline-none ring-2 ring-yellow-500 ring-offset-2 ring-offset-black;
+}

@@ -1,0 +1,6 @@
+-- Public profile fields on profiles
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS username TEXT UNIQUE;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS bio TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_profile_public BOOLEAN DEFAULT TRUE;
+
