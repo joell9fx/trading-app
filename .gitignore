@@ -131,3 +131,8 @@ temp/
 
 # Local development
 *.local
+node_modules/
+*.tar.gz
+.DS_Store
+.env.local
+.next/
