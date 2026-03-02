@@ -136,3 +136,5 @@ node_modules/
 .DS_Store
 .env.local
 .next/
+next
+trading-app@0.1.0
