@@ -1,4 +1,4 @@
-import { PublicProfile } from '@/components/public/public-profile'
+import { PublicProfile } from '../../../components/public/public-profile'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
