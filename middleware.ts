@@ -22,17 +22,22 @@ securityHeaders.set('Permissions-Policy', 'geolocation=(), camera=(), microphone
 // Relax CSP in development only to avoid blank screens while keeping prod strict.
 const cspDirectives = [
   "default-src 'self'",
-  // Allow supabase + Stripe + OpenAI + local dev HMR/websocket connections
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://*.stripe.com ws://localhost:4001 http://localhost:4001",
+  "base-uri 'self'",
   "frame-ancestors 'none'",
-  // Allow Next.js inline chunks; keep eval relaxed only in dev
+  "object-src 'none'",
+
+  `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://*.stripe.com https://api.stripe.com${
+    isDev ? ' ws://localhost:4001 http://localhost:4001' : ''
+  }`,
+
   isDev
-    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-    : "script-src 'self' 'unsafe-inline'",
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com"
+    : "script-src 'self' 'unsafe-inline' https://js.stripe.com",
+
   "style-src 'self' 'unsafe-inline'",
-  // Images/icons/fonts may be served as data URLs
-  "img-src 'self' data:",
+  "img-src 'self' data: https:",
   "font-src 'self' data:",
+  "frame-src https://js.stripe.com https://hooks.stripe.com",
 ].join('; ');
 
 securityHeaders.set('Content-Security-Policy', cspDirectives);
