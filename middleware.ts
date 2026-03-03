@@ -25,12 +25,11 @@ const cspDirectives = [
   // Allow supabase + Stripe + OpenAI + local dev HMR/websocket connections
   "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://*.stripe.com ws://localhost:4001 http://localhost:4001",
   "frame-ancestors 'none'",
+  // Allow Next.js inline chunks; keep eval relaxed only in dev
   isDev
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-    : "script-src 'self'",
-  isDev
-    ? "style-src 'self' 'unsafe-inline'"
-    : "style-src 'self'",
+    : "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
   // Images/icons/fonts may be served as data URLs
   "img-src 'self' data:",
   "font-src 'self' data:",
