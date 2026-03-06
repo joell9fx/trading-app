@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const { serviceKey } = await req.json()
     const priceId = SERVICE_PRODUCTS[serviceKey]
     if (!priceId) {
-      return NextResponse.json({ error: 'Invalid service' }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid service or price not configured' }, { status: 400 })
     }
 
     const successUrl = `${domainUrl || 'http://localhost:3000'}/dashboard/success?service=${serviceKey}`

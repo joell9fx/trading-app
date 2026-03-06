@@ -18,16 +18,17 @@ securityHeaders.set('X-Content-Type-Options', 'nosniff');
 securityHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 securityHeaders.set('Permissions-Policy', 'geolocation=(), camera=(), microphone=()');
 
-// Next.js dev server injects inline scripts and uses eval for React Refresh.
-// Relax CSP in development only to avoid blank screens while keeping prod strict.
+// Single CSP source of truth (next.config.js must NOT set CSP to avoid duplicate stricter policy).
+// Next.js requires 'unsafe-inline' for script (hydration) and style (Tailwind/Radix). In dev we allow eval for React Refresh.
 const cspDirectives = [
   "default-src 'self'",
   "base-uri 'self'",
+  "form-action 'self' https://*.supabase.co",
   "frame-ancestors 'none'",
   "object-src 'none'",
 
-  `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://*.stripe.com https://api.stripe.com${
-    isDev ? ' ws://localhost:4001 http://localhost:4001' : ''
+  `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://*.stripe.com https://api.stripe.com https://*.vercel-insights.com blob:${
+    isDev ? ' ws://localhost:* http://localhost:*' : ''
   }`,
 
   isDev
@@ -35,8 +36,8 @@ const cspDirectives = [
     : "script-src 'self' 'unsafe-inline' https://js.stripe.com",
 
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https:",
-  "font-src 'self' data:",
+  "img-src 'self' data: https: blob:",
+  "font-src 'self' data: https:",
   "frame-src https://js.stripe.com https://hooks.stripe.com",
 ].join('; ');
 
@@ -65,8 +66,35 @@ export async function middleware(request: NextRequest) {
   const isAuthPage = AUTH_PAGES.some((path) => pathname === path || pathname.startsWith(path + '/'));
   const isProtected = PROTECTED_PREFIXES.some((path) => pathname === path || pathname.startsWith(path + '/'));
 
+  // Auth pages always allowed; redirect authenticated users away
+  if (isAuthPage) {
+    const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach((cookie) => {
+            request.cookies.set(cookie.name, cookie.value);
+            response.cookies.set(cookie.name, cookie.value, cookie.options);
+          });
+        },
+      },
+    });
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      return withSecurityHeaders(NextResponse.redirect(new URL('/dashboard', request.url)));
+    }
+
+    return response;
+  }
+
   // Public routes: do not force auth
-  if (!isProtected && !isAuthPage) {
+  if (!isProtected) {
     return response;
   }
 

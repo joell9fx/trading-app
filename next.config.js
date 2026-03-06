@@ -27,45 +27,18 @@ const nextConfig = {
     
     return config;
   },
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'geolocation=(), camera=(), microphone=()',
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
-          },
-          {
-            key: 'Content-Security-Policy',
-            value:
-              "default-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://*.stripe.com; frame-ancestors 'none';",
-          },
-        ],
-      },
-    ]
-  },
+  // Security headers (CSP, X-Frame-Options, etc.) are set only in middleware.ts to avoid duplicates.
   async redirects() {
     return [
       {
         source: '/home',
         destination: '/',
+        permanent: true,
+      },
+      // Legacy path: ensure any request or cached link to /site.webmanifest gets the manifest
+      {
+        source: '/site.webmanifest',
+        destination: '/manifest.webmanifest',
         permanent: true,
       },
     ]

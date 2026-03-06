@@ -48,7 +48,7 @@ export function useUserServices(userId?: string) {
       } else {
         servicesResult.data?.forEach((row) => {
           const key = row.service_key as ServiceKey
-          if (typeof row.is_unlocked === 'boolean') {
+          if (key in unlocked && typeof row.is_unlocked === 'boolean') {
             unlocked[key] = unlocked[key] || !!row.is_unlocked
           }
         })

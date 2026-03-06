@@ -1,4 +1,13 @@
-export type AccessModuleKey = 'community' | 'signals' | 'funding' | 'courses' | 'mentorship' | 'auto_trader'
+export type AccessModuleKey =
+  | 'community'
+  | 'signals'
+  | 'funding'
+  | 'courses'
+  | 'mentorship'
+  | 'auto_trader'
+  | 'gold_to_glory'
+  | 'elite_membership'
+  | 'vip_membership'
 
 export const ACCESS_DEFAULTS: Record<AccessModuleKey, boolean> = {
   community: true,
@@ -7,6 +16,9 @@ export const ACCESS_DEFAULTS: Record<AccessModuleKey, boolean> = {
   courses: true,
   mentorship: true,
   auto_trader: false,
+  gold_to_glory: false,
+  elite_membership: false,
+  vip_membership: false,
 }
 
 export const ACCESS_COLUMN_MAP: Record<AccessModuleKey, string | null> = {
@@ -16,6 +28,9 @@ export const ACCESS_COLUMN_MAP: Record<AccessModuleKey, string | null> = {
   courses: 'has_courses_access',
   mentorship: 'has_mentorship_access',
   auto_trader: null,
+  gold_to_glory: null,
+  elite_membership: null,
+  vip_membership: null,
 }
 
 export function deriveAccessFromProfile(profile?: Record<string, any>): Record<AccessModuleKey, boolean> {
