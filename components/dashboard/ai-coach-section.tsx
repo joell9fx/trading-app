@@ -53,7 +53,7 @@ export function AICoachSection() {
   const [entries, setEntries] = useState<JournalEntryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createSupabaseClient();
+  const supabase = useMemo(() => createSupabaseClient(), []);
 
   const fetchData = useCallback(async () => {
     const {
@@ -65,14 +65,14 @@ export function AICoachSection() {
       return;
     }
     setError(null);
-    const { data, error: err } = await supabase
+    const { data, error } = await supabase
       .from('journal_entries')
       .select('*')
       .eq('user_id', user.id)
       .order('entry_date', { ascending: false })
       .limit(200);
-    if (err) {
-      setError(err.message);
+    if (error) {
+      setError(error.message);
       setEntries([]);
     } else {
       setEntries((data as JournalEntryRow[] | null) ?? []);
