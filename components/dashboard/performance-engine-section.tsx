@@ -411,8 +411,8 @@ export function PerformanceEngineSection() {
                       tick={{ fill: '#9ca3af', fontSize: 11 }}
                       axisLine={{ stroke: axisStroke }}
                       tickLine={{ stroke: axisStroke }}
-                      tickFormatter={(v) =>
-                        new Date(v).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                      tickFormatter={(v: unknown) =>
+                        new Date(typeof v === 'string' ? v : String(v ?? '')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
                       }
                     />
                     <YAxis
@@ -461,8 +461,8 @@ export function PerformanceEngineSection() {
                       tick={{ fill: '#9ca3af', fontSize: 11 }}
                       axisLine={{ stroke: axisStroke }}
                       tickLine={{ stroke: axisStroke }}
-                      tickFormatter={(v) =>
-                        new Date(v).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                      tickFormatter={(v: unknown) =>
+                        new Date(typeof v === 'string' ? v : String(v ?? '')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
                       }
                     />
                     <YAxis
@@ -509,9 +509,10 @@ export function PerformanceEngineSection() {
                         tick={{ fill: '#9ca3af', fontSize: 11 }}
                         axisLine={{ stroke: axisStroke }}
                         tickLine={{ stroke: axisStroke }}
-                        tickFormatter={(v) => {
-                          const [y, m] = v.split('-');
-                          return m && y ? `${m}/${y.slice(2)}` : v;
+                        tickFormatter={(v: unknown) => {
+                          const s = typeof v === 'string' ? v : String(v ?? '');
+                          const [y, m] = s.split('-');
+                          return m && y ? `${m}/${y.slice(2)}` : s;
                         }}
                       />
                       <YAxis
@@ -525,8 +526,14 @@ export function PerformanceEngineSection() {
                         labelFormatter={(l: unknown) => String(l ?? '')}
                         formatter={(value: number, _name: string, props: { payload?: { trades?: number; winRatePct?: number } }) => {
                           const p = props?.payload;
-                          const extra = p && typeof p.trades === 'number' ? ` (${p.trades} trades${typeof p.winRatePct === 'number' ? `, ${p.winRatePct.toFixed(0)}% win` : ''})` : '';
-                          return [`${value >= 0 ? '+' : ''}${Number(value).toFixed(1)}R${extra}`, 'Total R'];
+                          const extra =
+                            p && typeof p.trades === 'number'
+                              ? ` (${p.trades} trades${typeof p.winRatePct === 'number' ? `, ${p.winRatePct.toFixed(0)}% win` : ''})`
+                              : '';
+                          return [
+                            `${value >= 0 ? '+' : ''}${Number(value).toFixed(1)}R${extra}`,
+                            'Total R',
+                          ];
                         }}
                       />
                       <ReferenceLine y={0} stroke="rgba(255,255,255,0.15)" />

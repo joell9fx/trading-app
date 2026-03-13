@@ -15,6 +15,10 @@ import {
   computeConsistencyScores,
   type ConsistencyScores,
 } from './consistency-scores';
+import {
+  computePerformanceMetrics,
+  type PerformanceMetricsResult,
+} from './performance-metrics';
 
 type JournalEntryRow = Database['public']['Tables']['journal_entries']['Row'];
 
@@ -178,7 +182,8 @@ function buildSummary(
   totalTrades: number,
   _winRate: number,
   _totalR: number,
-  consistency: ConsistencyScores | null
+  consistency: ConsistencyScores | null,
+  perf: PerformanceMetricsResult | null
 ): string {
   if (totalTrades < 2) return DEFAULT_SUMMARY;
   const session = data.session_breakdown?.filter((s) => s.key && s.key !== '—')[0];
@@ -204,6 +209,18 @@ function buildSummary(
       parts.push(
         'Trades where rules were followed outperform rule-broken trades significantly.'
       );
+    }
+  }
+  if (perf && totalTrades >= 5) {
+    const pf = perf.profitFactor != null ? perf.profitFactor.toFixed(1) : null;
+    const exp = perf.expectancy.toFixed(2);
+    const dd = perf.maxDrawdown > 0 ? perf.maxDrawdown.toFixed(1) : null;
+    if (pf != null || exp || dd) {
+      const perfParts: string[] = [];
+      if (pf != null) perfParts.push(`profit factor is ${pf}`);
+      perfParts.push(`expectancy is ${perf.expectancy >= 0 ? '+' : ''}${exp}R per trade`);
+      if (dd != null) perfParts.push(`max drawdown was -${dd}R`);
+      parts.push(`Your ${perfParts.join(', and your ')}.`);
     }
   }
   if (consistency && totalTrades >= 3) {
@@ -284,6 +301,7 @@ export function generateCoachOutput(rows: JournalEntryRow[]): CoachOutput {
   const mistakes = data.mistake_patterns ?? [];
 
   const consistency = computeConsistencyScores(rows);
+  const perf = computePerformanceMetrics(rows);
 
   const insights: CoachInsight[] = [];
   const add = (i: CoachInsight | null) => {
@@ -304,7 +322,8 @@ export function generateCoachOutput(rows: JournalEntryRow[]): CoachOutput {
     totalTrades,
     winRate,
     totalR,
-    consistency
+    consistency,
+    perf
   );
   const nextActions = buildNextActions(data, totalTrades, ruleStats);
 

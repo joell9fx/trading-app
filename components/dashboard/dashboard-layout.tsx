@@ -51,6 +51,8 @@ import { PerformanceAnalyticsSection } from './performance-analytics-section';
 import { ReportsSection } from './reports-section';
 import { AICoachSection } from './ai-coach-section';
 import { ConsistencySection } from './consistency-section';
+import { PerformanceEngineSection } from './performance-engine-section';
+import { TerminalSection } from './terminal-section';
 
 type DashboardTab = 
   | 'overview'
@@ -81,7 +83,9 @@ type DashboardTab =
   | 'auto-trader'
   | 'reports'
   | 'ai-coach'
-  | 'consistency';
+  | 'consistency'
+  | 'performance'
+  | 'terminal';
 
 export default function DashboardLayout(props: { initialSection?: DashboardTab }) {
   return (
@@ -118,6 +122,8 @@ const ALLOWED_SECTIONS: DashboardTab[] = [
   'reports',
   'ai-coach',
   'consistency',
+  'performance',
+  'terminal',
 ];
 
 function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?: DashboardTab }) {
@@ -417,6 +423,10 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
         return <AICoachSection />;
       case 'consistency':
         return <ConsistencySection />;
+      case 'performance':
+        return <PerformanceEngineSection />;
+      case 'terminal':
+        return <TerminalSection />;
       case 'admin':
         if (!hasAdminAccess) {
           return <AccessDenied feature="Admin Control Panel" requiredRole="ADMIN" />;

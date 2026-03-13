@@ -489,7 +489,7 @@ export function PerformanceAnalyticsSection() {
         avg_r: report.avg_r,
         best_trade: report.best_trade,
         worst_trade: report.worst_trade,
-        report_data: report.report_data as Record<string, unknown>,
+        report_data: report.report_data as unknown as Record<string, unknown>,
       });
       if (error) throw error;
       toast({ title: 'Report saved' });
@@ -677,7 +677,7 @@ export function PerformanceAnalyticsSection() {
                   tick={{ fill: '#9ca3af', fontSize: 11 }}
                   axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                   tickLine={{ stroke: 'rgba(255,255,255,0.05)' }}
-                  tickFormatter={(v) => new Date(v).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  tickFormatter={(v: unknown) => new Date(typeof v === 'string' ? v : String(v ?? '')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 />
                 <YAxis
                   tick={{ fill: '#9ca3af', fontSize: 11 }}

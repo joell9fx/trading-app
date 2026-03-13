@@ -187,8 +187,8 @@ function ReportDetailView({
                     tick={{ fill: '#9ca3af', fontSize: 11 }}
                     axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                     tickLine={{ stroke: 'rgba(255,255,255,0.05)' }}
-                    tickFormatter={(v) =>
-                      new Date(v).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                    tickFormatter={(v: unknown) =>
+                      new Date(typeof v === 'string' ? v : String(v ?? '')).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
                     }
                   />
                   <YAxis

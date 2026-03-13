@@ -113,7 +113,8 @@ export function TradeAnnotationEditor({
       ctx.strokeStyle = color;
       ctx.fillStyle = color;
       ctx.lineWidth = Math.max(2, w / 300);
-      ctx.font = `${(ann.type === 'text' && (ann as TextAnnotation).fontSize ? (ann as TextAnnotation).fontSize : 14) * (w / 400)}px sans-serif`;
+      const fontSize = ann.type === 'text' ? ((ann as TextAnnotation).fontSize ?? 14) : 14;
+      ctx.font = `${fontSize * (w / 400)}px sans-serif`;
 
       switch (ann.type) {
         case 'arrow': {

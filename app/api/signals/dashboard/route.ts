@@ -30,7 +30,7 @@ export async function GET() {
       supabase
         .from('signals')
         .select('id, trading_pair, direction, entry_price, stop_loss, take_profit, risk_reward_ratio, status, notes, created_at')
-        .in('status', ['new', 'active', 'closed'])
+        .in('status', ['active', 'closed', 'cancelled'])
         .order('created_at', { ascending: false })
         .limit(50),
     ]);
@@ -57,19 +57,26 @@ export async function GET() {
     const analytics = computePerformanceAnalytics(trades, performance.monthly);
 
     const signals =
-      signalsRes.data?.map((s: Record<string, unknown>) => ({
-        id: String(s.id),
-        asset: String(s.trading_pair ?? ''),
-        timeframe: 'N/A',
-        bias: (s.direction ?? 'long') === 'short' ? 'short' : 'long',
-        entry: String(s.entry_price ?? ''),
-        stop: String(s.stop_loss ?? ''),
-        takeProfit: String(s.take_profit ?? ''),
-        rr: Number(s.risk_reward_ratio) || 0,
-        status: s.status === 'closed' ? 'closed' : s.status === 'new' ? 'new' : 'active',
-        rationale: String(s.notes ?? ''),
-        timestamp: String(s.created_at ?? ''),
-      })) ?? [];
+      signalsRes.data
+        ?.map((s: Record<string, unknown>) => ({
+          id: String(s.id),
+          asset: String(s.trading_pair ?? ''),
+          timeframe: 'N/A',
+          bias: (s.direction ?? 'long') === 'short' ? 'short' : 'long',
+          entry: String(s.entry_price ?? ''),
+          stop: String(s.stop_loss ?? ''),
+          takeProfit: String(s.take_profit ?? ''),
+          rr: Number(s.risk_reward_ratio) || 0,
+          status:
+            s.status === 'closed'
+              ? 'closed'
+              : s.status === 'cancelled'
+                ? 'cancelled'
+                : 'active',
+          rationale: String(s.notes ?? ''),
+          timestamp: String(s.created_at ?? ''),
+        }))
+        ?.filter((s: { status: string }) => s.status !== 'cancelled') ?? [];
 
     return NextResponse.json({
       history,

@@ -11,6 +11,7 @@ import {
   ShieldCheckIcon,
   BellIcon,
   CpuChipIcon,
+  CommandLineIcon,
 } from '@heroicons/react/24/outline';
 import { hasPermission, UserPermissions } from '@/lib/permissions';
 import { Crown, Lock, Sparkles, DollarSign } from 'lucide-react';
@@ -43,7 +44,9 @@ type DashboardSection =
   | 'auto-trader'
   | 'reports'
   | 'ai-coach'
-  | 'consistency';
+  | 'consistency'
+  | 'performance'
+  | 'terminal';
 
 interface DashboardSidebarProps {
   activeSection: DashboardSection | string;
@@ -225,6 +228,22 @@ export default function DashboardSidebar({ activeSection, onSectionChange, user,
       name: 'Consistency & Discipline', 
       icon: ChartBarIcon, 
       href: '#consistency',
+      requiredPermission: null,
+      requiredRole: 'MEMBER',
+    },
+    { 
+      id: 'performance', 
+      name: 'Performance Engine', 
+      icon: ChartBarIcon, 
+      href: '#performance',
+      requiredPermission: null,
+      requiredRole: 'MEMBER',
+    },
+    { 
+      id: 'terminal', 
+      name: 'Command Center', 
+      icon: CommandLineIcon, 
+      href: '#terminal',
       requiredPermission: null,
       requiredRole: 'MEMBER',
     },
