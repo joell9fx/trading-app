@@ -16,6 +16,16 @@ module.exports = {
     },
     extend: {
       colors: {
+        /* Luxury design tokens */
+        page: "hsl(var(--page))",
+        surface: "hsl(var(--surface))",
+        panel: "hsl(var(--panel))",
+        elevated: "hsl(var(--elevated))",
+        "text-secondary": "hsl(var(--text-secondary))",
+        "text-muted": "hsl(var(--text-muted))",
+        "accent-hover": "hsl(var(--accent-hover))",
+        "accent-muted": "hsl(var(--accent-muted))",
+        "border-subtle": "hsl(var(--border-subtle))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -40,6 +50,8 @@ module.exports = {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          hover: "hsl(var(--accent-hover))",
+          muted: "hsl(var(--accent-muted))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",

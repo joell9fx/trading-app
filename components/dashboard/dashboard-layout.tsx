@@ -52,6 +52,7 @@ import { AICoachSection } from './ai-coach-section';
 import { ConsistencySection } from './consistency-section';
 import { PerformanceEngineSection } from './performance-engine-section';
 import { TerminalSection } from './terminal-section';
+import { DashboardCommandPalette } from './dashboard-command-palette';
 
 type DashboardTab = 
   | 'overview'
@@ -128,6 +129,7 @@ const ALLOWED_SECTIONS: DashboardTab[] = [
 function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?: DashboardTab }) {
   const searchParams = useSearchParams();
   const sectionFromUrl = searchParams.get('section');
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [activeSection, setActiveSectionState] = useState<DashboardTab>(() => {
     if (sectionFromUrl && ALLOWED_SECTIONS.includes(sectionFromUrl as DashboardTab)) return sectionFromUrl as DashboardTab;
     return initialSection;
@@ -153,6 +155,18 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
   useEffect(() => {
     router.prefetch('/');
   }, [router]);
+
+  // Global command palette: Cmd+K / Ctrl+K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen((open) => !open);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
   const supabase = createSupabaseClient();
   const { toast } = useToast();
 
@@ -438,22 +452,28 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
 
   if (roleLoading || permissionsLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-page flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-500 mx-auto"></div>
-          <p className="mt-4 text-gray-300">Loading dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#05080f] text-gray-100">
-      <DashboardHeader 
-        user={user} 
+    <div className="min-h-screen bg-page text-foreground">
+      <DashboardCommandPalette
+        open={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        onNavigate={(sectionId) => setActiveSection(sectionId as DashboardTab)}
+      />
+      <DashboardHeader
+        user={user}
         onSignOut={handleSignOut}
-        onMenuToggle={() => {}} // handled by bottom nav on mobile
+        onMenuToggle={() => {}}
         onNotificationsClick={() => setActiveSection('notifications')}
+        onOpenCommandPalette={() => setCommandPaletteOpen(true)}
         unreadCount={unreadCount}
       />
       
@@ -471,9 +491,9 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
           permissions={permissions}
         />
         <main className="flex-1 min-w-0">
-          <div className="min-h-[calc(100vh-5rem)] lg:min-h-[calc(100vh-6rem)] rounded-xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-4 sm:p-6 lg:p-8">
+          <div className="min-h-[calc(100vh-5rem)] lg:min-h-[calc(100vh-6rem)] rounded-xl border border-border-subtle bg-panel backdrop-blur-sm p-4 sm:p-6 lg:p-8">
             {loadingKey && (
-              <p className="mb-4 text-xs text-amber-400/90">Starting checkout for {loadingKey}…</p>
+              <p className="mb-4 text-xs text-primary">Starting checkout for {loadingKey}…</p>
             )}
             {renderSection()}
           </div>
@@ -481,7 +501,7 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
       </div>
 
       {/* Mobile Bottom Nav: 5 primary actions */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-[#0a0e14]/98 backdrop-blur-md border-t border-white/[0.06]">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-surface/98 backdrop-blur-md border-t border-border-subtle">
         <div className="grid grid-cols-5 gap-1 px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           {[
             { id: 'overview', label: 'Home', icon: HomeIcon },
@@ -497,8 +517,8 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
                 key={item.id}
                 type="button"
                 onClick={() => setActiveSection(item.id as DashboardTab)}
-                className={`flex flex-col items-center justify-center py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:ring-offset-2 focus:ring-offset-[#0a0e14] ${
-                  isActive ? 'text-amber-400 bg-amber-500/10' : 'text-gray-400 hover:text-white'
+                className={`flex flex-col items-center justify-center py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-background ${
+                  isActive ? 'text-primary bg-accent-muted' : 'text-muted-foreground hover:text-foreground'
                 }`}
                 aria-current={isActive ? 'page' : undefined}
               >
@@ -512,7 +532,7 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
           <div className="px-2 pb-2">
             <a
               href="/dashboard/admin"
-              className="flex items-center justify-center gap-2 w-full py-2 rounded-lg text-xs font-semibold text-amber-200 bg-amber-500/10 border border-amber-400/20"
+              className="flex items-center justify-center gap-2 w-full py-2 rounded-lg text-xs font-semibold text-primary bg-accent-muted border border-primary/20"
             >
               <ShieldCheckIcon className="h-4 w-4" />
               Admin

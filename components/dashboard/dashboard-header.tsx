@@ -1,23 +1,24 @@
 'use client';
 
 interface DashboardHeaderProps {
-  user: any;
+  user: unknown;
   onSignOut: () => void;
   onMenuToggle: () => void;
   onNotificationsClick?: () => void;
+  onOpenCommandPalette?: () => void;
   unreadCount?: number;
 }
 
-export default function DashboardHeader({ user, onSignOut, onMenuToggle, onNotificationsClick, unreadCount = 0 }: DashboardHeaderProps) {
+export default function DashboardHeader({ user, onSignOut, onMenuToggle, onNotificationsClick, onOpenCommandPalette, unreadCount = 0 }: DashboardHeaderProps) {
   return (
-    <header className="sticky top-0 z-30 border-b border-white/10 bg-[#060910]/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-border bg-surface/90 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left side - Mobile menu button and title */}
           <div className="flex items-center gap-3">
             <button
               type="button"
-              className="lg:hidden p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#060910]"
+              className="lg:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-panel transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               onClick={onMenuToggle}
             >
               <span className="sr-only">Open sidebar</span>
@@ -27,15 +28,26 @@ export default function DashboardHeader({ user, onSignOut, onMenuToggle, onNotif
             </button>
             
             <div>
-              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-gray-500">Workspace</p>
-              <h1 className="text-base font-semibold text-white tracking-tight">Trading Desk</h1>
+              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground">Workspace</p>
+              <h1 className="text-base font-semibold text-foreground tracking-tight">Trading Desk</h1>
             </div>
           </div>
 
-          {/* Right side - User menu and notifications */}
-          <div className="flex items-center gap-3">
+          {/* Right side - Command palette hint, notifications, user */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {onOpenCommandPalette && (
+              <button
+                type="button"
+                onClick={onOpenCommandPalette}
+                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border-subtle bg-panel text-muted-foreground hover:text-foreground hover:border-border text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+                title="Search sections (⌘K)"
+              >
+                <span>Search</span>
+                <kbd className="px-1 py-0.5 rounded bg-elevated text-[10px]">⌘K</kbd>
+              </button>
+            )}
             <button
-              className="relative p-2.5 rounded-xl border border-white/10 bg-white/5 text-gray-200 hover:text-white hover:border-gold-400/60 hover:bg-gold-500/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#060910]"
+              className="relative p-2.5 rounded-xl border border-border bg-panel text-foreground/90 hover:text-foreground hover:border-primary/40 hover:bg-accent-muted transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               onClick={onNotificationsClick}
               aria-label="View notifications"
             >
@@ -44,31 +56,31 @@ export default function DashboardHeader({ user, onSignOut, onMenuToggle, onNotif
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-gold-400 px-1 text-[10px] font-bold text-black shadow">
+                <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
             </button>
 
-            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
-              <div className="w-9 h-9 bg-gold-500 rounded-full flex items-center justify-center ring-2 ring-gold-500/30">
-                <span className="text-black text-sm font-semibold">
-                  {user?.email?.charAt(0).toUpperCase() || 'U'}
+            <div className="flex items-center gap-3 rounded-2xl border border-border bg-panel px-3 py-2">
+              <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center ring-2 ring-primary/30">
+                <span className="text-primary-foreground text-sm font-semibold">
+                  {(user as { email?: string })?.email?.charAt(0).toUpperCase() || 'U'}
                 </span>
               </div>
               
               <div className="hidden sm:block text-left">
-                <div className="text-sm font-semibold text-white">
-                  {user?.email || 'User'}
+                <div className="text-sm font-semibold text-foreground">
+                  {(user as { email?: string })?.email || 'User'}
                 </div>
-                <div className="text-xs text-gray-400 capitalize">
-                  {user?.user_metadata?.role || 'Member'}
+                <div className="text-xs text-muted-foreground capitalize">
+                  {(user as { user_metadata?: { role?: string } })?.user_metadata?.role || 'Member'}
                 </div>
               </div>
 
               <button
                 onClick={onSignOut}
-                className="ml-2 px-3 py-2 text-sm font-semibold text-gray-200 hover:text-black bg-white/10 hover:bg-gold-400 transition rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#060910]"
+                className="ml-2 px-3 py-2 text-sm font-semibold text-foreground/90 hover:text-primary-foreground bg-panel hover:bg-primary transition rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Sign out
               </button>
