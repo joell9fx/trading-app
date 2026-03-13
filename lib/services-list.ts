@@ -4,6 +4,9 @@ export const ALL_SERVICES = [
   { key: 'mentorship', name: 'Mentorship', description: '1-on-1 sessions with professional traders.', credit_cost: 10 },
   { key: 'funding', name: 'Funding Account Support', description: 'Track prop firm evaluations and funding status.', credit_cost: 6 },
   { key: 'courses', name: 'Trading Courses', description: 'Step-by-step video education library.', credit_cost: 4 },
+  { key: 'gold_to_glory', name: 'Gold to Glory', description: 'Follow the 100 → 1000 XAUUSD challenge.', credit_cost: 9 },
+  { key: 'elite_membership', name: 'Elite Membership', description: 'Premium membership benefits and perks.', credit_cost: 12 },
+  { key: 'vip_membership', name: 'VIP Membership', description: 'Top-tier VIP perks and concierge access.', credit_cost: 15 },
 ] as const
 
 export type ServiceKey = (typeof ALL_SERVICES)[number]['key']

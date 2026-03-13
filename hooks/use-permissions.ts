@@ -41,7 +41,7 @@ export function usePermissions(userId: string | undefined, initialRole?: UserRol
           roleToUse = (profile?.role || 'MEMBER') as UserRole;
         }
 
-        // Fetch active subscription
+        // Fetch active subscription (maybeSingle: zero rows is valid)
         const { data: subscription } = await supabase
           .from('subscriptions')
           .select(`
@@ -57,7 +57,7 @@ export function usePermissions(userId: string | undefined, initialRole?: UserRol
           .gt('current_period_end', new Date().toISOString())
           .order('created_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
         const userRole = (roleToUse || 'MEMBER') as UserRole;
         const isActive = subscription && new Date(subscription.current_period_end) > new Date();

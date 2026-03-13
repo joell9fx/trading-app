@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +11,14 @@ import { createSupabaseClient } from '@/lib/supabase/client'
 import { getSafeRedirectPath } from '@/lib/utils'
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react'
 
-export function SignInForm() {
+const SIGNIN_DEBUG = process.env.NODE_ENV === 'development'
+
+export interface SignInFormProps {
+  /** Pass from server to avoid useSearchParams() suspend; fallback /dashboard */
+  initialRedirectTo?: string | null
+}
+
+export function SignInForm({ initialRedirectTo }: SignInFormProps = {}) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -19,15 +26,15 @@ export function SignInForm() {
   const [error, setError] = useState('')
   
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { toast } = useToast()
   const supabase = createSupabaseClient()
+  const redirectTo = getSafeRedirectPath(initialRedirectTo ?? null)
 
   const handleOAuthSignIn = async (provider: 'google' | 'apple') => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
       },
     })
     
@@ -68,7 +75,7 @@ export function SignInForm() {
         })
         
         // Redirect to dashboard or intended page (same-origin relative path only)
-        const redirectTo = getSafeRedirectPath(searchParams.get('redirectTo'))
+        if (SIGNIN_DEBUG) console.log('[SignInForm] redirect after login', { redirectTo })
         router.push(redirectTo)
         router.refresh()
       }

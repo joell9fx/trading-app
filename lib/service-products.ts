@@ -5,6 +5,10 @@ export const SERVICE_PRODUCTS: Record<string, string | undefined> = {
   gold_to_glory: process.env.STRIPE_PRICE_G2G,
   elite_membership: process.env.STRIPE_PRICE_ELITE,
   vip_membership: process.env.STRIPE_PRICE_VIP,
+  mentorship: process.env.STRIPE_PRICE_MENTORSHIP,
+  community: process.env.STRIPE_PRICE_COMMUNITY,
+  funding: process.env.STRIPE_PRICE_FUNDING,
+  courses: process.env.STRIPE_PRICE_COURSES,
 }
 
 export const SERVICE_DISPLAY_NAMES: Record<string, string> = {

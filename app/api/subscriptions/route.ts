@@ -34,9 +34,9 @@ export async function GET(request: NextRequest) {
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+    if (error) {
       console.error('Error fetching subscription:', error);
       return NextResponse.json(
         { error: 'Failed to fetch subscription' },

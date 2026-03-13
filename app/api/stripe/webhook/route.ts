@@ -10,12 +10,18 @@ const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-const priceToServiceKey: Record<string, string> = {
-  [process.env.STRIPE_PRICE_ELITE || '']: 'elite_membership',
-  [process.env.STRIPE_PRICE_VIP || '']: 'vip_membership',
-  [process.env.STRIPE_PRICE_SIGNALS || '']: 'signals',
-  [process.env.STRIPE_PRICE_G2G || '']: 'gold_to_glory',
-}
+const priceToServiceKey: Record<string, string> = Object.fromEntries(
+  [
+    [process.env.STRIPE_PRICE_ELITE, 'elite_membership'],
+    [process.env.STRIPE_PRICE_VIP, 'vip_membership'],
+    [process.env.STRIPE_PRICE_SIGNALS, 'signals'],
+    [process.env.STRIPE_PRICE_G2G, 'gold_to_glory'],
+    [process.env.STRIPE_PRICE_MENTORSHIP, 'mentorship'],
+    [process.env.STRIPE_PRICE_COMMUNITY, 'community'],
+    [process.env.STRIPE_PRICE_FUNDING, 'funding'],
+    [process.env.STRIPE_PRICE_COURSES, 'courses'],
+  ].filter(([price]) => typeof price === 'string' && price.trim().length > 0) as [string, string][]
+)
 
 const stripe = stripeSecret ? new Stripe(stripeSecret, { apiVersion: '2023-10-16' }) : null
 const supabaseAdmin =
@@ -49,13 +55,6 @@ export async function POST(req: NextRequest) {
     const serviceKeyFromPrice = priceId ? priceToServiceKey[priceId] : undefined
     const serviceKey = serviceKeyFromPrice || session.metadata?.service_key
 
-    console.info('[stripe.webhook] checkout.session.completed', {
-      eventId: event.id,
-      priceId,
-      serviceKey,
-      userId,
-    })
-
     if (!userId || !serviceKey) {
       console.warn('[stripe.webhook] missing userId or serviceKey', { userId, priceId, metadata: session.metadata })
       return NextResponse.json({ received: true, skipped: true })
@@ -78,8 +77,6 @@ export async function POST(req: NextRequest) {
       console.error('[stripe.webhook] user_services upsert error', upsertError)
       return NextResponse.json({ error: 'Upsert failed' }, { status: 500 })
     }
-
-    console.info('[stripe.webhook] user_services upserted', { upsertData })
   }
 
   return NextResponse.json({ received: true })

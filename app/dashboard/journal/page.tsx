@@ -1,16 +1,37 @@
-import { Suspense } from 'react'
-import { JournalList } from '@/components/dashboard/journal/journal-list'
-import { LoadingSpinner } from '@/components/ui/loading-spinner'
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import DashboardLayout from '@/components/dashboard/dashboard-layout';
 
-export default function JournalPage() {
-  return (
-    <div className="min-h-screen bg-black text-white p-4 md:p-6 space-y-4">
-      <h1 className="text-3xl font-bold">Growth Journal</h1>
-      <p className="text-gray-400">Weekly AI-written summaries of your performance, mindset, and focus.</p>
-      <Suspense fallback={<LoadingSpinner />}>
-        <JournalList />
-      </Suspense>
-    </div>
-  )
+export default async function JournalPage() {
+  const cookieStore = cookies();
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Server component context; safe to ignore
+          }
+        },
+      },
+    }
+  );
+
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    redirect('/signin');
+  }
+
+  return <DashboardLayout initialSection="journal" />;
 }
-

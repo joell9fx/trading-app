@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createSupabaseClient } from '@/lib/supabase/client';
 import DashboardSidebar from './dashboard-sidebar';
 import DashboardHeader from './dashboard-header';
@@ -38,6 +38,19 @@ import {
 } from '@heroicons/react/24/outline';
 import { AdminHub } from './admin/admin-hub';
 import { RoleProvider, useRole } from './role-provider';
+import EliteMembership from './elite-membership';
+import VipMembership from './vip-membership';
+import { isServiceUnlocked } from '@/lib/services/access-client';
+import { GrowthJournalSection } from './growth-journal-section';
+import { VisionTimelineSection } from './vision-timeline-section';
+import { AffiliateDashboard } from './affiliate/affiliate-dashboard';
+import { MarketingToolkit } from './marketing/marketing-toolkit';
+import { CampaignManager } from './campaigns/campaign-manager';
+import { OptimizerDashboard } from './optimizer/optimizer-dashboard';
+import { PerformanceAnalyticsSection } from './performance-analytics-section';
+import { ReportsSection } from './reports-section';
+import { AICoachSection } from './ai-coach-section';
+import { ConsistencySection } from './consistency-section';
 
 type DashboardTab = 
   | 'overview'
@@ -56,6 +69,8 @@ type DashboardTab =
   | 'learning-path'
   | 'analytics'
   | 'gold-to-glory'
+  | 'elite-membership'
+  | 'vip-membership'
   | 'mentor'
   | 'journal'
   | 'timeline'
@@ -63,7 +78,10 @@ type DashboardTab =
   | 'marketing'
   | 'campaigns'
   | 'optimizer'
-  | 'auto-trader';
+  | 'auto-trader'
+  | 'reports'
+  | 'ai-coach'
+  | 'consistency';
 
 export default function DashboardLayout(props: { initialSection?: DashboardTab }) {
   return (
@@ -73,38 +91,63 @@ export default function DashboardLayout(props: { initialSection?: DashboardTab }
   );
 }
 
+const ALLOWED_SECTIONS: DashboardTab[] = [
+  'overview',
+  'community-hub',
+  'signals',
+  'courses',
+  'mentorship',
+  'profile',
+  'admin',
+  'ai',
+  'funding',
+  'notifications',
+  'auto-trader',
+  'gold-to-glory',
+  'mentor',
+  'elite-membership',
+  'vip-membership',
+  'learning-path',
+  'journal',
+  'timeline',
+  'affiliate',
+  'marketing',
+  'campaigns',
+  'optimizer',
+  'analytics',
+  'reports',
+  'ai-coach',
+  'consistency',
+];
+
 function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?: DashboardTab }) {
-  const [activeSection, setActiveSection] = useState<DashboardTab>(initialSection);
+  const searchParams = useSearchParams();
+  const sectionFromUrl = searchParams.get('section');
+  const [activeSection, setActiveSectionState] = useState<DashboardTab>(() => {
+    if (sectionFromUrl && ALLOWED_SECTIONS.includes(sectionFromUrl as DashboardTab)) return sectionFromUrl as DashboardTab;
+    return initialSection;
+  });
   const router = useRouter();
+
+  // Sync activeSection from URL when ?section= changes (e.g. overview buttons, external links)
+  useEffect(() => {
+    if (sectionFromUrl && ALLOWED_SECTIONS.includes(sectionFromUrl as DashboardTab)) {
+      setActiveSectionState(sectionFromUrl as DashboardTab);
+    }
+  }, [sectionFromUrl]);
+
+  const setActiveSection = useCallback(
+    (section: DashboardTab) => {
+      setActiveSectionState(section);
+      router.replace(`/dashboard?section=${section}`, { scroll: false });
+    },
+    [router]
+  );
 
   // Prefetch home so signing out doesn't trigger a cold load (avoids CSS 404s)
   useEffect(() => {
     router.prefetch('/');
   }, [router]);
-
-  // Handle section from URL query parameter
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const section = params.get('section');
-    const allowedSections: DashboardTab[] = [
-      'overview',
-      'community-hub',
-      'signals',
-      'courses',
-      'mentorship',
-      'profile',
-      'admin',
-      'ai',
-      'funding',
-      'notifications',
-      'auto-trader',
-      'gold-to-glory',
-      'mentor',
-    ];
-    if (section && allowedSections.includes(section as DashboardTab)) {
-      setActiveSection(section as DashboardTab);
-    }
-  }, []);
   const supabase = createSupabaseClient();
   const { toast } = useToast();
 
@@ -172,16 +215,52 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
     router.push('/');
   };
 
+  if (roleLoading || permissionsLoading || servicesLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-gray-200">
+          Loading your dashboard access…
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-gray-200">
+          No active session.{' '}
+          <button className="underline text-gold-300" onClick={() => router.push('/signin')}>
+            Sign in again
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const userWithProfile = { ...user, ...profile, role };
   const userRoleForPermissions = roleForPermissions;
 
+  const ensureAccess = (serviceKey: 'signals' | 'gold_to_glory' | 'elite_membership' | 'vip_membership') => {
+    if (!user) {
+      router.push(`/signin?redirectTo=${encodeURIComponent('/dashboard')}`);
+      return false;
+    }
+    if (!isUnlocked(serviceKey as any)) {
+      router.push(`/pricing?product=${serviceKey}`);
+      return false;
+    }
+    return true;
+  };
+
+  const effectiveSection: DashboardTab =
+    sectionFromUrl && ALLOWED_SECTIONS.includes(sectionFromUrl as DashboardTab)
+      ? (sectionFromUrl as DashboardTab)
+      : activeSection;
+
   const renderSection = () => {
     const userRole = userRoleForPermissions;
-    switch (activeSection) {
+    switch (effectiveSection) {
       case 'overview':
         return <DashboardOverview user={userWithProfile} access={access} unlockedCount={unlockedCount} />;
       case 'community':
@@ -210,22 +289,7 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
         if (!hasPermission(userRole, 'signals', 'view_basic')) {
           return <AccessDenied feature="Trading Signals" requiredRole="MEMBER" />;
         }
-        if (!isUnlocked('signals')) {
-          return (
-            <LockedFeature
-              serviceKey="signals"
-              title="Trading Signals"
-              description="Unlock high-conviction signals and market insights."
-              onCheckout={() => handleCheckout('signals')}
-              onUnlock={() =>
-                unlockService('signals').catch((e: any) =>
-                  toast({ title: 'Error', description: e?.message || 'Failed to unlock', variant: 'destructive' })
-                )
-              }
-              ctaHref="/pricing"
-            />
-          );
-        }
+        if (!ensureAccess('signals')) return null;
         return <SignalsSection user={userWithProfile} />;
       case 'ai':
         return <AIAssistant user={userWithProfile} />;
@@ -323,9 +387,36 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
           />
         );
       case 'gold-to-glory':
-        return <GoldToGlory hasAccess={Boolean((access as any)?.gold_to_glory)} />;
+        if (!ensureAccess('gold_to_glory')) return null;
+        return <GoldToGlory hasAccess={isServiceUnlocked(access as any, 'gold_to_glory')} />;
+      case 'elite-membership':
+        if (!ensureAccess('elite_membership')) return null;
+        return <EliteMembership />;
+      case 'vip-membership':
+        if (!ensureAccess('vip_membership')) return null;
+        return <VipMembership />;
       case 'mentor':
         return <MentorChat userId={userWithProfile?.id || user?.id} />;
+      case 'journal':
+        return <GrowthJournalSection />;
+      case 'timeline':
+        return <VisionTimelineSection />;
+      case 'affiliate':
+        return <AffiliateDashboard />;
+      case 'marketing':
+        return <MarketingToolkit />;
+      case 'campaigns':
+        return <CampaignManager />;
+      case 'optimizer':
+        return <OptimizerDashboard />;
+      case 'analytics':
+        return <PerformanceAnalyticsSection />;
+      case 'reports':
+        return <ReportsSection />;
+      case 'ai-coach':
+        return <AICoachSection />;
+      case 'consistency':
+        return <ConsistencySection />;
       case 'admin':
         if (!hasAdminAccess) {
           return <AccessDenied feature="Admin Control Panel" requiredRole="ADMIN" />;
@@ -359,7 +450,7 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
       
       <div className="relative flex gap-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-10 pt-3 lg:pt-6">
         <DashboardSidebar
-          activeSection={activeSection as any}
+          activeSection={effectiveSection as any}
           onSectionChange={(section) => setActiveSection(section as DashboardTab)}
           user={{
             ...user,
@@ -384,6 +475,7 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
                 </span>
               )}
             </div>
+
             {renderSection()}
           </div>
         </main>
@@ -401,7 +493,7 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
             { id: 'gold-to-glory', label: 'G2G', icon: CpuChipIcon },
             { id: 'profile', label: 'Account', icon: UserIcon },
           ].map((item) => {
-            const isActive = activeSection === item.id;
+            const isActive = effectiveSection === item.id;
             const Icon = item.icon;
             return (
               <button
@@ -431,7 +523,7 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
                   router.push('/dashboard/admin');
                 }}
                 className={`w-full flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b101a] ${
-                  activeSection === 'admin'
+                  effectiveSection === 'admin'
                     ? 'text-white bg-white/10 border-white/20'
                     : 'text-gold-200 bg-emerald-500/10 border-emerald-400/30'
                 }`}

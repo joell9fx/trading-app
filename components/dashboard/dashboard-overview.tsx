@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseClient } from '@/lib/supabase/client';
 import Link from 'next/link';
@@ -20,6 +20,7 @@ import {
 import { useCheckout } from './use-checkout';
 import { NextUpgradeCard } from './NextUpgradeCard';
 import { ServicesGrid } from './ServicesGrid';
+import { ActivityFeed } from './activity-feed';
 import { ALL_SERVICES, type ServiceKey } from '@/lib/services-list';
 import { MembershipCard } from './MembershipCard';
 import { MembershipTier, computeTier } from '@/lib/tier-utils';
@@ -42,12 +43,16 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
     activeCourses: 0,
   });
   const [loading, setLoading] = useState(true);
-  const supabase = createSupabaseClient();
+  const supabase = useMemo(() => createSupabaseClient(), []);
   const { handleCheckout } = useCheckout();
   const openUpgrade = () => router.push('/dashboard/upgrade');
   const startCheckout = onCheckout || ((key: ServiceKey) => handleCheckout(key));
 
   useEffect(() => {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
     const fetchStats = async () => {
       try {
         // Fetch user's profile data
@@ -148,7 +153,7 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
     };
 
     fetchStats();
-  }, [user.id, supabase]);
+  }, [user?.id, supabase]);
 
   if (loading) {
     return (
@@ -203,47 +208,48 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
         <ServicesGrid services={ALL_SERVICES as any} unlocked={unlockedMap} onCheckout={(_key) => openUpgrade()} />
       </div>
 
-      {/* Hero Welcome Section */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0f1624] p-8 text-white shadow-[0_20px_50px_-35px_rgba(0,0,0,0.85)]">
-        <div className="flex flex-col lg:flex-row items-start justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 border border-white/15 text-gray-200">
-              {greeting}, {userName}
-            </span>
-            <h1 className="text-3xl lg:text-4xl font-semibold leading-tight">
-              Welcome back to your trading desk 👋
-            </h1>
-            <p className="text-gray-300">
-              Continue your journey, unlock services, and keep your edge sharp with curated actions below.
-            </p>
-            <div className="flex flex-wrap gap-3 pt-2">
-            <Button
-              onClick={() => router.push('/dashboard?section=learning-path')}
-              className="bg-gold-500 hover:bg-gold-400 text-black"
-            >
-              View learning path
-              <ArrowRightIcon className="w-4 h-4 ml-2" />
-            </Button>
-              <Button
-                variant="outline"
-                onClick={() => router.push('/dashboard?section=notifications')}
-                className="border-white/20 text-white hover:bg-white/10"
-              >
-                Check notifications
-              </Button>
-            </div>
-          </div>
-          <div className="hidden lg:flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 p-4">
-            <div className="w-20 h-20 rounded-full bg-gold-500/15 flex items-center justify-center">
-              <ChartBarIcon className="w-10 h-10 text-gold-300" />
+      {/* Hero Welcome + Member Updates — side-by-side on large screens for immediate visibility */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="lg:col-span-2 relative overflow-hidden rounded-2xl border border-white/10 bg-[#0f1624] p-8 text-white shadow-[0_20px_50px_-35px_rgba(0,0,0,0.85)]">
+          <div className="flex flex-col items-start gap-6">
+            <div className="space-y-3 max-w-2xl">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 border border-white/15 text-gray-200">
+                {greeting}, {userName}
+              </span>
+              <h1 className="text-3xl lg:text-4xl font-semibold leading-tight">
+                Welcome back to your trading desk 👋
+              </h1>
+              <p className="text-gray-300">
+                Continue your journey, unlock services, and keep your edge sharp with curated actions below.
+              </p>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  onClick={() => router.push('/dashboard?section=learning-path')}
+                  className="bg-gold-500 hover:bg-gold-400 text-black"
+                >
+                  View learning path
+                  <ArrowRightIcon className="w-4 h-4 ml-2" />
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push('/dashboard?section=notifications')}
+                  className="border-white/20 text-white hover:bg-white/10"
+                >
+                  Check notifications
+                </Button>
+              </div>
             </div>
           </div>
         </div>
+        <div className="min-w-0">
+          <ActivityFeed title="Member Updates" items={[]} />
+        </div>
       </div>
 
+      <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">Status</p>
       {/* Status Indicators */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-        <Card className="bg-white/5 border border-white/10 p-4 sm:p-5">
+        <Card className="bg-white/5 border border-white/10 p-4 sm:p-5 transition-all duration-200 ease-out hover:border-white/15 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs uppercase tracking-[0.18em] text-gray-400">Membership</span>
             <span className="px-2 py-1 text-[11px] rounded-full bg-gold-500/15 border border-gold-500/25 text-gold-200">
@@ -253,7 +259,7 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
           <p className="text-sm text-gray-300">Access level: {tier === 'Elite' ? 'Full access' : 'Core member'}</p>
         </Card>
 
-        <Card className="bg-white/5 border border-white/10 p-4 sm:p-5">
+        <Card className="bg-white/5 border border-white/10 p-4 sm:p-5 transition-all duration-200 ease-out hover:border-white/15 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs uppercase tracking-[0.18em] text-gray-400">Unlocked</span>
             <span className="px-2 py-1 text-[11px] rounded-full bg-white/10 border border-white/15 text-gray-100">
@@ -265,7 +271,7 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
           </p>
         </Card>
 
-        <Card className="bg-white/5 border border-white/10 p-4 sm:p-5">
+        <Card className="bg-white/5 border border-white/10 p-4 sm:p-5 transition-all duration-200 ease-out hover:border-white/15 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs uppercase tracking-[0.18em] text-gray-400">Auto Trader</span>
             <span className={`px-2 py-1 text-[11px] rounded-full ${access?.auto_trader ? 'bg-emerald-500/15 border border-emerald-400/30 text-emerald-200' : 'bg-white/10 border border-white/15 text-gray-100'}`}>
@@ -303,7 +309,9 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
                 <BookOpenIcon className="w-6 h-6 text-gold-300" />
               </div>
               <span className="text-xs font-semibold text-gold-200 bg-gold-500/15 border border-gold-500/25 px-2 py-1 rounded-full">
-                {Math.round((stats.completedLessons / (stats.totalCourses * 5)) * 100)}%
+                {stats.totalCourses > 0
+                  ? Math.round((stats.completedLessons / (stats.totalCourses * 5)) * 100)
+                  : 0}%
               </span>
             </div>
             <p className="text-sm font-medium text-gray-400 mb-1">Completed Lessons</p>

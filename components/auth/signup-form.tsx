@@ -38,10 +38,11 @@ export function SignUpForm() {
   }
 
   const handleOAuthSignUp = async (provider: 'google' | 'apple') => {
+    const safeNext = getSafeRedirectPath(searchParams.get('redirectTo'))
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`,
       },
     })
     

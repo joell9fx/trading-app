@@ -13,7 +13,7 @@
     "format:check": "prettier --check .",
     "test": "jest",
     "test:watch": "jest --watch",
-    "db:generate": "supabase gen types typescript --project-id cfnfrxnxnavlknrjujurj > types/supabase.ts",
+    "db:generate": "supabase gen types typescript --project-id cffqnrxnavlknrijuurj > types/supabase.ts",
     "db:push": "supabase db push --project-ref cfnfrxnxnavlknrjujurj",
     "db:reset": "supabase db reset --project-ref cfnfrxnxnavlknrjujurj",
     "setup:supabase": "node scripts/auto-setup-supabase.js",

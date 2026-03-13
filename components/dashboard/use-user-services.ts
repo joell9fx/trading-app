@@ -27,7 +27,7 @@ export function useUserServices(userId?: string) {
           .from('profiles')
           .select('has_signals_access, has_funding_access, has_courses_access, has_mentorship_access, has_ai_tools_access')
           .eq('id', userId)
-          .single(),
+          .maybeSingle(),
         supabase
           .from('user_services')
           .select('service_key, is_unlocked')
@@ -35,9 +35,12 @@ export function useUserServices(userId?: string) {
           .eq('is_unlocked', true),
       ])
 
-      if (profileResult.error) throw profileResult.error
+      // No row, 400 (e.g. missing columns), or other profile error: use defaults so dashboard still loads
+      if (profileResult.error) {
+        console.warn('useUserServices: profile fetch failed', profileResult.error.code, profileResult.error.message, '- using default access')
+      }
 
-      const baseAccess = deriveAccessFromProfile(profileResult.data || {})
+      const baseAccess = deriveAccessFromProfile(profileResult.data ?? {})
       const unlocked: Record<ServiceKey, boolean> = { ...baseAccess }
 
       // If user_services table doesn't exist yet (e.g., missing migration), skip gracefully.
@@ -46,12 +49,20 @@ export function useUserServices(userId?: string) {
       } else if (servicesResult.error) {
         throw servicesResult.error
       } else {
+        const unknownKeys: string[] = []
         servicesResult.data?.forEach((row) => {
           const key = row.service_key as ServiceKey
-          if (key in unlocked && typeof row.is_unlocked === 'boolean') {
-            unlocked[key] = unlocked[key] || !!row.is_unlocked
+          if (key in unlocked) {
+            if (typeof row.is_unlocked === 'boolean') {
+              unlocked[key] = unlocked[key] || !!row.is_unlocked
+            }
+          } else if (typeof row.service_key === 'string') {
+            unknownKeys.push(row.service_key)
           }
         })
+        if (unknownKeys.length > 0) {
+          console.warn('Ignored unknown service keys from user_services', { userId, unknownKeys })
+        }
       }
 
       setServices(unlocked)

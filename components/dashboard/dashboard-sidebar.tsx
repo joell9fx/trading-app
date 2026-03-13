@@ -40,7 +40,10 @@ type DashboardSection =
   | 'optimizer'
   | 'gold-to-glory'
   | 'progress'
-  | 'auto-trader';
+  | 'auto-trader'
+  | 'reports'
+  | 'ai-coach'
+  | 'consistency';
 
 interface DashboardSidebarProps {
   activeSection: DashboardSection | string;
@@ -165,7 +168,7 @@ export default function DashboardSidebar({ activeSection, onSectionChange, user,
       id: 'affiliate', 
       name: 'Affiliate', 
       icon: ChartBarIcon, 
-      href: '/dashboard/affiliate',
+      href: '#affiliate',
       requiredPermission: null,
       requiredRole: 'MEMBER',
     },
@@ -173,7 +176,7 @@ export default function DashboardSidebar({ activeSection, onSectionChange, user,
       id: 'marketing', 
       name: 'Marketing', 
       icon: ChartBarIcon, 
-      href: '/dashboard/marketing',
+      href: '#marketing',
       requiredPermission: null,
       requiredRole: 'MEMBER',
     },
@@ -181,7 +184,7 @@ export default function DashboardSidebar({ activeSection, onSectionChange, user,
       id: 'campaigns', 
       name: 'Campaigns', 
       icon: ChartBarIcon, 
-      href: '/dashboard/campaigns',
+      href: '#campaigns',
       requiredPermission: null,
       requiredRole: 'MEMBER',
     },
@@ -189,7 +192,7 @@ export default function DashboardSidebar({ activeSection, onSectionChange, user,
       id: 'optimizer', 
       name: 'Optimizer', 
       icon: ChartBarIcon, 
-      href: '/dashboard/optimizer',
+      href: '#optimizer',
       requiredPermission: null,
       requiredRole: 'MEMBER',
     },
@@ -198,6 +201,30 @@ export default function DashboardSidebar({ activeSection, onSectionChange, user,
       name: 'Performance Analytics', 
       icon: ChartBarIcon, 
       href: '#analytics',
+      requiredPermission: null,
+      requiredRole: 'MEMBER',
+    },
+    { 
+      id: 'reports', 
+      name: 'Reports', 
+      icon: ChartBarIcon, 
+      href: '#reports',
+      requiredPermission: null,
+      requiredRole: 'MEMBER',
+    },
+    { 
+      id: 'ai-coach', 
+      name: 'AI Trade Coach', 
+      icon: Sparkles, 
+      href: '#ai-coach',
+      requiredPermission: null,
+      requiredRole: 'MEMBER',
+    },
+    { 
+      id: 'consistency', 
+      name: 'Consistency & Discipline', 
+      icon: ChartBarIcon, 
+      href: '#consistency',
       requiredPermission: null,
       requiredRole: 'MEMBER',
     },

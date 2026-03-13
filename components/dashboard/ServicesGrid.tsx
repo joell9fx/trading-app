@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Lock, ArrowUpRight } from 'lucide-react'
@@ -17,22 +18,71 @@ const ICONS: Record<ServiceKey, string> = {
   funding: '💼',
   courses: '🎓',
   mentorship: '🧠',
+  gold_to_glory: '🥇',
+  elite_membership: '👑',
+  vip_membership: '🌟',
 }
 
 const PATHS: Record<ServiceKey, string> = {
-  community: '/dashboard/community',
-  signals: '/signals',
-  funding: '/dashboard/funding',
-  courses: '/courses',
-  mentorship: '/dashboard/mentorship',
+  community: '/dashboard?section=community-hub',
+  signals: '/dashboard?section=signals',
+  funding: '/dashboard?section=funding',
+  courses: '/dashboard?section=courses',
+  mentorship: '/dashboard?section=mentorship',
+  gold_to_glory: '/dashboard?section=gold-to-glory',
+  elite_membership: '/dashboard?section=elite-membership',
+  vip_membership: '/dashboard?section=vip-membership',
 }
 
+const PAID_SERVICES = new Set<ServiceKey>([
+  'signals',
+  'gold_to_glory',
+  'elite_membership',
+  'vip_membership',
+])
+const INCLUDED_SERVICES = new Set<ServiceKey>(['community', 'funding', 'courses', 'mentorship'])
+const COMING_SOON_SERVICES = new Set<ServiceKey>(['auto_trader' as ServiceKey])
+
 export function ServicesGrid({ services, unlocked, onCheckout }: ServicesGridProps) {
+  const [availability, setAvailability] = useState<Record<string, boolean>>({})
+  const [loading, setLoading] = useState(true)
+  const serviceList = Array.isArray(services) ? services : []
+
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const res = await fetch('/api/products/availability', { cache: 'no-store' })
+        if (!res.ok) throw new Error('Failed availability fetch')
+        const json = await res.json()
+        if (mounted) {
+          setAvailability(json?.availability || {})
+        }
+      } catch {
+        if (mounted) {
+          const fallback: Record<string, boolean> = {}
+          PAID_SERVICES.forEach((k) => (fallback[k] = false))
+          setAvailability(fallback)
+        }
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    })()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {services.map((service) => {
+      {serviceList.map((service) => {
         const isUnlocked = !!unlocked[service.key]
         const isCommunity = service.key === 'community'
+        const isPaid = PAID_SERVICES.has(service.key)
+        const isIncluded = INCLUDED_SERVICES.has(service.key)
+        const isComingSoon = COMING_SOON_SERVICES.has(service.key)
+        const isAvailable = availability[service.key]
+        const isChecking = isPaid && loading
 
         return (
           <div
@@ -58,7 +108,11 @@ export function ServicesGrid({ services, unlocked, onCheckout }: ServicesGridPro
               {!isUnlocked && <Lock className="h-4 w-4 text-gold-400" aria-label="Locked" />}
             </div>
             <p className="text-gray-300 text-sm mt-3 mb-6">{service.description}</p>
-            {isUnlocked ? (
+            {isComingSoon ? (
+              <div className="inline-flex items-center justify-center rounded-md border border-white/20 px-4 py-2 text-sm text-gray-300">
+                Coming Soon
+              </div>
+            ) : isIncluded || isUnlocked ? (
               <Link
                 href={PATHS[service.key]}
                 className="inline-flex items-center justify-center rounded-md bg-gold-500 text-black px-4 py-2 font-semibold hover:bg-gold-600 transition"
@@ -66,14 +120,24 @@ export function ServicesGrid({ services, unlocked, onCheckout }: ServicesGridPro
                 Enter
                 <ArrowUpRight className="h-4 w-4 ml-2" />
               </Link>
+            ) : isPaid ? (
+              isAvailable ? (
+                <Button
+                  onClick={() => onCheckout(service.key)}
+                  className="bg-gold-500 text-black font-semibold hover:bg-gold-600"
+                  title="Unlock this feature to gain full access."
+                >
+                  Unlock Access
+                </Button>
+              ) : (
+                <div className="inline-flex items-center justify-center rounded-md border border-white/20 px-4 py-2 text-sm text-gray-300">
+                  {isChecking ? 'Checking...' : 'Coming Soon'}
+                </div>
+              )
             ) : (
-              <Button
-                onClick={() => onCheckout(service.key)}
-                className="bg-gold-500 text-black font-semibold hover:bg-gold-600"
-                title="Unlock this feature to gain full access."
-              >
-                Unlock Access
-              </Button>
+              <div className="inline-flex items-center justify-center rounded-md border border-white/20 px-4 py-2 text-sm text-gray-300">
+                Unavailable
+              </div>
             )}
 
             {!isUnlocked && (
@@ -82,14 +146,26 @@ export function ServicesGrid({ services, unlocked, onCheckout }: ServicesGridPro
                   <Lock className="h-4 w-4" aria-label="Locked" />
                   <span>Locked Feature</span>
                 </div>
-                <p className="text-xs text-gray-300 px-4 text-center">Unlock this feature to gain full access.</p>
-                <Button
-                  onClick={() => onCheckout(service.key)}
-                  className="bg-gold-500 text-black font-semibold hover:bg-gold-600"
-                  title="Unlock this feature to gain full access."
-                >
-                  Unlock Access
-                </Button>
+                <p className="text-xs text-gray-300 px-4 text-center">
+                  {isComingSoon
+                    ? 'Coming soon.'
+                    : isPaid
+                      ? isAvailable
+                        ? 'Unlock this feature to gain full access.'
+                        : isChecking
+                          ? 'Checking availability...'
+                          : 'Coming soon.'
+                      : 'Included for members.'}
+                </p>
+                {isPaid && !isComingSoon && isAvailable && (
+                  <Button
+                    onClick={() => onCheckout(service.key)}
+                    className="bg-gold-500 text-black font-semibold hover:bg-gold-600"
+                    title="Unlock this feature to gain full access."
+                  >
+                    Unlock Access
+                  </Button>
+                )}
               </div>
             )}
           </div>
