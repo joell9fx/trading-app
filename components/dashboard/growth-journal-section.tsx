@@ -470,14 +470,14 @@ export function GrowthJournalSection() {
   };
 
   const inputClass =
-    'w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-500/50';
-  const labelClass = 'block text-sm font-medium text-gray-300 mb-1.5';
+    'w-full rounded-lg border border-border bg-panel px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50';
+  const labelClass = 'block text-sm font-medium text-muted-foreground mb-1.5';
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-white">Growth Journal</h1>
-        <p className="mt-1 text-gray-400 text-sm sm:text-base">
+        <p className="mt-1 text-muted-foreground text-sm sm:text-base">
           Log trades, tag strategies and sessions, and track performance with R-multiples and lessons learned.
         </p>
       </div>
@@ -489,7 +489,7 @@ export function GrowthJournalSection() {
       )}
 
       {loading && (
-        <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-8 text-center text-gray-400 text-sm">
+        <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-8 text-center text-muted-foreground text-sm">
           Loading journal entries…
         </div>
       )}
@@ -498,13 +498,13 @@ export function GrowthJournalSection() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <Card className="border-white/10 bg-white/5 rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider">Entries</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Entries</p>
             <p className="text-xl font-bold text-white mt-0.5">{analytics.totalEntries}</p>
           </CardContent>
         </Card>
         <Card className="border-white/10 bg-white/5 rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider flex items-center gap-1">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1">
               <ChartBarIcon className="h-3.5 w-3.5" /> Total R
             </p>
             <p className="text-xl font-bold text-white mt-0.5">{analytics.totalR.toFixed(1)}</p>
@@ -512,13 +512,13 @@ export function GrowthJournalSection() {
         </Card>
         <Card className="border-white/10 bg-white/5 rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider">Avg R</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Avg R</p>
             <p className="text-xl font-bold text-white mt-0.5">{analytics.avgR.toFixed(1)}</p>
           </CardContent>
         </Card>
         <Card className="border-white/10 bg-white/5 rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider flex items-center gap-1">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1">
               <TrophyIcon className="h-3.5 w-3.5" /> Best strategy
             </p>
             <p className="text-sm font-semibold text-gold-400 mt-0.5 truncate" title={analytics.bestStrategy}>
@@ -528,7 +528,7 @@ export function GrowthJournalSection() {
         </Card>
         <Card className="border-white/10 bg-white/5 rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider flex items-center gap-1">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1">
               <ClockIcon className="h-3.5 w-3.5" /> Best session
             </p>
             <p className="text-sm font-semibold text-gold-400 mt-0.5 truncate" title={analytics.bestSession}>
@@ -538,10 +538,10 @@ export function GrowthJournalSection() {
         </Card>
         <Card className="border-white/10 bg-white/5 rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider flex items-center gap-1">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1">
               <ExclamationTriangleIcon className="h-3.5 w-3.5" /> Top mistake
             </p>
-            <p className="text-sm text-gray-300 mt-0.5 line-clamp-2" title={analytics.topMistakes[0]?.phrase}>
+            <p className="text-sm text-foreground/80 mt-0.5 line-clamp-2" title={analytics.topMistakes[0]?.phrase}>
               {analytics.topMistakes[0]?.phrase ?? '—'}
             </p>
           </CardContent>
@@ -570,7 +570,7 @@ export function GrowthJournalSection() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="text-gray-400 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={handleCancelEdit}
               >
                 Cancel
@@ -783,18 +783,18 @@ export function GrowthJournalSection() {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="border-white/20 text-gray-200 hover:bg-white/10"
+                className="border-border text-foreground/90 hover:bg-panel"
                 onClick={() => document.getElementById('journal-screenshot-upload')?.click()}
               >
                 Choose image
               </Button>
               {screenshotFile && (
-                <span className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="flex items-center gap-2 text-sm text-foreground/80">
                   <span className="truncate max-w-[180px]" title={screenshotFile.name}>{screenshotFile.name}</span>
                   <button
                     type="button"
                     onClick={() => { setScreenshotFile(null); setScreenshotError(null); }}
-                    className="p-0.5 rounded hover:bg-white/10 text-gray-400 hover:text-white"
+                    className="p-0.5 rounded hover:bg-panel text-muted-foreground hover:text-foreground"
                     aria-label="Remove selected file"
                   >
                     <XMarkIcon className="h-4 w-4" />
@@ -813,14 +813,14 @@ export function GrowthJournalSection() {
                     e.currentTarget.nextElementSibling?.classList.remove('hidden');
                   }}
                 />
-                <span className="hidden text-xs text-gray-500 self-center" aria-hidden>
+                <span className="hidden text-xs text-muted-foreground self-center" aria-hidden>
                   Image could not be loaded
                 </span>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="text-gray-400 hover:text-red-400 hover:bg-red-500/10 shrink-0"
+                  className="text-muted-foreground hover:text-red-400 hover:bg-red-500/10 shrink-0"
                   onClick={() => setForm((f) => ({ ...f, screenshotUrl: '' }))}
                 >
                   Remove screenshot
@@ -830,7 +830,7 @@ export function GrowthJournalSection() {
             {screenshotError && (
               <p className="text-sm text-red-400 mt-1">{screenshotError}</p>
             )}
-            <p className="text-xs text-gray-500 mt-1">JPEG, PNG, WebP or GIF, max 5MB. Or paste a URL below.</p>
+            <p className="text-xs text-muted-foreground mt-1">JPEG, PNG, WebP or GIF, max 5MB. Or paste a URL below.</p>
             <input
               type="url"
               value={form.screenshotUrl}
@@ -892,7 +892,7 @@ export function GrowthJournalSection() {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="border-white/20 text-gray-300"
+                className="border-border text-foreground/80"
                 onClick={handleCancelEdit}
                 disabled={saving}
               >
@@ -913,11 +913,11 @@ export function GrowthJournalSection() {
         </CardHeader>
         <CardContent className="p-5 sm:p-6">
           {loading ? (
-            <div className="py-10 text-center text-gray-400 text-sm">Loading entries…</div>
+            <div className="py-10 text-center text-muted-foreground text-sm">Loading entries…</div>
           ) : entries.length === 0 ? (
             <div className="py-10 text-center">
-              <p className="text-gray-400 text-sm">No entries yet.</p>
-              <p className="text-gray-500 text-xs mt-1">Add one above to start your trading journal and see analytics here.</p>
+              <p className="text-muted-foreground text-sm">No entries yet.</p>
+              <p className="text-muted-foreground text-xs mt-1">Add one above to start your trading journal and see analytics here.</p>
             </div>
           ) : (
             <ul className="space-y-4">
@@ -929,7 +929,7 @@ export function GrowthJournalSection() {
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <span className="font-semibold text-white">{entry.title}</span>
-                      <span className="text-gray-500 text-sm ml-2">
+                      <span className="text-muted-foreground text-sm ml-2">
                         {new Date(entry.date).toLocaleDateString()}
                         {entry.pair && ` · ${entry.pair}`}
                         {entry.session && ` · ${entry.session}`}
@@ -942,12 +942,12 @@ export function GrowthJournalSection() {
                         </span>
                       )}
                       {entry.mood && (
-                        <span className="text-xs text-gray-400">{entry.mood}</span>
+                        <span className="text-xs text-muted-foreground">{entry.mood}</span>
                       )}
                       <div className="flex items-center gap-1 ml-1">
                         <Link
                           href={`/dashboard/trade-review/${entry.id}`}
-                          className="inline-flex items-center justify-center h-8 w-8 rounded-md text-gray-400 hover:text-gold-400 hover:bg-white/10 transition"
+                          className="inline-flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-primary hover:bg-panel transition"
                           title="Review trade"
                           aria-label="Review trade"
                         >
@@ -957,7 +957,7 @@ export function GrowthJournalSection() {
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 text-gray-400 hover:text-gold-400 hover:bg-white/10"
+                          className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-panel"
                           onClick={() => handleEdit(entry)}
                           disabled={deletingEntryId === entry.id}
                           aria-label="Edit entry"
@@ -968,7 +968,7 @@ export function GrowthJournalSection() {
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="min-w-[2rem] h-8 px-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
+                          className="min-w-[2rem] h-8 px-2 text-muted-foreground hover:text-red-400 hover:bg-red-500/10"
                           onClick={() => handleDelete(entry)}
                           disabled={deletingEntryId !== null}
                           aria-label="Delete entry"
@@ -985,10 +985,10 @@ export function GrowthJournalSection() {
                   {(entry.strategyUsed || entry.tradeId) && (
                     <div className="flex flex-wrap gap-2 text-xs">
                       {entry.strategyUsed && (
-                        <span className="px-2 py-0.5 rounded bg-white/10 text-gray-300">{entry.strategyUsed}</span>
+                        <span className="px-2 py-0.5 rounded bg-white/10 text-foreground/80">{entry.strategyUsed}</span>
                       )}
                       {entry.tradeId && (
-                        <span className="text-gray-500">ID: {entry.tradeId}</span>
+                        <span className="text-muted-foreground">ID: {entry.tradeId}</span>
                       )}
                     </div>
                   )}
@@ -998,15 +998,15 @@ export function GrowthJournalSection() {
                         <span className="px-2 py-0.5 rounded bg-gold-500/20 text-gold-300">{entry.setupType}</span>
                       )}
                       {entry.timeframe && (
-                        <span className="px-2 py-0.5 rounded bg-white/10 text-gray-300">{entry.timeframe}</span>
+                        <span className="px-2 py-0.5 rounded bg-white/10 text-foreground/80">{entry.timeframe}</span>
                       )}
                       {entry.bias && (
-                        <span className={`px-2 py-0.5 rounded ${entry.bias.toLowerCase() === 'bullish' ? 'bg-emerald-500/20 text-emerald-300' : entry.bias.toLowerCase() === 'bearish' ? 'bg-red-500/20 text-red-300' : 'bg-white/10 text-gray-300'}`}>
+                        <span className={`px-2 py-0.5 rounded ${entry.bias.toLowerCase() === 'bullish' ? 'bg-emerald-500/20 text-emerald-300' : entry.bias.toLowerCase() === 'bearish' ? 'bg-red-500/20 text-red-300' : 'bg-white/10 text-foreground/80'}`}>
                           {entry.bias}
                         </span>
                       )}
                       {entry.confidenceScore != null && (
-                        <span className="text-gray-500">Conf: {entry.confidenceScore}</span>
+                        <span className="text-muted-foreground">Conf: {entry.confidenceScore}</span>
                       )}
                       {entry.ruleFollowed === true && (
                         <span className="text-emerald-400">Rule ✓</span>
@@ -1015,16 +1015,16 @@ export function GrowthJournalSection() {
                         <span className="text-amber-400">Rule ✗</span>
                       )}
                       {entry.executionQuality != null && (
-                        <span className="text-gray-500">Exec: {entry.executionQuality}</span>
+                        <span className="text-muted-foreground">Exec: {entry.executionQuality}</span>
                       )}
                     </div>
                   )}
                   {entry.lessonLearned && (
-                    <p className="text-gray-300 text-sm line-clamp-2">{entry.lessonLearned}</p>
+                    <p className="text-foreground/80 text-sm line-clamp-2">{entry.lessonLearned}</p>
                   )}
                   {entry.mistakesMade && (
-                    <p className="text-gray-400 text-xs line-clamp-1">
-                      <span className="text-gray-500">Mistakes:</span> {entry.mistakesMade}
+                    <p className="text-muted-foreground text-xs line-clamp-1">
+                      <span className="text-muted-foreground">Mistakes:</span> {entry.mistakesMade}
                     </p>
                   )}
                   {entry.screenshotUrl && (

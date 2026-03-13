@@ -5,7 +5,7 @@ import { BookOpen, Play, Users, Clock, Star, Award, TrendingUp, Target, Shield }
 
 export default function CoursesPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
+    <div className="min-h-screen bg-page">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"></div>
@@ -13,16 +13,16 @@ export default function CoursesPage() {
           <div className="py-24 sm:py-32">
             <div className="text-center">
               <div className="mb-8">
-                <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                <span className="inline-flex items-center rounded-full bg-accent-muted px-3 py-1 text-sm font-medium text-primary">
                   <BookOpen className="mr-1 h-4 w-4" />
                   Master Trading
                 </span>
               </div>
-              <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl lg:text-7xl">
+              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl">
                 Learn Trading from
                 <span className="gradient-text block">Industry Experts</span>
               </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600 dark:text-gray-300">
+              <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
                 Comprehensive trading courses designed to take you from beginner to advanced trader. Learn proven strategies, risk management, and market analysis.
               </p>
               <div className="mt-10 flex items-center justify-center gap-x-6">
@@ -43,13 +43,13 @@ export default function CoursesPage() {
       </section>
 
       {/* Course Categories */}
-      <section className="py-24 sm:py-32 bg-gray-900">
+      <section className="py-24 sm:py-32 bg-surface">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Course Categories
             </h2>
-            <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
+            <p className="mt-6 text-lg leading-8 text-muted-foreground">
               Choose from our comprehensive range of trading courses designed for all skill levels.
             </p>
           </div>
@@ -61,12 +61,12 @@ export default function CoursesPage() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
                     <Target className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Beginner</h3>
+                  <h3 className="text-xl font-semibold text-foreground">Beginner</h3>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                <p className="text-muted-foreground mb-4">
                   Perfect for those new to trading. Learn the fundamentals, terminology, and basic strategies.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-blue-500"></div>
                     Market basics and terminology
@@ -87,12 +87,12 @@ export default function CoursesPage() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900">
                     <TrendingUp className="h-6 w-6 text-green-600 dark:text-green-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Intermediate</h3>
+                  <h3 className="text-xl font-semibold text-foreground">Intermediate</h3>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                <p className="text-muted-foreground mb-4">
                   For traders with some experience. Master advanced strategies and technical analysis.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-green-500"></div>
                     Advanced technical analysis
@@ -113,12 +113,12 @@ export default function CoursesPage() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900">
                     <Award className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Advanced</h3>
+                  <h3 className="text-xl font-semibold text-foreground">Advanced</h3>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                <p className="text-muted-foreground mb-4">
                   Expert-level courses for professional traders. Master complex strategies and market psychology.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-purple-500"></div>
                     Algorithmic trading
@@ -139,13 +139,13 @@ export default function CoursesPage() {
       </section>
 
       {/* Featured Courses */}
-      <section className="py-24 sm:py-32 bg-gray-800">
+      <section className="py-24 sm:py-32 bg-panel">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Featured Courses
             </h2>
-            <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
+            <p className="mt-6 text-lg leading-8 text-muted-foreground">
               Our most popular and highly-rated courses to accelerate your trading journey.
             </p>
           </div>
@@ -166,10 +166,10 @@ export default function CoursesPage() {
                       <span className="text-sm text-gray-600 dark:text-gray-400">4.9 (2.1k)</span>
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
                     Trading Fundamentals Masterclass
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  <p className="text-sm text-muted-foreground mb-4">
                     Master the basics of trading with this comprehensive course covering market mechanics, risk management, and basic strategies.
                   </p>
                   <div className="flex items-center justify-between">
@@ -202,10 +202,10 @@ export default function CoursesPage() {
                       <span className="text-sm text-gray-600 dark:text-gray-400">4.8 (1.8k)</span>
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
                     Technical Analysis Pro
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  <p className="text-sm text-muted-foreground mb-4">
                     Learn advanced chart patterns, indicators, and technical analysis techniques used by professional traders.
                   </p>
                   <div className="flex items-center justify-between">
@@ -238,10 +238,10 @@ export default function CoursesPage() {
                       <span className="text-sm text-gray-600 dark:text-gray-400">4.9 (956)</span>
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
                     Risk Management Excellence
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  <p className="text-sm text-muted-foreground mb-4">
                     Master the art of risk management and position sizing to protect your capital and maximize returns.
                   </p>
                   <div className="flex items-center justify-between">
@@ -265,13 +265,13 @@ export default function CoursesPage() {
       </section>
 
       {/* Learning Path */}
-      <section className="py-24 sm:py-32 bg-gray-900">
+      <section className="py-24 sm:py-32 bg-surface">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Your Learning Path
             </h2>
-            <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
+            <p className="mt-6 text-lg leading-8 text-muted-foreground">
               Follow our structured learning path to become a confident and successful trader.
             </p>
           </div>
@@ -287,10 +287,10 @@ export default function CoursesPage() {
                     1
                   </div>
                   <div className="flex-1 pt-2">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
                       Foundation Building
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300">
+                    <p className="text-muted-foreground">
                       Start with market basics, terminology, and fundamental concepts. Complete our beginner courses to build a solid foundation.
                     </p>
                   </div>
@@ -301,10 +301,10 @@ export default function CoursesPage() {
                     2
                   </div>
                   <div className="flex-1 pt-2">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
                       Skill Development
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300">
+                    <p className="text-muted-foreground">
                       Master technical analysis, chart patterns, and trading strategies. Practice with paper trading and small positions.
                     </p>
                   </div>
@@ -315,10 +315,10 @@ export default function CoursesPage() {
                     3
                   </div>
                   <div className="flex-1 pt-2">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
                       Advanced Mastery
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300">
+                    <p className="text-muted-foreground">
                       Learn advanced strategies, risk management, and market psychology. Develop your own trading system and style.
                     </p>
                   </div>
@@ -329,10 +329,10 @@ export default function CoursesPage() {
                     4
                   </div>
                   <div className="flex-1 pt-2">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
                       Continuous Growth
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300">
+                    <p className="text-muted-foreground">
                       Stay updated with market trends, new strategies, and continuous learning. Join our community for ongoing support.
                     </p>
                   </div>

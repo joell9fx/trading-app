@@ -151,13 +151,13 @@ export function PerformanceEngineSection() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Performance Engine</h1>
-          <p className="mt-1 text-gray-400 text-sm sm:text-base">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Performance Engine</h1>
+          <p className="mt-1 text-muted-foreground text-sm sm:text-base">
             Equity curve, drawdown, profit factor, and expectancy from your journal.
           </p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/5 p-8 flex items-center justify-center min-h-[200px]">
-          <p className="text-gray-400 text-sm">Loading…</p>
+        <div className="rounded-xl border border-border-subtle bg-panel p-8 flex items-center justify-center min-h-[200px]">
+          <p className="text-muted-foreground text-sm">Loading…</p>
         </div>
       </div>
     );
@@ -167,8 +167,8 @@ export function PerformanceEngineSection() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Performance Engine</h1>
-          <p className="mt-1 text-gray-400 text-sm sm:text-base">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Performance Engine</h1>
+          <p className="mt-1 text-muted-foreground text-sm sm:text-base">
             Equity curve, drawdown, profit factor, and expectancy from your journal.
           </p>
         </div>
@@ -185,22 +185,22 @@ export function PerformanceEngineSection() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Performance Engine</h1>
-          <p className="mt-1 text-gray-400 text-sm sm:text-base">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Performance Engine</h1>
+          <p className="mt-1 text-muted-foreground text-sm sm:text-base">
             Equity curve, drawdown, profit factor, and expectancy from your journal.
           </p>
         </div>
-        <Card className="border-white/10 bg-white/5 rounded-xl overflow-hidden">
+        <Card className="border-border-subtle bg-panel rounded-xl overflow-hidden">
           <CardContent className="p-8 flex flex-col items-center justify-center min-h-[280px] text-center">
-            <ChartBarIcon className="h-12 w-12 text-gray-500 mb-4" />
+            <ChartBarIcon className="h-12 w-12 text-muted-foreground mb-4" />
             <h2 className="text-lg font-semibold text-white mb-2">No journal data yet</h2>
-            <p className="text-gray-400 text-sm max-w-md mb-6">
+            <p className="text-muted-foreground text-sm max-w-md mb-6">
               Add trades in the Growth Journal with result (R) to see equity curve, drawdown, and
               performance metrics.
             </p>
             <Link
               href="/dashboard?section=journal"
-              className="inline-flex items-center gap-2 rounded-lg bg-gold-500 px-4 py-2.5 text-sm font-semibold text-black hover:bg-gold-400 transition"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-accent-hover transition"
             >
               <BookOpenIcon className="h-5 w-5" />
               Open Growth Journal
@@ -223,21 +223,21 @@ export function PerformanceEngineSection() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-white">Performance Engine</h1>
-        <p className="mt-1 text-gray-400 text-sm sm:text-base">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Performance Engine</h1>
+        <p className="mt-1 text-muted-foreground text-sm sm:text-base">
           Equity curve, drawdown, profit factor, and expectancy from your journal.
         </p>
       </div>
 
       {/* Filters */}
-      <Card className="border-white/10 bg-white/5 rounded-xl overflow-hidden">
+      <Card className="border-border-subtle bg-panel rounded-xl overflow-hidden">
         <CardHeader className="pb-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-              <FunnelIcon className="h-4 w-4 text-gold-400" />
+              <FunnelIcon className="h-4 w-4 text-primary" />
               Filters
               {filteredRows.length < rows.length && (
-                <span className="text-xs font-normal text-gray-400">
+                <span className="text-xs font-normal text-muted-foreground">
                   Showing {filteredRows.length} of {rows.length} entries
                 </span>
               )}
@@ -247,7 +247,7 @@ export function PerformanceEngineSection() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="text-gray-400 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
                 onClick={clearFilters}
               >
                 <XMarkIcon className="h-4 w-4 mr-1.5" />
@@ -259,32 +259,32 @@ export function PerformanceEngineSection() {
         <CardContent className="pt-0">
           <div className="flex flex-wrap items-end gap-3 sm:gap-4">
             <div className="flex flex-col gap-1">
-              <label htmlFor="pe-date-from" className="text-xs text-gray-400">Date from</label>
+              <label htmlFor="pe-date-from" className="text-xs text-muted-foreground">Date from</label>
               <input
                 id="pe-date-from"
                 type="date"
                 value={filters.dateFrom}
                 onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white min-w-[140px] focus:outline-none focus:ring-2 focus:ring-gold-500/50"
+                className="rounded-lg border border-border bg-panel px-3 py-2 text-sm text-foreground min-w-[140px] focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label htmlFor="pe-date-to" className="text-xs text-gray-400">Date to</label>
+              <label htmlFor="pe-date-to" className="text-xs text-muted-foreground">Date to</label>
               <input
                 id="pe-date-to"
                 type="date"
                 value={filters.dateTo}
                 onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white min-w-[140px] focus:outline-none focus:ring-2 focus:ring-gold-500/50"
+                className="rounded-lg border border-border bg-panel px-3 py-2 text-sm text-foreground min-w-[140px] focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label htmlFor="pe-pair" className="text-xs text-gray-400">Pair</label>
+              <label htmlFor="pe-pair" className="text-xs text-muted-foreground">Pair</label>
               <select
                 id="pe-pair"
                 value={filters.pair}
                 onChange={(e) => handleFilterChange('pair', e.target.value)}
-                className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white min-w-[120px] focus:outline-none focus:ring-2 focus:ring-gold-500/50"
+                className="rounded-lg border border-border bg-panel px-3 py-2 text-sm text-foreground min-w-[120px] focus:outline-none focus:ring-2 focus:ring-primary/50"
               >
                 <option value={ALL_FILTER}>All</option>
                 {filterOptions.pairs.map((o) => (
@@ -293,12 +293,12 @@ export function PerformanceEngineSection() {
               </select>
             </div>
             <div className="flex flex-col gap-1">
-              <label htmlFor="pe-session" className="text-xs text-gray-400">Session</label>
+              <label htmlFor="pe-session" className="text-xs text-muted-foreground">Session</label>
               <select
                 id="pe-session"
                 value={filters.session}
                 onChange={(e) => handleFilterChange('session', e.target.value)}
-                className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white min-w-[120px] focus:outline-none focus:ring-2 focus:ring-gold-500/50"
+                className="rounded-lg border border-border bg-panel px-3 py-2 text-sm text-foreground min-w-[120px] focus:outline-none focus:ring-2 focus:ring-primary/50"
               >
                 <option value={ALL_FILTER}>All</option>
                 {filterOptions.sessions.map((o) => (
@@ -311,7 +311,7 @@ export function PerformanceEngineSection() {
       </Card>
 
       {hasActiveFilters && filteredRows.length === 0 && (
-        <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
+        <div className="rounded-xl border border-primary/20 bg-accent-muted px-4 py-3 text-sm text-primary">
           No entries match the current filters. Clear filters or adjust your selection.
         </div>
       )}
@@ -320,33 +320,33 @@ export function PerformanceEngineSection() {
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="border-white/10 bg-white/5 rounded-xl">
+            <Card className="border-border-subtle bg-panel rounded-xl">
               <CardContent className="p-4">
-                <p className="text-xs text-gray-400 uppercase tracking-wider">Total R</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Total R</p>
                 <p className={`text-2xl font-bold mt-1 ${metrics.totalR >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                   {formatR(metrics.totalR)}
                 </p>
               </CardContent>
             </Card>
-            <Card className="border-white/10 bg-white/5 rounded-xl">
+            <Card className="border-border-subtle bg-panel rounded-xl">
               <CardContent className="p-4">
-                <p className="text-xs text-gray-400 uppercase tracking-wider">Profit factor</p>
-                <p className="text-2xl font-bold text-white mt-1">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Profit factor</p>
+                <p className="text-2xl font-bold text-foreground mt-1">
                   {metrics.profitFactor != null ? metrics.profitFactor.toFixed(2) : '—'}
                 </p>
               </CardContent>
             </Card>
-            <Card className="border-white/10 bg-white/5 rounded-xl">
+            <Card className="border-border-subtle bg-panel rounded-xl">
               <CardContent className="p-4">
-                <p className="text-xs text-gray-400 uppercase tracking-wider">Expectancy</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Expectancy</p>
                 <p className={`text-2xl font-bold mt-1 ${metrics.expectancy >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {formatR(metrics.expectancy)} <span className="text-sm font-normal text-gray-400">/ trade</span>
+                  {formatR(metrics.expectancy)} <span className="text-sm font-normal text-muted-foreground">/ trade</span>
                 </p>
               </CardContent>
             </Card>
-            <Card className="border-white/10 bg-white/5 rounded-xl">
+            <Card className="border-border-subtle bg-panel rounded-xl">
               <CardContent className="p-4">
-                <p className="text-xs text-gray-400 uppercase tracking-wider">Max drawdown</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Max drawdown</p>
                 <p className="text-2xl font-bold text-red-400 mt-1">
                   {metrics.maxDrawdown > 0 ? `-${metrics.maxDrawdown.toFixed(1)}R` : '0'}
                 </p>
@@ -356,47 +356,47 @@ export function PerformanceEngineSection() {
 
           {/* Secondary metrics */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            <Card className="border-white/10 bg-white/5 rounded-xl">
+            <Card className="border-border-subtle bg-panel rounded-xl">
               <CardContent className="p-3">
-                <p className="text-xs text-gray-500">Avg win</p>
+                <p className="text-xs text-muted-foreground">Avg win</p>
                 <p className="text-lg font-semibold text-emerald-400">
                   {metrics.averageWin != null ? formatR(metrics.averageWin) : '—'}
                 </p>
               </CardContent>
             </Card>
-            <Card className="border-white/10 bg-white/5 rounded-xl">
+            <Card className="border-border-subtle bg-panel rounded-xl">
               <CardContent className="p-3">
-                <p className="text-xs text-gray-500">Avg loss</p>
+                <p className="text-xs text-muted-foreground">Avg loss</p>
                 <p className="text-lg font-semibold text-red-400">
                   {metrics.averageLoss != null ? formatR(metrics.averageLoss) : '—'}
                 </p>
               </CardContent>
             </Card>
-            <Card className="border-white/10 bg-white/5 rounded-xl">
+            <Card className="border-border-subtle bg-panel rounded-xl">
               <CardContent className="p-3">
-                <p className="text-xs text-gray-500">Win streak</p>
+                <p className="text-xs text-muted-foreground">Win streak</p>
                 <p className="text-lg font-semibold text-white">{metrics.largestWinningStreak}</p>
               </CardContent>
             </Card>
-            <Card className="border-white/10 bg-white/5 rounded-xl">
+            <Card className="border-border-subtle bg-panel rounded-xl">
               <CardContent className="p-3">
-                <p className="text-xs text-gray-500">Loss streak</p>
+                <p className="text-xs text-muted-foreground">Loss streak</p>
                 <p className="text-lg font-semibold text-white">{metrics.largestLosingStreak}</p>
               </CardContent>
             </Card>
-            <Card className="border-white/10 bg-white/5 rounded-xl">
+            <Card className="border-border-subtle bg-panel rounded-xl">
               <CardContent className="p-3">
-                <p className="text-xs text-gray-500">Risk consistency</p>
+                <p className="text-xs text-muted-foreground">Risk consistency</p>
                 <p className="text-lg font-semibold text-white">{metrics.riskConsistency}</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Equity curve */}
-          <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-            <CardHeader className="border-b border-white/10 pb-4">
+          <Card className="border-border-subtle bg-panel rounded-2xl overflow-hidden">
+            <CardHeader className="border-b border-border-subtle pb-4">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <ArrowTrendingUpIcon className="h-5 w-5 text-gold-400" />
+                <ArrowTrendingUpIcon className="h-5 w-5 text-primary" />
                 Equity curve (cumulative R)
               </h2>
             </CardHeader>
@@ -443,8 +443,8 @@ export function PerformanceEngineSection() {
           </Card>
 
           {/* Drawdown curve */}
-          <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-            <CardHeader className="border-b border-white/10 pb-4">
+          <Card className="border-border-subtle bg-panel rounded-2xl overflow-hidden">
+            <CardHeader className="border-b border-border-subtle pb-4">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                 <ArrowTrendingDownIcon className="h-5 w-5 text-red-400" />
                 Drawdown curve
@@ -494,8 +494,8 @@ export function PerformanceEngineSection() {
 
           {/* Monthly R */}
           {metrics.monthlyR.length > 0 && (
-            <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-              <CardHeader className="border-b border-white/10 pb-4">
+            <Card className="border-border-subtle bg-panel rounded-2xl overflow-hidden">
+              <CardHeader className="border-b border-border-subtle pb-4">
                 <h2 className="text-lg font-semibold text-white">Monthly R performance</h2>
               </CardHeader>
               <CardContent className="p-6">
@@ -554,14 +554,14 @@ export function PerformanceEngineSection() {
       <div className="flex flex-wrap gap-3 text-sm">
         <Link
           href="/dashboard?section=journal"
-          className="inline-flex items-center gap-2 text-gold-400 hover:text-gold-300"
+          className="inline-flex items-center gap-2 text-primary hover:text-accent-hover"
         >
           <BookOpenIcon className="h-4 w-4" />
           Growth Journal
         </Link>
         <Link
           href="/dashboard?section=analytics"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white"
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"
         >
           <ChartBarIcon className="h-4 w-4" />
           Performance Analytics

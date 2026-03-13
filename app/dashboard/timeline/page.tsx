@@ -90,22 +90,22 @@ export default async function TimelinePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-4 md:p-6 space-y-4">
+    <div className="min-h-screen bg-page text-foreground p-4 md:p-6 space-y-4">
       <h1 className="text-3xl font-bold">Vision Timeline</h1>
-      <p className="text-gray-400">Every trade, every lesson — your journey is your edge.</p>
+      <p className="text-muted-foreground">Every trade, every lesson — your journey is your edge.</p>
 
       <Card className="bg-neutral-900 border border-gold-500/40 p-4">
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-gold-400 font-bold">Current Tier: {tier}</h3>
-          <p className="text-sm text-gray-400">XP: {xp}</p>
+          <p className="text-sm text-muted-foreground">XP: {xp}</p>
         </div>
-        <Progress value={Math.min((xp / 1000) * 100, 100)} className="bg-gray-700 h-3" />
+        <Progress value={Math.min((xp / 1000) * 100, 100)} className="bg-elevated h-3" />
       </Card>
 
       {aiSummary && (
         <Card className="bg-neutral-900 border border-gold-500/30 p-4">
           <h3 className="text-gold-400 font-semibold mb-2">🧠 AI Perspective</h3>
-          <p className="text-gray-200 whitespace-pre-line text-sm">{aiSummary}</p>
+          <p className="text-foreground/90 whitespace-pre-line text-sm">{aiSummary}</p>
         </Card>
       )}
 

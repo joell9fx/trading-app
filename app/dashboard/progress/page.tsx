@@ -62,11 +62,11 @@ export default async function ProfileProgressPage() {
     <div className="bg-black text-white p-8 border border-gold rounded-2xl max-w-5xl mx-auto space-y-8 shadow-[0_0_25px_rgba(255,215,0,0.08)]">
       <div>
         <h1 className="text-3xl text-gold font-bold mb-2">🎯 Your Progress, {username}</h1>
-        <p className="text-gray-400">Track your journey and unlock new features as you grow.</p>
+        <p className="text-muted-foreground">Track your journey and unlock new features as you grow.</p>
       </div>
 
       <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm text-gray-400">
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>
             {unlockedCount} of {totalCount} features unlocked
           </span>
@@ -85,7 +85,7 @@ export default async function ProfileProgressPage() {
           <div
             key={f.name}
             className={`p-4 border rounded-xl flex items-center justify-between transition-transform hover:scale-[1.01] ${
-              f.unlocked ? 'border-green-500/60 bg-green-500/5' : 'border-gray-700 bg-neutral-950'
+              f.unlocked ? 'border-primary/60 bg-accent-muted' : 'border-border bg-panel'
             }`}
           >
             <p className="text-lg font-semibold">{f.name}</p>
@@ -104,7 +104,7 @@ export default async function ProfileProgressPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl text-gold font-semibold">Your XP & Achievements</h2>
-            <p className="text-gray-400 text-sm">Total XP: {xp}</p>
+            <p className="text-muted-foreground text-sm">Total XP: {xp}</p>
           </div>
           <Link href="/dashboard/upgrade" className="text-sm text-gold hover:underline">
             Unlock more to earn XP →
@@ -119,7 +119,7 @@ export default async function ProfileProgressPage() {
         </div>
       </div>
 
-      <div className="text-center text-gray-400 italic">
+      <div className="text-center text-muted-foreground italic">
         “Growth is built one trade, one lesson, and one unlock at a time.”
       </div>
     </div>

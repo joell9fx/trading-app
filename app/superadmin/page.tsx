@@ -21,7 +21,7 @@ export default function SuperAdminDashboard() {
             <h3 className="text-xl text-gold-300 font-bold mb-2 flex items-center gap-2">
               <span>{s.icon}</span> {s.name}
             </h3>
-            <p className="text-gray-300 text-sm">{s.desc}</p>
+            <p className="text-muted-foreground text-sm">{s.desc}</p>
           </Link>
         ))}
       </div>

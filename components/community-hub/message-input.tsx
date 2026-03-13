@@ -28,7 +28,7 @@ export function MessageInput({ value, onChange, onSend, onUpload, disabled, isSe
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Share an insight, ask a question, or drop a chart..."
-          className="min-h-[70px] bg-gray-900 border-gray-800 text-gray-100 placeholder:text-gray-500 focus:border-amber-400 focus:ring-amber-400"
+          className="min-h-[70px] bg-panel border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
           disabled={disabled}
         />
         <div className="flex flex-col gap-2">

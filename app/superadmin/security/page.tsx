@@ -58,20 +58,20 @@ export default function SuperAdminSecurityPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-semibold text-white">Security & Safety</h2>
-        <p className="text-sm text-gray-400">
+        <h2 className="text-xl font-semibold text-foreground">Security & Safety</h2>
+        <p className="text-sm text-muted-foreground">
           Trigger lockdown mode, revoke access, and view platform safety flags.
         </p>
       </div>
       {error && <div className="text-sm text-red-400">{error}</div>}
-      <div className="border border-gray-800 rounded-xl p-5 bg-neutral-950 space-y-4">
+      <div className="border border-border rounded-xl p-5 bg-panel space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gold-300">Lockdown Mode</h3>
-            <p className="text-sm text-gray-400">Disables payments/access while issues are investigated.</p>
+            <p className="text-sm text-muted-foreground">Disables payments/access while issues are investigated.</p>
           </div>
           <div className="flex items-center gap-2">
-            <Label className="text-gray-300">Lockdown</Label>
+            <Label className="text-foreground/80">Lockdown</Label>
             <Switch
               checked={!!flags.find((f) => f.key === 'lockdown')?.value}
               onCheckedChange={(v) => updateFlag('lockdown', v)}
@@ -79,8 +79,8 @@ export default function SuperAdminSecurityPage() {
             />
           </div>
         </div>
-        <div className="border-t border-gray-800 pt-4">
-          <Button variant="outline" className="border-gray-700 text-gray-200 hover:border-gold-500/60" onClick={load} disabled={loading}>
+        <div className="border-t border-border pt-4">
+          <Button variant="outline" className="border-border text-foreground/90 hover:border-primary/60" onClick={load} disabled={loading}>
             Refresh Flags
           </Button>
         </div>

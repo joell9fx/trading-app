@@ -49,8 +49,8 @@ function DashboardSuccessContent() {
   }, [refresh, router, searchParams, userId]);
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
-      <Card className="p-6 bg-white/5 border border-white/10 text-white">
+    <div className="min-h-screen bg-page flex items-center justify-center">
+      <Card className="p-6 bg-panel border border-border-subtle text-foreground">
         Updating your access... please wait.
       </Card>
     </div>
@@ -60,8 +60,8 @@ function DashboardSuccessContent() {
 export default function DashboardSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <Card className="p-6 bg-white/5 border border-white/10 text-white">
+      <div className="min-h-screen bg-page flex items-center justify-center">
+        <Card className="p-6 bg-panel border border-border-subtle text-foreground">
           Loading...
         </Card>
       </div>

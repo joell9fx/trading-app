@@ -16,9 +16,9 @@ type TimelineEvent = {
 const typeClass = (type: string) => {
   if (type === 'badge') return 'border-green-400'
   if (type === 'lesson') return 'border-blue-400'
-  if (type === 'journal') return 'border-gray-500'
-  if (type === 'start') return 'border-gold-500'
-  return 'border-gold-500'
+  if (type === 'journal') return 'border-border'
+  if (type === 'start') return 'border-primary'
+  return 'border-primary'
 }
 
 export function VisionTimelineClient({ timeline }: { timeline: TimelineEvent[] }) {
@@ -33,16 +33,16 @@ export function VisionTimelineClient({ timeline }: { timeline: TimelineEvent[] }
   }, [])
 
   return (
-    <Card className="bg-black border border-gold-500/40 p-6 rounded-2xl">
+    <Card className="bg-surface border border-primary/40 p-6 rounded-2xl">
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <h2 className="text-2xl text-gold-400 font-bold">🛤️ Your VisionEdge Journey</h2>
+        <h2 className="text-2xl text-primary font-bold">🛤️ Your VisionEdge Journey</h2>
         <div className="ml-auto flex gap-2 text-xs">
           {['all', 'journal', 'lesson', 'badge', 'start'].map((f) => (
             <Button
               key={f}
               size="sm"
               variant={filter === f ? 'default' : 'outline'}
-              className={filter === f ? 'bg-gold-500 text-black' : 'border-gray-700 text-gray-200'}
+              className={filter === f ? '' : 'border-border text-foreground/90'}
               onClick={() => setFilter(f)}
             >
               {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -51,7 +51,7 @@ export function VisionTimelineClient({ timeline }: { timeline: TimelineEvent[] }
         </div>
       </div>
 
-      <div className="relative border-l border-gold-500/40 ml-4">
+      <div className="relative border-l border-primary/40 ml-4">
         {filtered.map((event, i) => (
           <motion.div
             key={`${event.type}-${event.date}-${i}`}
@@ -60,20 +60,20 @@ export function VisionTimelineClient({ timeline }: { timeline: TimelineEvent[] }
             transition={{ delay: i * 0.03 }}
             className="mb-10 ml-6"
           >
-            <span className="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-gold-500 text-black shadow-[0_0_10px_rgba(255,215,0,0.4)]">
+            <span className="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_0_10px_hsl(var(--primary)/0.4)]">
               {event.icon || '•'}
             </span>
             <div className={`border-l-4 pl-3 ${typeClass(event.type)} border-opacity-60`}>
               <h3 className="text-lg font-semibold">{event.title}</h3>
-              <p className="text-gray-400 text-sm">{new Date(event.date).toLocaleDateString()}</p>
+              <p className="text-muted-foreground text-sm">{new Date(event.date).toLocaleDateString()}</p>
               {event.description && (
-                <p className="mt-1 text-gray-300 text-sm whitespace-pre-line line-clamp-3">{event.description}</p>
+                <p className="mt-1 text-foreground/80 text-sm whitespace-pre-line line-clamp-3">{event.description}</p>
               )}
             </div>
           </motion.div>
         ))}
         {filtered.length === 0 && (
-          <div className="text-gray-400 text-sm ml-6">No events match this filter yet.</div>
+          <div className="text-muted-foreground text-sm ml-6">No events match this filter yet.</div>
         )}
       </div>
     </Card>

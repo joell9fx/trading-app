@@ -792,7 +792,7 @@ export function RealTimeChat({ user }: RealTimeChatProps) {
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Type your message..."
                       disabled={isSending || !isConnected}
-                      className="pr-12 h-12 rounded-xl border-gray-700 bg-gray-800 text-gray-100 placeholder:text-gray-500 focus:border-gold-500 focus:ring-gold-500"
+                      className="pr-12 h-12 rounded-xl border-border bg-panel text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault()

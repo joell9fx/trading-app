@@ -99,7 +99,7 @@ export function SignalsHistory({ data = EMPTY_HISTORY }: SignalsHistoryProps) {
         </div>
         <div className="flex flex-wrap gap-2">
           <select
-            className="bg-black border border-white/15 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-gold-500/50"
+            className="bg-panel border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
             value={filters.asset}
             onChange={(e) =>
               setFilters((f) => ({ ...f, asset: e.target.value }))
@@ -112,7 +112,7 @@ export function SignalsHistory({ data = EMPTY_HISTORY }: SignalsHistoryProps) {
             ))}
           </select>
           <select
-            className="bg-black border border-white/15 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-gold-500/50"
+            className="bg-panel border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
             value={filters.timeframe}
             onChange={(e) =>
               setFilters((f) => ({ ...f, timeframe: e.target.value }))

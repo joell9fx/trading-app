@@ -27,7 +27,7 @@ export default function SuperAdminReports() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-gold-300">AI Performance Summary</h2>
-            <p className="text-sm text-gray-400">Aggregated metrics across operator, forecast, and security systems.</p>
+            <p className="text-sm text-muted-foreground">Aggregated metrics across operator, forecast, and security systems.</p>
           </div>
           <Button className="bg-gold-500 text-black hover:bg-gold-600" onClick={runSummary} disabled={loading}>
             {loading ? 'Generating...' : 'Generate Report'}
@@ -36,17 +36,17 @@ export default function SuperAdminReports() {
       </div>
 
       {data && (
-        <div className="border border-gray-800 rounded-xl p-5 bg-black/60 space-y-3">
+        <div className="border border-border rounded-xl p-5 bg-panel space-y-3">
           {data.error && <p className="text-red-400 text-sm">{data.error}</p>}
           {data.summary && (
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-white">Summary</h3>
-              <p className="text-sm text-gray-200 whitespace-pre-wrap">{data.summary}</p>
+              <h3 className="text-lg font-semibold text-foreground">Summary</h3>
+              <p className="text-sm text-foreground/90 whitespace-pre-wrap">{data.summary}</p>
             </div>
           )}
           {data.metrics && (
-            <div className="space-y-1 text-xs text-gray-400">
-              <pre className="bg-gray-900 border border-gray-800 rounded-lg p-3 overflow-auto">
+            <div className="space-y-1 text-xs text-muted-foreground">
+              <pre className="bg-elevated border border-border rounded-lg p-3 overflow-auto">
                 {JSON.stringify(data.metrics, null, 2)}
               </pre>
             </div>

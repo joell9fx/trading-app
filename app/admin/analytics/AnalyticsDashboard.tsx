@@ -83,12 +83,12 @@ export default function AnalyticsDashboard({ admin }: { admin: AdminInfo }) {
 
   return (
     <div className="space-y-5">
-      <Card className="bg-gray-950 border border-gray-800 p-4">
+      <Card className="bg-panel border border-border p-4">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-2 text-gray-100">
+          <div className="flex items-center gap-2 text-foreground">
             <BarChart3 className="h-5 w-5 text-amber-400" />
             <div>
-              <p className="text-xs uppercase tracking-wide text-gray-500">Analytics</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Analytics</p>
               <h3 className="text-lg font-semibold">Moderation Impact & Activity</h3>
             </div>
           </div>
@@ -99,7 +99,7 @@ export default function AnalyticsDashboard({ admin }: { admin: AdminInfo }) {
                 variant={range === r.value ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setRange(r.value)}
-                className={range === r.value ? 'bg-blue-600 text-white' : 'border-gray-700 text-gray-200'}
+                className={range === r.value ? 'bg-primary text-primary-foreground' : 'border-gray-700 text-gray-200'}
               >
                 {r.label}
               </Button>
@@ -144,17 +144,17 @@ export default function AnalyticsDashboard({ admin }: { admin: AdminInfo }) {
         />
       ) : null}
 
-      <Card className="bg-gray-950 border border-gray-800 p-4">
+      <Card className="bg-panel border border-border p-4">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="text-xs uppercase text-gray-500">Engagement</p>
-            <h3 className="text-lg font-semibold text-white">Active users trend</h3>
+            <p className="text-xs uppercase text-muted-foreground">Engagement</p>
+            <h3 className="text-lg font-semibold text-foreground">Active users trend</h3>
           </div>
-          <Badge className="bg-gray-900 border border-gray-800 text-gray-200">
+          <Badge className="bg-elevated border border-border text-foreground/90">
             Last {metrics?.rangeDays ?? 30} days
           </Badge>
         </div>
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-muted-foreground">
           Active users per day: {overview?.charts.activeUsers.slice(-7).reduce((sum, d) => sum + d.active_users, 0) ?? 0} users (last 7 records)
         </div>
       </Card>

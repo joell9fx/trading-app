@@ -211,7 +211,7 @@ export default function CommunityFeed({ user }: CommunityFeedProps) {
                 onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
                 placeholder="Enter post title"
                 required
-                className="w-full px-3 py-2 border border-gray-700 bg-gray-800 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 placeholder:text-gray-500"
+                className="w-full px-3 py-2 border border-border bg-panel text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-muted-foreground"
               />
             </div>
             
@@ -226,7 +226,7 @@ export default function CommunityFeed({ user }: CommunityFeedProps) {
                 placeholder="Share your thoughts..."
                 rows={4}
                 required
-                className="w-full px-3 py-2 border border-gray-700 bg-gray-800 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 placeholder:text-gray-500"
+                className="w-full px-3 py-2 border border-border bg-panel text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-muted-foreground"
               />
             </div>
             
@@ -240,7 +240,7 @@ export default function CommunityFeed({ user }: CommunityFeedProps) {
                 value={newPost.tag}
                 onChange={(e) => setNewPost({ ...newPost, tag: e.target.value })}
                 placeholder="e.g., strategy, question, analysis"
-                className="w-full px-3 py-2 border border-gray-700 bg-gray-800 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gold-500 placeholder:text-gray-500"
+                className="w-full px-3 py-2 border border-border bg-panel text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-muted-foreground"
               />
             </div>
             

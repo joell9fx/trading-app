@@ -49,12 +49,12 @@ export default async function AdminToolsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-page">
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-6">
-        <h1 className="text-2xl font-bold text-white">Admin Tools</h1>
-        <Card className="p-4 bg-gray-950 border border-gray-800">
-          <h2 className="text-lg font-semibold text-white mb-2">Chat Diagnostics</h2>
-          <p className="text-sm text-gray-400 mb-4">
+        <h1 className="text-2xl font-bold text-foreground">Admin Tools</h1>
+        <Card className="p-4 bg-panel border border-border">
+          <h2 className="text-lg font-semibold text-foreground mb-2">Chat Diagnostics</h2>
+          <p className="text-sm text-muted-foreground mb-4">
             Run a full send + realtime diagnostic. Visible only in non-production or admin context.
           </p>
           <DiagnosticsButton user={hubUser as any} />

@@ -104,17 +104,17 @@ export default function UsersPanel({ adminId }: { adminId: string }) {
 
   return (
     <div className="space-y-3">
-      <Card className="bg-gray-950 border border-gray-800">
-        <div className="p-4 border-b border-gray-800 flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+      <Card className="bg-panel border border-border">
+        <div className="p-4 border-b border-border flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-white">User Management</h3>
-            <p className="text-sm text-gray-400">Mute, ban, and promote members.</p>
+            <h3 className="text-lg font-semibold text-foreground">User Management</h3>
+            <p className="text-sm text-muted-foreground">Mute, ban, and promote members.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <div className="space-y-1">
-              <Label className="text-xs text-gray-400">Role</Label>
+              <Label className="text-xs text-muted-foreground">Role</Label>
               <select
-                className="bg-gray-900 border border-gray-800 text-gray-100 rounded-md px-3 py-2"
+                className="bg-panel border border-border text-foreground rounded-md px-3 py-2"
                 value={filters.role}
                 onChange={(e) => setFilters((f) => ({ ...f, role: e.target.value }))}
               >
@@ -126,9 +126,9 @@ export default function UsersPanel({ adminId }: { adminId: string }) {
               </select>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-gray-400">Status</Label>
+              <Label className="text-xs text-muted-foreground">Status</Label>
               <select
-                className="bg-gray-900 border border-gray-800 text-gray-100 rounded-md px-3 py-2"
+                className="bg-panel border border-border text-foreground rounded-md px-3 py-2"
                 value={filters.status}
                 onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
               >
@@ -139,15 +139,15 @@ export default function UsersPanel({ adminId }: { adminId: string }) {
                 ))}
               </select>
             </div>
-            <Button variant="outline" className="border-gray-700 text-gray-200" onClick={loadUsers} disabled={loading}>
+            <Button variant="outline" className="border-border text-foreground/90" onClick={loadUsers} disabled={loading}>
               Refresh
             </Button>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm text-left text-gray-300">
-            <thead className="bg-gray-900 text-xs uppercase text-gray-500">
+          <table className="min-w-full text-sm text-left text-foreground/80">
+            <thead className="bg-elevated text-xs uppercase text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Username</th>
                 <th className="px-4 py-3">Role</th>
@@ -159,26 +159,26 @@ export default function UsersPanel({ adminId }: { adminId: string }) {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id} className="border-t border-gray-800">
+                <tr key={user.id} className="border-t border-border">
                   <td className="px-4 py-3">
-                    <div className="font-semibold text-white">{user.name || user.full_name || user.email}</div>
-                    <div className="text-xs text-gray-500">{user.email}</div>
+                    <div className="font-semibold text-foreground">{user.name || user.full_name || user.email}</div>
+                    <div className="text-xs text-muted-foreground">{user.email}</div>
                   </td>
                   <td className="px-4 py-3">{user.role}</td>
                   <td className="px-4 py-3 capitalize">
                     {user.status === 'active' ? '🟢 Active' : user.status === 'banned' ? '🔴 Banned' : '🔇 Muted'}
                   </td>
-                  <td className="px-4 py-3 text-gray-400">{user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}</td>
-                  <td className="px-4 py-3 text-gray-400">
+                  <td className="px-4 py-3 text-muted-foreground">{user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}</td>
+                  <td className="px-4 py-3 text-muted-foreground">
                     {user.last_active ? new Date(user.last_active).toLocaleString() : '—'}
                   </td>
                   <td className="px-4 py-3">
                     <ActionButtons>
-                      <Button variant="outline" size="sm" className="border-gray-700 text-gray-200" onClick={() => openModal(user, 'mute')}>
+                      <Button variant="outline" size="sm" className="border-border text-foreground/90" onClick={() => openModal(user, 'mute')}>
                         <VolumeX className="h-4 w-4 mr-1" />
                         Mute
                       </Button>
-                      <Button variant="outline" size="sm" className="border-gray-700 text-gray-200" onClick={() => openModal(user, 'ban')}>
+                      <Button variant="outline" size="sm" className="border-border text-foreground/90" onClick={() => openModal(user, 'ban')}>
                         <ShieldBan className="h-4 w-4 mr-1" />
                         Ban
                       </Button>
@@ -187,11 +187,11 @@ export default function UsersPanel({ adminId }: { adminId: string }) {
                           Unban
                         </Button>
                       ) : (
-                        <Button size="sm" variant="outline" className="border-gray-700 text-gray-200" onClick={() => openModal(user, 'unmute')}>
+                        <Button size="sm" variant="outline" className="border-border text-foreground/90" onClick={() => openModal(user, 'unmute')}>
                           Unmute
                         </Button>
                       )}
-                      <Button variant="outline" size="sm" className="border-gray-700 text-gray-200" onClick={() => openModal(user, 'role')}>
+                      <Button variant="outline" size="sm" className="border-border text-foreground/90" onClick={() => openModal(user, 'role')}>
                         <Crown className="h-4 w-4 mr-1" />
                         Change Role
                       </Button>
@@ -201,7 +201,7 @@ export default function UsersPanel({ adminId }: { adminId: string }) {
               ))}
               {!users.length && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-gray-500">
+                  <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
                     {loading ? 'Loading users...' : 'No users match the filters.'}
                   </td>
                 </tr>
@@ -222,9 +222,9 @@ export default function UsersPanel({ adminId }: { adminId: string }) {
       >
         {modalState.action === 'role' ? (
           <div className="space-y-2">
-            <Label className="text-xs text-gray-400">New role</Label>
+            <Label className="text-xs text-muted-foreground">New role</Label>
             <select
-              className="w-full bg-gray-900 border border-gray-800 text-gray-100 rounded-md px-3 py-2"
+              className="w-full bg-panel border border-border text-foreground rounded-md px-3 py-2"
               value={nextRole}
               onChange={(e) => setNextRole(e.target.value)}
             >
@@ -241,23 +241,23 @@ export default function UsersPanel({ adminId }: { adminId: string }) {
           <>
             {modalState.action === 'mute' || modalState.action === 'ban' ? (
               <div className="space-y-2">
-                <Label className="text-xs text-gray-400">Duration (minutes)</Label>
+                <Label className="text-xs text-muted-foreground">Duration (minutes)</Label>
                 <Input
                   type="number"
                   min={5}
                   value={durationMinutes}
                   onChange={(e) => setDurationMinutes(parseInt(e.target.value, 10))}
-                  className="bg-gray-900 border-gray-800 text-gray-100"
+                  className="bg-panel border-border text-foreground"
                 />
               </div>
             ) : null}
             <div className="space-y-2">
-              <Label className="text-xs text-gray-400">Reason (optional)</Label>
+              <Label className="text-xs text-muted-foreground">Reason (optional)</Label>
               <Input
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Reason for action"
-                className="bg-gray-900 border-gray-800 text-gray-100"
+                className="bg-panel border-border text-foreground"
               />
             </div>
           </>

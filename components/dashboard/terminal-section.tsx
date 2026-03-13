@@ -57,9 +57,9 @@ function formatR(v: number): string {
 // —— Panel: Today's Focus ———————————————————————————————————————————————————
 function TodaysFocusPanel({ points }: { points: string[] }) {
   return (
-    <Card className="rounded-xl border border-amber-500/20 bg-amber-500/5 overflow-hidden">
+    <Card className="rounded-xl border border-primary/20 bg-accent-muted overflow-hidden">
       <CardHeader className="pb-2 pt-4 px-4">
-        <h2 className="text-sm font-semibold text-amber-200/90 uppercase tracking-wider flex items-center gap-2">
+        <h2 className="text-sm font-semibold text-primary uppercase tracking-wider flex items-center gap-2">
           <Cog6ToothIcon className="h-4 w-4" />
           Today&apos;s Focus
         </h2>
@@ -67,8 +67,8 @@ function TodaysFocusPanel({ points }: { points: string[] }) {
       <CardContent className="px-4 pb-4 pt-0">
         <ul className="space-y-2">
           {points.map((p, i) => (
-            <li key={i} className="flex gap-2 text-sm text-gray-200">
-              <span className="text-amber-400/80 shrink-0">▸</span>
+            <li key={i} className="flex gap-2 text-sm text-foreground/90">
+              <span className="text-primary shrink-0">▸</span>
               <span>{p}</span>
             </li>
           ))}
@@ -87,22 +87,22 @@ function AICoachSummaryPanel({
   nextActions: string[];
 }) {
   return (
-    <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+    <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
       <CardHeader className="pb-2 pt-4 px-4">
-        <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider flex items-center gap-2">
-          <SparklesIcon className="h-4 w-4 text-gold-400" />
+        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+          <SparklesIcon className="h-4 w-4 text-primary" />
           AI Coach Summary
         </h2>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0 space-y-3">
-        <p className="text-sm text-gray-300 leading-snug">{summary}</p>
+        <p className="text-sm text-foreground/80 leading-snug">{summary}</p>
         {nextActions.length > 0 && (
           <div>
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Next actions</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Next actions</p>
             <ul className="space-y-1">
               {nextActions.slice(0, 3).map((a, i) => (
-                <li key={i} className="text-xs text-gray-400 flex gap-2">
-                  <span className="text-gold-400/80 shrink-0">•</span>
+                <li key={i} className="text-xs text-muted-foreground flex gap-2">
+                  <span className="text-primary shrink-0">•</span>
                   <span>{a}</span>
                 </li>
               ))}
@@ -118,14 +118,14 @@ function AICoachSummaryPanel({
 function EquityCurvePanel({ curve }: { curve: { date: string; cumulativeR: number }[] }) {
   if (!curve.length) {
     return (
-      <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+      <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
         <CardHeader className="pb-2 pt-4 px-4">
-          <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
             Equity Curve
           </h2>
         </CardHeader>
         <CardContent className="px-4 pb-4 pt-0 h-[120px] flex items-center justify-center">
-          <p className="text-gray-500 text-sm">No trade data yet</p>
+          <p className="text-muted-foreground text-sm">No trade data yet</p>
         </CardContent>
       </Card>
     );
@@ -136,9 +136,9 @@ function EquityCurvePanel({ curve }: { curve: { date: string; cumulativeR: numbe
   }));
   const strokeColor = data[data.length - 1]?.r >= 0 ? '#10b981' : '#f59e0b';
   return (
-    <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+    <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
       <CardHeader className="pb-2 pt-4 px-4">
-        <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
           Equity Curve
         </h2>
       </CardHeader>
@@ -189,14 +189,14 @@ function EquityCurvePanel({ curve }: { curve: { date: string; cumulativeR: numbe
 function DrawdownPanel({ perf }: { perf: PerformanceMetricsResult | null }) {
   if (!perf || perf.totalTrades === 0) {
     return (
-      <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+      <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
         <CardHeader className="pb-2 pt-4 px-4">
-          <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
             Drawdown
           </h2>
         </CardHeader>
         <CardContent className="px-4 pb-4 pt-0">
-          <p className="text-gray-500 text-sm">—</p>
+          <p className="text-muted-foreground text-sm">—</p>
         </CardContent>
       </Card>
     );
@@ -206,21 +206,21 @@ function DrawdownPanel({ perf }: { perf: PerformanceMetricsResult | null }) {
       ? perf.drawdownCurve[perf.drawdownCurve.length - 1]?.drawdown ?? 0
       : 0;
   return (
-    <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+    <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
       <CardHeader className="pb-2 pt-4 px-4">
-        <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
           Drawdown
         </h2>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0">
         <div className="flex items-baseline gap-3">
-          <span className="text-2xl font-bold text-white">
+          <span className="text-2xl font-bold text-foreground">
             {perf.maxDrawdown > 0 ? `-${perf.maxDrawdown.toFixed(1)}` : '0'}R
           </span>
-          <span className="text-xs text-gray-500">max</span>
+          <span className="text-xs text-muted-foreground">max</span>
         </div>
         {current > 0 && (
-          <p className="text-xs text-amber-400/90 mt-1">Current: -{current.toFixed(1)}R</p>
+          <p className="text-xs text-primary mt-1">Current: -{current.toFixed(1)}R</p>
         )}
       </CardContent>
     </Card>
@@ -231,39 +231,39 @@ function DrawdownPanel({ perf }: { perf: PerformanceMetricsResult | null }) {
 function KeyMetricsPanel({ perf }: { perf: PerformanceMetricsResult | null }) {
   if (!perf || perf.totalTrades === 0) {
     return (
-      <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+      <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
         <CardHeader className="pb-2 pt-4 px-4">
-          <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
             Key Metrics
           </h2>
         </CardHeader>
         <CardContent className="px-4 pb-4 pt-0">
-          <p className="text-gray-500 text-sm">Log trades to see metrics.</p>
+          <p className="text-muted-foreground text-sm">Log trades to see metrics.</p>
         </CardContent>
       </Card>
     );
   }
   return (
-    <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+    <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
       <CardHeader className="pb-2 pt-4 px-4">
-        <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
           Key Metrics
         </h2>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0">
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-          <dt className="text-gray-500">Total R</dt>
+          <dt className="text-muted-foreground">Total R</dt>
           <dd className={`font-medium text-right ${perf.totalR >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
             {formatR(perf.totalR)}
           </dd>
-          <dt className="text-gray-500">Win rate</dt>
-          <dd className="text-right font-medium text-white">{perf.winRatePct.toFixed(0)}%</dd>
-          <dt className="text-gray-500">Expectancy</dt>
+          <dt className="text-muted-foreground">Win rate</dt>
+          <dd className="text-right font-medium text-foreground">{perf.winRatePct.toFixed(0)}%</dd>
+          <dt className="text-muted-foreground">Expectancy</dt>
           <dd className={`text-right font-medium ${perf.expectancy >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
             {formatR(perf.expectancy)}/trade
           </dd>
-          <dt className="text-gray-500">Profit factor</dt>
-          <dd className="text-right font-medium text-white">
+          <dt className="text-muted-foreground">Profit factor</dt>
+          <dd className="text-right font-medium text-foreground">
             {perf.profitFactor != null ? perf.profitFactor.toFixed(1) : '—'}
           </dd>
         </dl>
@@ -276,14 +276,14 @@ function KeyMetricsPanel({ perf }: { perf: PerformanceMetricsResult | null }) {
 function BestSetupPanel({ setup }: { setup: GroupedStat | null }) {
   if (!setup || setup.count < 2) {
     return (
-      <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+      <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
         <CardHeader className="pb-2 pt-4 px-4">
-          <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
             Best Setup
           </h2>
         </CardHeader>
         <CardContent className="px-4 pb-4 pt-0">
-          <p className="text-gray-500 text-sm">Need more data</p>
+          <p className="text-muted-foreground text-sm">Need more data</p>
         </CardContent>
       </Card>
     );
@@ -296,8 +296,8 @@ function BestSetupPanel({ setup }: { setup: GroupedStat | null }) {
         </h2>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0">
-        <p className="font-semibold text-white">{setup.key}</p>
-        <p className="text-xs text-gray-400 mt-0.5">
+        <p className="font-semibold text-foreground">{setup.key}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
           {setup.count} trades · {setup.winRatePct.toFixed(0)}% win · {formatR(setup.avgR)} avg
         </p>
       </CardContent>
@@ -317,34 +317,34 @@ function BiggestLeakPanel({
   const hasLeak = hasMistake || ruleBrokenWorse;
   if (!hasLeak) {
     return (
-      <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+      <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
         <CardHeader className="pb-2 pt-4 px-4">
-          <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
             Biggest Leak
           </h2>
         </CardHeader>
         <CardContent className="px-4 pb-4 pt-0">
-          <p className="text-gray-500 text-sm">None identified yet</p>
+          <p className="text-muted-foreground text-sm">None identified yet</p>
         </CardContent>
       </Card>
     );
   }
   return (
-    <Card className="rounded-xl border border-amber-500/20 bg-amber-500/5 overflow-hidden">
+    <Card className="rounded-xl border border-primary/20 bg-accent-muted overflow-hidden">
       <CardHeader className="pb-2 pt-4 px-4">
-        <h2 className="text-sm font-semibold text-amber-200/90 uppercase tracking-wider flex items-center gap-2">
+        <h2 className="text-sm font-semibold text-primary uppercase tracking-wider flex items-center gap-2">
           <ExclamationTriangleIcon className="h-4 w-4" />
           Biggest Leak
         </h2>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0">
         {hasMistake && (
-          <p className="text-sm text-gray-200">
+          <p className="text-sm text-foreground/90">
             &quot;{mistake!.phrase.slice(0, 60)}{mistake!.phrase.length > 60 ? '…' : ''}&quot; ({mistake!.count}×)
           </p>
         )}
         {ruleBrokenWorse && (
-          <p className="text-sm text-gray-200 mt-1">Rule-broken trades underperform. Reduce breaks.</p>
+          <p className="text-sm text-foreground/90 mt-1">Rule-broken trades underperform. Reduce breaks.</p>
         )}
       </CardContent>
     </Card>
@@ -354,17 +354,17 @@ function BiggestLeakPanel({
 // —— Panel: Discipline Score —————————————————————————————————————————————————
 function DisciplineScorePanel({ score }: { score: number | null }) {
   const color =
-    score == null ? 'text-gray-500' : score >= 70 ? 'text-emerald-400' : score >= 50 ? 'text-gold-400' : 'text-amber-400';
+    score == null ? 'text-muted-foreground' : score >= 70 ? 'text-emerald-400' : score >= 50 ? 'text-primary' : 'text-primary/80';
   return (
-    <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+    <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
       <CardHeader className="pb-2 pt-4 px-4">
-        <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
           Discipline
         </h2>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0">
         <p className={`text-2xl font-bold ${color}`}>{score != null ? score : '—'}</p>
-        <p className="text-xs text-gray-500 mt-0.5">Rule-following score 0–100</p>
+        <p className="text-xs text-muted-foreground mt-0.5">Rule-following score 0–100</p>
       </CardContent>
     </Card>
   );
@@ -373,17 +373,17 @@ function DisciplineScorePanel({ score }: { score: number | null }) {
 // —— Panel: Consistency Score ————————————————————————————————————————————————
 function ConsistencyScorePanel({ score }: { score: number | null }) {
   const color =
-    score == null ? 'text-gray-500' : score >= 70 ? 'text-emerald-400' : score >= 50 ? 'text-gold-400' : 'text-amber-400';
+    score == null ? 'text-muted-foreground' : score >= 70 ? 'text-emerald-400' : score >= 50 ? 'text-primary' : 'text-primary/80';
   return (
-    <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+    <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
       <CardHeader className="pb-2 pt-4 px-4">
-        <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
           Consistency
         </h2>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0">
         <p className={`text-2xl font-bold ${color}`}>{score != null ? score : '—'}</p>
-        <p className="text-xs text-gray-500 mt-0.5">Process consistency 0–100</p>
+        <p className="text-xs text-muted-foreground mt-0.5">Process consistency 0–100</p>
       </CardContent>
     </Card>
   );
@@ -400,15 +400,15 @@ function RecentTradesPanel({
   const recent = entries.slice(0, 5);
   if (recent.length === 0) {
     return (
-      <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+      <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
         <CardHeader className="pb-2 pt-4 px-4">
-          <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
             Recent Trades
           </h2>
         </CardHeader>
         <CardContent className="px-4 pb-4 pt-0">
-          <p className="text-gray-500 text-sm">No trades yet</p>
-          <Button variant="link" className="text-gold-400 text-xs mt-2 p-0 h-auto" onClick={onOpenJournal}>
+          <p className="text-muted-foreground text-sm">No trades yet</p>
+          <Button variant="link" className="text-primary text-xs mt-2 p-0 h-auto" onClick={onOpenJournal}>
             Add journal entry
           </Button>
         </CardContent>
@@ -416,12 +416,12 @@ function RecentTradesPanel({
     );
   }
   return (
-    <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+    <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
       <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center justify-between">
-        <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
           Recent Trades
         </h2>
-        <Button variant="ghost" size="sm" className="text-xs text-gold-400" onClick={onOpenJournal}>
+        <Button variant="ghost" size="sm" className="text-xs text-primary" onClick={onOpenJournal}>
           View all
         </Button>
       </CardHeader>
@@ -431,7 +431,7 @@ function RecentTradesPanel({
             const r = parseR(e.result_r);
             return (
               <li key={e.id} className="flex justify-between items-center text-sm">
-                <span className="text-gray-300 truncate max-w-[140px]">
+                <span className="text-foreground/80 truncate max-w-[140px]">
                   {(e.setup_type || e.pair || e.title || 'Trade').toString().slice(0, 20)}
                 </span>
                 <span className={`shrink-0 font-medium ${r >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -451,33 +451,33 @@ function RecentMistakesPanel({ mistakes }: { mistakes: { phrase: string; count: 
   const top = mistakes.slice(0, 3);
   if (top.length === 0) {
     return (
-      <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+      <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
         <CardHeader className="pb-2 pt-4 px-4">
-          <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
             Recent Mistakes
           </h2>
         </CardHeader>
         <CardContent className="px-4 pb-4 pt-0">
-          <p className="text-gray-500 text-sm">No patterns yet</p>
+          <p className="text-muted-foreground text-sm">No patterns yet</p>
         </CardContent>
       </Card>
     );
   }
   return (
-    <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+    <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
       <CardHeader className="pb-2 pt-4 px-4">
-        <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
           Top Mistakes
         </h2>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0">
         <ul className="space-y-1.5">
           {top.map((m, i) => (
-            <li key={i} className="text-sm text-gray-300 flex justify-between gap-2">
+            <li key={i} className="text-sm text-foreground/80 flex justify-between gap-2">
               <span className="truncate" title={m.phrase}>
                 {m.phrase.slice(0, 40)}{m.phrase.length > 40 ? '…' : ''}
               </span>
-              <span className="text-gray-500 shrink-0">×{m.count}</span>
+              <span className="text-muted-foreground shrink-0">×{m.count}</span>
             </li>
           ))}
         </ul>
@@ -496,15 +496,15 @@ function LatestReportPanel({
 }) {
   if (!report) {
     return (
-      <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+      <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
         <CardHeader className="pb-2 pt-4 px-4">
-          <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
             Latest Report
           </h2>
         </CardHeader>
         <CardContent className="px-4 pb-4 pt-0">
-          <p className="text-gray-500 text-sm">No saved reports</p>
-          <Button variant="link" className="text-gold-400 text-xs mt-2 p-0 h-auto" onClick={onOpenReports}>
+          <p className="text-muted-foreground text-sm">No saved reports</p>
+          <Button variant="link" className="text-primary text-xs mt-2 p-0 h-auto" onClick={onOpenReports}>
             Generate from Analytics
           </Button>
         </CardContent>
@@ -513,20 +513,20 @@ function LatestReportPanel({
   }
   const totalR = report.total_r ?? 0;
   return (
-    <Card className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+    <Card className="rounded-xl border border-border-subtle bg-panel overflow-hidden">
       <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-center justify-between">
-        <h2 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
+        <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
           Latest Report
         </h2>
-        <Button variant="ghost" size="sm" className="text-xs text-gold-400" onClick={onOpenReports}>
+        <Button variant="ghost" size="sm" className="text-xs text-primary" onClick={onOpenReports}>
           Open
         </Button>
       </CardHeader>
       <CardContent className="px-4 pb-4 pt-0">
-        <p className="font-medium text-white truncate" title={report.title}>
+        <p className="font-medium text-foreground truncate" title={report.title}>
           {report.title || 'Performance Report'}
         </p>
-        <p className="text-xs text-gray-500 mt-0.5">
+        <p className="text-xs text-muted-foreground mt-0.5">
           {report.total_trades ?? 0} trades · {report.win_rate != null ? `${report.win_rate.toFixed(0)}%` : '—'} win ·{' '}
           <span className={totalR >= 0 ? 'text-emerald-400' : 'text-red-400'}>{formatR(totalR)}</span>
         </p>
@@ -547,7 +547,7 @@ function QuickActions({ onJournal, onAnalytics, onCoach, onReport }: {
       <Button
         size="sm"
         variant="outline"
-        className="border-white/20 bg-white/5 text-gray-200 hover:bg-white/10 hover:text-white"
+        className="border-border bg-panel text-foreground/90 hover:bg-elevated hover:text-foreground"
         onClick={onJournal}
       >
         <PlusIcon className="h-4 w-4 mr-1.5" />
@@ -556,7 +556,7 @@ function QuickActions({ onJournal, onAnalytics, onCoach, onReport }: {
       <Button
         size="sm"
         variant="outline"
-        className="border-white/20 bg-white/5 text-gray-200 hover:bg-white/10 hover:text-white"
+        className="border-border bg-panel text-foreground/90 hover:bg-elevated hover:text-foreground"
         onClick={onAnalytics}
       >
         <ChartBarIcon className="h-4 w-4 mr-1.5" />
@@ -565,7 +565,7 @@ function QuickActions({ onJournal, onAnalytics, onCoach, onReport }: {
       <Button
         size="sm"
         variant="outline"
-        className="border-white/20 bg-white/5 text-gray-200 hover:bg-white/10 hover:text-white"
+        className="border-border bg-panel text-foreground/90 hover:bg-elevated hover:text-foreground"
         onClick={onCoach}
       >
         <SparklesIcon className="h-4 w-4 mr-1.5" />
@@ -574,7 +574,7 @@ function QuickActions({ onJournal, onAnalytics, onCoach, onReport }: {
       <Button
         size="sm"
         variant="outline"
-        className="border-white/20 bg-white/5 text-gray-200 hover:bg-white/10 hover:text-white"
+        className="border-border bg-panel text-foreground/90 hover:bg-elevated hover:text-foreground"
         onClick={onReport}
       >
         <DocumentChartBarIcon className="h-4 w-4 mr-1.5" />
@@ -678,13 +678,13 @@ export function TerminalSection() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Command Center</h1>
-          <p className="mt-1 text-gray-400 text-sm sm:text-base">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Command Center</h1>
+          <p className="mt-1 text-muted-foreground text-sm sm:text-base">
             Unified view of journal, analytics, coach, and consistency.
           </p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/5 p-12 flex items-center justify-center min-h-[300px]">
-          <p className="text-gray-400 text-sm">Loading terminal…</p>
+        <div className="rounded-xl border border-border-subtle bg-panel p-12 flex items-center justify-center min-h-[300px]">
+          <p className="text-muted-foreground text-sm">Loading terminal…</p>
         </div>
       </div>
     );
@@ -694,8 +694,8 @@ export function TerminalSection() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Command Center</h1>
-          <p className="mt-1 text-gray-400 text-sm sm:text-base">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Command Center</h1>
+          <p className="mt-1 text-muted-foreground text-sm sm:text-base">
             Unified view of journal, analytics, coach, and consistency.
           </p>
         </div>
@@ -712,8 +712,8 @@ export function TerminalSection() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Command Center</h1>
-          <p className="mt-1 text-gray-400 text-sm sm:text-base">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Command Center</h1>
+          <p className="mt-1 text-muted-foreground text-sm sm:text-base">
             Single-view summary: focus, metrics, coach, and next actions.
           </p>
         </div>

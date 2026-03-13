@@ -249,14 +249,14 @@ function FilterSelect({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-xs text-gray-400">
+      <label htmlFor={id} className="text-xs text-muted-foreground">
         {label}
       </label>
       <select
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-gold-500/50 min-w-[120px] cursor-pointer"
+        className="rounded-lg border border-border bg-panel px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 min-w-[120px] cursor-pointer"
       >
         <option value={ALL_FILTER}>All</option>
         {options.map((opt) => (
@@ -394,12 +394,12 @@ export function PerformanceAnalyticsSection() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-white">Performance Analytics</h1>
-          <p className="mt-1 text-gray-400 text-sm sm:text-base">
+          <p className="mt-1 text-muted-foreground text-sm sm:text-base">
             Trading metrics, win rate, R-multiples, and equity curve from your journal entries.
           </p>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/5 p-8 flex items-center justify-center min-h-[200px]">
-          <p className="text-gray-400 text-sm">Loading analytics…</p>
+        <div className="rounded-xl border border-border-subtle bg-panel p-8 flex items-center justify-center min-h-[200px]">
+          <p className="text-muted-foreground text-sm">Loading analytics…</p>
         </div>
       </div>
     );
@@ -410,7 +410,7 @@ export function PerformanceAnalyticsSection() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-white">Performance Analytics</h1>
-          <p className="mt-1 text-gray-400 text-sm sm:text-base">
+          <p className="mt-1 text-muted-foreground text-sm sm:text-base">
             Trading metrics, win rate, R-multiples, and equity curve from your journal entries.
           </p>
         </div>
@@ -428,21 +428,21 @@ export function PerformanceAnalyticsSection() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-white">Performance Analytics</h1>
-          <p className="mt-1 text-gray-400 text-sm sm:text-base">
+          <p className="mt-1 text-muted-foreground text-sm sm:text-base">
             Trading metrics, win rate, R-multiples, and equity curve from your journal entries.
           </p>
         </div>
-        <Card className="border-white/10 bg-white/5 rounded-xl overflow-hidden">
+        <Card className="border-border-subtle bg-panel rounded-xl overflow-hidden">
           <CardContent className="p-8 flex flex-col items-center justify-center min-h-[280px] text-center">
-            <ChartBarIcon className="h-12 w-12 text-gray-500 mb-4" />
+            <ChartBarIcon className="h-12 w-12 text-muted-foreground mb-4" />
             <h2 className="text-lg font-semibold text-white mb-2">No journal entries yet</h2>
-            <p className="text-gray-400 text-sm max-w-md mb-6">
+            <p className="text-muted-foreground text-sm max-w-md mb-6">
               Add trades in the Growth Journal to see performance metrics, equity curve, and
               breakdowns here.
             </p>
             <Link
               href="/dashboard?section=journal"
-              className="inline-flex items-center gap-2 rounded-lg bg-gold-500 px-4 py-2.5 text-sm font-semibold text-black hover:bg-gold-400 transition"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-accent-hover transition"
             >
               <BookOpenIcon className="h-5 w-5" />
               Open Growth Journal
@@ -510,7 +510,7 @@ export function PerformanceAnalyticsSection() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-white">Performance Analytics</h1>
-          <p className="mt-1 text-gray-400 text-sm sm:text-base">
+          <p className="mt-1 text-muted-foreground text-sm sm:text-base">
             Trading metrics, win rate, R-multiples, and equity curve from your journal entries.
           </p>
         </div>
@@ -518,7 +518,7 @@ export function PerformanceAnalyticsSection() {
           type="button"
           onClick={handleGenerateReport}
           disabled={generatingReport || filteredRows.length === 0}
-          className="shrink-0 inline-flex items-center gap-2 bg-gold-500 text-black font-semibold hover:bg-gold-400 disabled:opacity-50"
+          className="shrink-0 inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold hover:bg-accent-hover disabled:opacity-50"
         >
           <DocumentPlusIcon className="h-5 w-5" />
           {generatingReport ? 'Saving…' : 'Generate Report'}
@@ -526,14 +526,14 @@ export function PerformanceAnalyticsSection() {
       </div>
 
       {/* Filters */}
-      <Card className="border-white/10 bg-white/5 rounded-xl overflow-hidden">
+      <Card className="border-border-subtle bg-panel rounded-xl overflow-hidden">
         <CardHeader className="pb-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-              <FunnelIcon className="h-4 w-4 text-gold-400" />
+              <FunnelIcon className="h-4 w-4 text-primary" />
               Filters
               {filteredRows.length < rows.length && (
-                <span className="text-xs font-normal text-gray-400">
+                <span className="text-xs font-normal text-muted-foreground">
                   Showing {filteredRows.length} of {rows.length} entries
                 </span>
               )}
@@ -543,7 +543,7 @@ export function PerformanceAnalyticsSection() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="text-gray-400 hover:text-white hover:bg-white/10"
+                className="text-muted-foreground hover:text-foreground hover:bg-panel"
                 onClick={clearFilters}
               >
                 <XMarkIcon className="h-4 w-4 mr-1.5" />
@@ -555,23 +555,23 @@ export function PerformanceAnalyticsSection() {
         <CardContent className="pt-0">
           <div className="flex flex-wrap items-end gap-3 sm:gap-4">
             <div className="flex flex-col gap-1">
-              <label htmlFor="pa-date-from" className="text-xs text-gray-400">Date from</label>
+              <label htmlFor="pa-date-from" className="text-xs text-muted-foreground">Date from</label>
               <input
                 id="pa-date-from"
                 type="date"
                 value={filters.dateFrom}
                 onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-500/50 min-w-[140px]"
+                className="rounded-lg border border-border bg-panel px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 min-w-[140px]"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label htmlFor="pa-date-to" className="text-xs text-gray-400">Date to</label>
+              <label htmlFor="pa-date-to" className="text-xs text-muted-foreground">Date to</label>
               <input
                 id="pa-date-to"
                 type="date"
                 value={filters.dateTo}
                 onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                className="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-500/50 min-w-[140px]"
+                className="rounded-lg border border-border bg-panel px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 min-w-[140px]"
               />
             </div>
             <FilterSelect
@@ -607,48 +607,48 @@ export function PerformanceAnalyticsSection() {
       </Card>
 
       {hasActiveFilters && filteredRows.length === 0 && (
-        <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
+        <div className="rounded-xl border border-primary/20 bg-accent-muted px-4 py-3 text-sm text-primary">
           No entries match the current filters. Clear filters or adjust your selection.
         </div>
       )}
 
       {/* Metrics cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        <Card className="border-white/10 bg-white/5 rounded-xl">
+        <Card className="border-border-subtle bg-panel rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider">Total trades</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Total trades</p>
             <p className="text-2xl font-bold text-white mt-1">{metrics.totalTrades}</p>
           </CardContent>
         </Card>
-        <Card className="border-white/10 bg-white/5 rounded-xl">
+        <Card className="border-border-subtle bg-panel rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider">Win rate</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Win rate</p>
             <p className="text-2xl font-bold text-white mt-1">{formatPct(metrics.winRatePct)}</p>
           </CardContent>
         </Card>
-        <Card className="border-white/10 bg-white/5 rounded-xl">
+        <Card className="border-border-subtle bg-panel rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider">Total R</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Total R</p>
             <p className="text-2xl font-bold text-white mt-1">{formatR(metrics.totalR)}</p>
           </CardContent>
         </Card>
-        <Card className="border-white/10 bg-white/5 rounded-xl">
+        <Card className="border-border-subtle bg-panel rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider">Avg R</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Avg R</p>
             <p className="text-2xl font-bold text-white mt-1">{formatR(metrics.avgR)}</p>
           </CardContent>
         </Card>
-        <Card className="border-white/10 bg-white/5 rounded-xl">
+        <Card className="border-border-subtle bg-panel rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider flex items-center gap-1">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1">
               <ArrowTrendingUpIcon className="h-3.5 w-3.5" /> Best
             </p>
             <p className="text-2xl font-bold text-emerald-400 mt-1">{formatR(metrics.bestTrade)}</p>
           </CardContent>
         </Card>
-        <Card className="border-white/10 bg-white/5 rounded-xl">
+        <Card className="border-border-subtle bg-panel rounded-xl">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wider flex items-center gap-1">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1">
               <ArrowTrendingDownIcon className="h-3.5 w-3.5" /> Worst
             </p>
             <p className="text-2xl font-bold text-red-400 mt-1">{formatR(metrics.worstTrade)}</p>
@@ -657,10 +657,10 @@ export function PerformanceAnalyticsSection() {
       </div>
 
       {/* Equity curve */}
-      <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-        <CardHeader className="border-b border-white/10 pb-4">
+      <Card className="border-border-subtle bg-panel rounded-2xl overflow-hidden">
+        <CardHeader className="border-b border-border-subtle pb-4">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-            <ChartBarIcon className="h-5 w-5 text-gold-400" />
+            <ChartBarIcon className="h-5 w-5 text-primary" />
             Equity curve
           </h2>
         </CardHeader>
@@ -716,21 +716,21 @@ export function PerformanceAnalyticsSection() {
       <div className="grid lg:grid-cols-3 gap-6">
         <BreakdownCard
           title="Strategy"
-          icon={<CubeIcon className="h-5 w-5 text-gold-400" />}
+          icon={<CubeIcon className="h-5 w-5 text-primary" />}
           stats={byStrategy}
           formatR={formatR}
           formatPct={formatPct}
         />
         <BreakdownCard
           title="Session"
-          icon={<ClockIcon className="h-5 w-5 text-gold-400" />}
+          icon={<ClockIcon className="h-5 w-5 text-primary" />}
           stats={bySession}
           formatR={formatR}
           formatPct={formatPct}
         />
         <BreakdownCard
           title="Pair / Market"
-          icon={<TrophyIcon className="h-5 w-5 text-gold-400" />}
+          icon={<TrophyIcon className="h-5 w-5 text-primary" />}
           stats={byPair}
           formatR={formatR}
           formatPct={formatPct}
@@ -741,21 +741,21 @@ export function PerformanceAnalyticsSection() {
       <div className="grid lg:grid-cols-3 gap-6">
         <BreakdownCard
           title="Setup type"
-          icon={<Square3Stack3DIcon className="h-5 w-5 text-gold-400" />}
+          icon={<Square3Stack3DIcon className="h-5 w-5 text-primary" />}
           stats={bySetupType}
           formatR={formatR}
           formatPct={formatPct}
         />
         <BreakdownCard
           title="Timeframe"
-          icon={<ClockIcon className="h-5 w-5 text-gold-400" />}
+          icon={<ClockIcon className="h-5 w-5 text-primary" />}
           stats={byTimeframe}
           formatR={formatR}
           formatPct={formatPct}
         />
         <BreakdownCard
           title="Bias"
-          icon={<ScaleIcon className="h-5 w-5 text-gold-400" />}
+          icon={<ScaleIcon className="h-5 w-5 text-primary" />}
           stats={byBias}
           formatR={formatR}
           formatPct={formatPct}
@@ -764,17 +764,17 @@ export function PerformanceAnalyticsSection() {
 
       {/* Rule followed + Score buckets */}
       <div className="grid lg:grid-cols-3 gap-6">
-        <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-          <CardHeader className="border-b border-white/10 pb-4">
+        <Card className="border-border-subtle bg-panel rounded-2xl overflow-hidden">
+          <CardHeader className="border-b border-border-subtle pb-4">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <CheckCircleIcon className="h-5 w-5 text-gold-400" />
+              <CheckCircleIcon className="h-5 w-5 text-primary" />
               Rule followed vs Rule broken
             </h2>
           </CardHeader>
           <CardContent className="p-4">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-gray-400 border-b border-white/10">
+                <tr className="text-left text-muted-foreground border-b border-border-subtle">
                   <th className="pb-2 pr-2 font-medium">—</th>
                   <th className="pb-2 pr-2 font-medium text-right">Trades</th>
                   <th className="pb-2 pr-2 font-medium text-right">Total R</th>
@@ -782,38 +782,38 @@ export function PerformanceAnalyticsSection() {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b border-white/5">
+                <tr className="border-b border-border-subtle">
                   <td className="py-2 pr-2 text-emerald-400 font-medium">Followed</td>
-                  <td className="py-2 pr-2 text-right text-gray-300">{ruleFollowed.followed.count}</td>
+                  <td className="py-2 pr-2 text-right text-foreground/80">{ruleFollowed.followed.count}</td>
                   <td className="py-2 pr-2 text-right font-medium text-emerald-400">{formatR(ruleFollowed.followed.totalR)}</td>
                   <td className="py-2 text-right font-medium text-emerald-400/90">{formatR(ruleFollowed.followed.avgR)}</td>
                 </tr>
-                <tr className="border-b border-white/5">
-                  <td className="py-2 pr-2 text-amber-400 font-medium">Broken</td>
-                  <td className="py-2 pr-2 text-right text-gray-300">{ruleFollowed.broken.count}</td>
-                  <td className="py-2 pr-2 text-right font-medium text-amber-400">{formatR(ruleFollowed.broken.totalR)}</td>
-                  <td className="py-2 text-right font-medium text-amber-400/90">{formatR(ruleFollowed.broken.avgR)}</td>
+                <tr className="border-b border-border-subtle">
+                  <td className="py-2 pr-2 text-primary font-medium">Broken</td>
+                  <td className="py-2 pr-2 text-right text-foreground/80">{ruleFollowed.broken.count}</td>
+                  <td className="py-2 pr-2 text-right font-medium text-primary">{formatR(ruleFollowed.broken.totalR)}</td>
+                  <td className="py-2 text-right font-medium text-primary/90">{formatR(ruleFollowed.broken.avgR)}</td>
                 </tr>
                 {ruleFollowed.unknown.count > 0 && (
-                  <tr className="border-b border-white/5">
-                    <td className="py-2 pr-2 text-gray-500 font-medium">Unknown</td>
-                    <td className="py-2 pr-2 text-right text-gray-300">{ruleFollowed.unknown.count}</td>
-                    <td className="py-2 pr-2 text-right font-medium text-gray-400">{formatR(ruleFollowed.unknown.totalR)}</td>
-                    <td className="py-2 text-right font-medium text-gray-400">{formatR(ruleFollowed.unknown.avgR)}</td>
+                  <tr className="border-b border-border-subtle">
+                    <td className="py-2 pr-2 text-muted-foreground font-medium">Unknown</td>
+                    <td className="py-2 pr-2 text-right text-foreground/80">{ruleFollowed.unknown.count}</td>
+                    <td className="py-2 pr-2 text-right font-medium text-muted-foreground">{formatR(ruleFollowed.unknown.totalR)}</td>
+                    <td className="py-2 text-right font-medium text-muted-foreground">{formatR(ruleFollowed.unknown.avgR)}</td>
                   </tr>
                 )}
               </tbody>
             </table>
           </CardContent>
         </Card>
-        <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-          <CardHeader className="border-b border-white/10 pb-4">
+        <Card className="border-border-subtle bg-panel rounded-2xl overflow-hidden">
+          <CardHeader className="border-b border-border-subtle pb-4">
             <h2 className="text-lg font-semibold text-white">Avg R by confidence</h2>
           </CardHeader>
           <CardContent className="p-4">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-gray-400 border-b border-white/10">
+                <tr className="text-left text-muted-foreground border-b border-border-subtle">
                   <th className="pb-2 pr-2 font-medium">Bucket</th>
                   <th className="pb-2 pr-2 font-medium text-right">Trades</th>
                   <th className="pb-2 font-medium text-right">Avg R</th>
@@ -821,9 +821,9 @@ export function PerformanceAnalyticsSection() {
               </thead>
               <tbody>
                 {avgRByConfidence.map(({ bucket, count, avgR }) => (
-                  <tr key={bucket} className="border-b border-white/5 last:border-0">
-                    <td className="py-2 pr-2 text-gray-200">{bucket}</td>
-                    <td className="py-2 pr-2 text-right text-gray-300">{count}</td>
+                  <tr key={bucket} className="border-b border-border-subtle last:border-0">
+                    <td className="py-2 pr-2 text-foreground/90">{bucket}</td>
+                    <td className="py-2 pr-2 text-right text-foreground/80">{count}</td>
                     <td className={`py-2 text-right font-medium ${avgR >= 0 ? 'text-emerald-400/90' : 'text-red-400/90'}`}>{formatR(avgR)}</td>
                   </tr>
                 ))}
@@ -831,14 +831,14 @@ export function PerformanceAnalyticsSection() {
             </table>
           </CardContent>
         </Card>
-        <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-          <CardHeader className="border-b border-white/10 pb-4">
+        <Card className="border-border-subtle bg-panel rounded-2xl overflow-hidden">
+          <CardHeader className="border-b border-border-subtle pb-4">
             <h2 className="text-lg font-semibold text-white">Avg R by execution quality</h2>
           </CardHeader>
           <CardContent className="p-4">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-gray-400 border-b border-white/10">
+                <tr className="text-left text-muted-foreground border-b border-border-subtle">
                   <th className="pb-2 pr-2 font-medium">Bucket</th>
                   <th className="pb-2 pr-2 font-medium text-right">Trades</th>
                   <th className="pb-2 font-medium text-right">Avg R</th>
@@ -846,9 +846,9 @@ export function PerformanceAnalyticsSection() {
               </thead>
               <tbody>
                 {avgRByExecution.map(({ bucket, count, avgR }) => (
-                  <tr key={bucket} className="border-b border-white/5 last:border-0">
-                    <td className="py-2 pr-2 text-gray-200">{bucket}</td>
-                    <td className="py-2 pr-2 text-right text-gray-300">{count}</td>
+                  <tr key={bucket} className="border-b border-border-subtle last:border-0">
+                    <td className="py-2 pr-2 text-foreground/90">{bucket}</td>
+                    <td className="py-2 pr-2 text-right text-foreground/80">{count}</td>
                     <td className={`py-2 text-right font-medium ${avgR >= 0 ? 'text-emerald-400/90' : 'text-red-400/90'}`}>{formatR(avgR)}</td>
                   </tr>
                 ))}
@@ -860,24 +860,24 @@ export function PerformanceAnalyticsSection() {
 
       {/* Mistake patterns + Recent performance */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-          <CardHeader className="border-b border-white/10 pb-4">
+        <Card className="border-border-subtle bg-panel rounded-2xl overflow-hidden">
+          <CardHeader className="border-b border-border-subtle pb-4">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <ExclamationTriangleIcon className="h-5 w-5 text-amber-400" />
+              <ExclamationTriangleIcon className="h-5 w-5 text-primary" />
               Top mistake patterns
             </h2>
           </CardHeader>
           <CardContent className="p-6">
             {topMistakes.length === 0 ? (
-              <p className="text-gray-500 text-sm">No mistake phrases recorded yet.</p>
+              <p className="text-muted-foreground text-sm">No mistake phrases recorded yet.</p>
             ) : (
               <ul className="space-y-2">
                 {topMistakes.map(({ phrase, count }, i) => (
                   <li key={i} className="flex justify-between items-baseline gap-2 text-sm">
-                    <span className="text-gray-200 truncate" title={phrase}>
+                    <span className="text-foreground/90 truncate" title={phrase}>
                       {phrase}
                     </span>
-                    <span className="text-gray-500 shrink-0">×{count}</span>
+                    <span className="text-muted-foreground shrink-0">×{count}</span>
                   </li>
                 ))}
               </ul>
@@ -885,8 +885,8 @@ export function PerformanceAnalyticsSection() {
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-          <CardHeader className="border-b border-white/10 pb-4">
+        <Card className="border-border-subtle bg-panel rounded-2xl overflow-hidden">
+          <CardHeader className="border-b border-border-subtle pb-4">
             <h2 className="text-lg font-semibold text-white">Recent performance</h2>
           </CardHeader>
           <CardContent className="p-6">
@@ -896,19 +896,19 @@ export function PerformanceAnalyticsSection() {
                 return (
                   <li
                     key={row.id}
-                    className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm border-b border-white/5 pb-3 last:border-0 last:pb-0"
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm border-b border-border-subtle pb-3 last:border-0 last:pb-0"
                   >
-                    <span className="text-gray-500 shrink-0">
+                    <span className="text-muted-foreground shrink-0">
                       {new Date(row.entry_date).toLocaleDateString()}
                     </span>
                     <span className="text-white font-medium truncate min-w-0" title={row.title}>
                       {row.title || 'Untitled'}
                     </span>
                     {row.pair && (
-                      <span className="text-gray-400">{row.pair}</span>
+                      <span className="text-muted-foreground">{row.pair}</span>
                     )}
                     {row.strategy_used && (
-                      <span className="px-2 py-0.5 rounded bg-white/10 text-gray-300 text-xs">
+                      <span className="px-2 py-0.5 rounded bg-white/10 text-foreground/80 text-xs">
                         {row.strategy_used}
                       </span>
                     )}
@@ -920,7 +920,7 @@ export function PerformanceAnalyticsSection() {
                       {formatR(r)} R
                     </span>
                     {row.mood && (
-                      <span className="text-gray-500 text-xs">{row.mood}</span>
+                      <span className="text-muted-foreground text-xs">{row.mood}</span>
                     )}
                   </li>
                 );
@@ -948,22 +948,22 @@ function BreakdownCard({
 }) {
   if (stats.length === 0) {
     return (
-      <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-        <CardHeader className="border-b border-white/10 pb-4">
+      <Card className="border-border-subtle bg-panel rounded-2xl overflow-hidden">
+        <CardHeader className="border-b border-border-subtle pb-4">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             {icon}
             {title} breakdown
           </h2>
         </CardHeader>
         <CardContent className="p-6">
-          <p className="text-gray-500 text-sm">No data to show.</p>
+          <p className="text-muted-foreground text-sm">No data to show.</p>
         </CardContent>
       </Card>
     );
   }
   return (
-    <Card className="border-white/10 bg-white/5 rounded-2xl overflow-hidden">
-      <CardHeader className="border-b border-white/10 pb-4">
+    <Card className="border-border-subtle bg-panel rounded-2xl overflow-hidden">
+      <CardHeader className="border-b border-border-subtle pb-4">
         <h2 className="text-lg font-semibold text-white flex items-center gap-2">
           {icon}
           {title} breakdown
@@ -973,7 +973,7 @@ function BreakdownCard({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-400 border-b border-white/10">
+              <tr className="text-left text-muted-foreground border-b border-border-subtle">
                 <th className="pb-2 pr-2 font-medium">{title}</th>
                 <th className="pb-2 pr-2 font-medium text-right">Trades</th>
                 <th className="pb-2 pr-2 font-medium text-right">Win %</th>
@@ -983,12 +983,12 @@ function BreakdownCard({
             </thead>
             <tbody>
               {stats.map((s) => (
-                <tr key={s.key} className="border-b border-white/5 last:border-0">
-                  <td className="py-2 pr-2 text-gray-200 truncate max-w-[120px]" title={s.key}>
+                <tr key={s.key} className="border-b border-border-subtle last:border-0">
+                  <td className="py-2 pr-2 text-foreground/90 truncate max-w-[120px]" title={s.key}>
                     {s.key}
                   </td>
-                  <td className="py-2 pr-2 text-right text-gray-300">{s.count}</td>
-                  <td className="py-2 pr-2 text-right text-gray-300">{formatPct(s.winRatePct)}</td>
+                  <td className="py-2 pr-2 text-right text-foreground/80">{s.count}</td>
+                  <td className="py-2 pr-2 text-right text-foreground/80">{formatPct(s.winRatePct)}</td>
                   <td
                     className={`py-2 pr-2 text-right font-medium ${
                       s.totalR >= 0 ? 'text-emerald-400' : 'text-red-400'

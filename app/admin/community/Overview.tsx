@@ -137,31 +137,31 @@ export default function Overview({ adminId, channels }: { adminId: string; chann
         />
       </div>
 
-      <Card className="bg-gray-950 border border-gray-800">
-        <div className="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+      <Card className="bg-panel border border-border">
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-gray-500">Live feed</p>
-            <h3 className="text-lg font-semibold text-white">Recent messages</h3>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Live feed</p>
+            <h3 className="text-lg font-semibold text-foreground">Recent messages</h3>
           </div>
-          {loading ? <span className="text-xs text-gray-400">Refreshing...</span> : null}
+          {loading ? <span className="text-xs text-muted-foreground">Refreshing...</span> : null}
         </div>
         <div className="divide-y divide-gray-800">
           {recentMessages.length === 0 ? (
-            <div className="px-4 py-6 text-gray-500 text-sm">No messages yet.</div>
+            <div className="px-4 py-6 text-muted-foreground text-sm">No messages yet.</div>
           ) : (
             recentMessages.map((msg) => (
               <div key={msg.id} className="px-4 py-3 flex items-start gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="bg-gray-900 border-gray-800 text-gray-200">
+                    <Badge variant="secondary" className="bg-elevated border-border text-foreground/90">
                       {channelLookup.get(msg.channel_id) || 'Channel'}
                     </Badge>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-muted-foreground">
                       {new Date(msg.created_at).toLocaleString()}
                     </span>
                   </div>
-                  <p className="text-white mt-1 line-clamp-2">{msg.content}</p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-foreground mt-1 line-clamp-2">{msg.content}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
                     {msg.profiles?.name || msg.profiles?.email || 'Unknown user'}
                   </p>
                 </div>

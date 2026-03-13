@@ -12,8 +12,8 @@ export function WinLossPie({ wins, losses, breakevens }: { wins: number; losses:
   ]
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-      <h3 className="text-white font-semibold mb-2">Win / Loss</h3>
+    <div className="bg-panel border border-border rounded-xl p-4">
+      <h3 className="text-foreground font-semibold mb-2">Win / Loss</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>

@@ -121,9 +121,9 @@ export default function TradeReviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white p-4 md:p-6">
+      <div className="min-h-screen bg-page text-foreground p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
-          <div className="rounded-xl border border-white/10 bg-white/5 p-12 text-center text-gray-400">
+          <div className="rounded-xl border border-border-subtle bg-panel p-12 text-center text-muted-foreground">
             Loading…
           </div>
         </div>
@@ -133,11 +133,11 @@ export default function TradeReviewPage() {
 
   if (error || !entry) {
     return (
-      <div className="min-h-screen bg-black text-white p-4 md:p-6">
+      <div className="min-h-screen bg-page text-foreground p-4 md:p-6">
         <div className="max-w-4xl mx-auto space-y-4">
           <Link
             href="/dashboard?section=journal"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm"
           >
             <ArrowLeftIcon className="h-4 w-4" />
             Back to Growth Journal
@@ -155,21 +155,21 @@ export default function TradeReviewPage() {
   const screenshotUrl = entry.screenshot_url?.trim();
   if (!screenshotUrl) {
     return (
-      <div className="min-h-screen bg-black text-white p-4 md:p-6">
+      <div className="min-h-screen bg-page text-foreground p-4 md:p-6">
         <div className="max-w-4xl mx-auto space-y-4">
           <Link
             href="/dashboard?section=journal"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm"
           >
             <ArrowLeftIcon className="h-4 w-4" />
             Back to Growth Journal
           </Link>
-          <Card className="border-white/10 bg-white/5">
+          <Card className="border-border-subtle bg-panel">
             <CardContent className="p-8 text-center">
-              <p className="text-gray-300">This entry has no screenshot. Add a screenshot in the journal to annotate it.</p>
+              <p className="text-foreground/80">This entry has no screenshot. Add a screenshot in the journal to annotate it.</p>
               <Button
                 variant="outline"
-                className="mt-4 border-gold-500/40 text-gold-300 hover:bg-gold-500/10"
+                className="mt-4 border-primary/40 text-primary hover:bg-accent-muted"
                 onClick={() => router.push('/dashboard?section=journal')}
               >
                 Edit entry
@@ -182,17 +182,17 @@ export default function TradeReviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-4 md:p-6">
+    <div className="min-h-screen bg-page text-foreground p-4 md:p-6">
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <Link
             href="/dashboard?section=journal"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm"
           >
             <ArrowLeftIcon className="h-4 w-4" />
             Back to Growth Journal
           </Link>
-          <h1 className="text-xl font-semibold text-white truncate">
+          <h1 className="text-xl font-semibold text-foreground truncate">
             {entry.title || 'Trade review'}
           </h1>
         </div>

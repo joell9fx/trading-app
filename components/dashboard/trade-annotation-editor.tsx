@@ -405,8 +405,8 @@ export function TradeAnnotationEditor({
   ];
 
   return (
-    <Card className="border-white/10 bg-white/5 rounded-xl overflow-hidden">
-      <CardHeader className="border-b border-white/10 pb-3">
+    <Card className="border-border-subtle bg-panel rounded-xl overflow-hidden">
+      <CardHeader className="border-b border-border-subtle pb-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-white">Annotate screenshot</h2>
           <div className="flex items-center gap-2">
@@ -414,7 +414,7 @@ export function TradeAnnotationEditor({
               type="button"
               variant="ghost"
               size="sm"
-              className="text-gray-400 hover:text-white"
+              className="text-muted-foreground hover:text-foreground"
               onClick={handleUndo}
               disabled={history.length === 0}
             >
@@ -435,7 +435,7 @@ export function TradeAnnotationEditor({
             <Button
               type="button"
               size="sm"
-              className="bg-gold-500 text-black font-semibold hover:bg-gold-400"
+              className="font-semibold"
               onClick={handleSave}
               disabled={saving}
             >
@@ -452,8 +452,8 @@ export function TradeAnnotationEditor({
               onClick={() => setTool(t)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                 tool === t
-                  ? 'bg-gold-500/20 text-gold-300 border border-gold-500/40'
-                  : 'text-gray-400 hover:text-white hover:bg-white/10 border border-transparent'
+                  ? 'bg-accent-muted text-primary border border-primary/40'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-panel border border-transparent'
               }`}
               title={label}
             >
@@ -471,7 +471,7 @@ export function TradeAnnotationEditor({
         ) : (
           <div
             ref={containerRef}
-            className="relative inline-block max-w-full overflow-hidden rounded-lg border border-white/10 bg-black"
+            className="relative inline-block max-w-full overflow-hidden rounded-lg border border-border-subtle bg-panel"
           >
             <img
               ref={(el) => {
@@ -504,7 +504,7 @@ export function TradeAnnotationEditor({
               />
             )}
             {!imageLoaded && !imageError && (
-              <div className="flex items-center justify-center w-full min-h-[300px] text-gray-500">
+              <div className="flex items-center justify-center w-full min-h-[300px] text-muted-foreground">
                 Loading image…
               </div>
             )}
@@ -512,14 +512,14 @@ export function TradeAnnotationEditor({
         )}
 
         {textPrompt && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-            <div className="rounded-xl border border-white/20 bg-gray-900 p-4 w-full max-w-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-page/80 p-4">
+            <div className="rounded-xl border border-border bg-elevated p-4 w-full max-w-sm">
               <label className="block text-sm font-medium text-white mb-2">Text note</label>
               <input
                 ref={textInputRef}
                 type="text"
                 autoFocus
-                className="w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-500"
+                className="w-full rounded-lg border border-border bg-panel px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter text"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -538,7 +538,7 @@ export function TradeAnnotationEditor({
                 <Button
                   type="button"
                   size="sm"
-                  className="bg-gold-500 text-black"
+                  className=""
                   onClick={() => {
                     const v = textInputRef.current?.value?.trim();
                     if (v) handleTextSubmit(v);

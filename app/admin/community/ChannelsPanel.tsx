@@ -88,34 +88,34 @@ export default function ChannelsPanel({
 
   return (
     <div className="space-y-4">
-      <Card className="bg-gray-950 border border-gray-800 p-4 space-y-3">
+      <Card className="bg-panel border border-border p-4 space-y-3">
         <div>
-          <h3 className="text-lg font-semibold text-white">Create Channel</h3>
-          <p className="text-sm text-gray-400">Add a new discussion space.</p>
+          <h3 className="text-lg font-semibold text-foreground">Create Channel</h3>
+          <p className="text-sm text-muted-foreground">Add a new discussion space.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           <div className="space-y-1">
-            <Label className="text-xs text-gray-400">Name</Label>
+            <Label className="text-xs text-muted-foreground">Name</Label>
             <Input
               value={newChannel.name}
               onChange={(e) => setNewChannel((c) => ({ ...c, name: e.target.value }))}
               placeholder="Orderflow Lab"
-              className="bg-gray-900 border-gray-800 text-gray-100"
+              className="bg-gray-900 border-border text-gray-100"
             />
           </div>
           <div className="space-y-1 md:col-span-2">
-            <Label className="text-xs text-gray-400">Description</Label>
+            <Label className="text-xs text-muted-foreground">Description</Label>
             <Input
               value={newChannel.description}
               onChange={(e) => setNewChannel((c) => ({ ...c, description: e.target.value }))}
               placeholder="What is this channel about?"
-              className="bg-gray-900 border-gray-800 text-gray-100"
+              className="bg-gray-900 border-border text-gray-100"
             />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs text-gray-400">Category</Label>
+            <Label className="text-xs text-muted-foreground">Category</Label>
             <select
-              className="w-full bg-gray-900 border border-gray-800 text-gray-100 rounded-md px-3 py-2"
+              className="w-full bg-panel border border-border text-foreground rounded-md px-3 py-2"
               value={newChannel.category}
               onChange={(e) => setNewChannel((c) => ({ ...c, category: e.target.value }))}
             >
@@ -128,12 +128,12 @@ export default function ChannelsPanel({
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-gray-300">
+          <label className="flex items-center gap-2 text-sm text-foreground/80">
             <input
               type="checkbox"
               checked={newChannel.is_private}
               onChange={(e) => setNewChannel((c) => ({ ...c, is_private: e.target.checked }))}
-              className="rounded border-gray-700 bg-gray-900"
+              className="rounded border-border bg-panel"
             />
             Private channel
           </label>
@@ -144,16 +144,16 @@ export default function ChannelsPanel({
         </div>
       </Card>
 
-      <Card className="bg-gray-950 border border-gray-800">
-        <div className="p-4 border-b border-gray-800 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">Channels</h3>
-          <Button variant="outline" className="border-gray-700 text-gray-200" onClick={onRefresh} disabled={loading}>
+      <Card className="bg-panel border border-border">
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-foreground">Channels</h3>
+          <Button variant="outline" className="border-border text-foreground/90" onClick={onRefresh} disabled={loading}>
             Refresh
           </Button>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm text-left text-gray-300">
-            <thead className="bg-gray-900 text-xs uppercase text-gray-500">
+          <table className="min-w-full text-sm text-left text-foreground/80">
+            <thead className="bg-gray-900 text-xs uppercase text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Type</th>
@@ -165,13 +165,13 @@ export default function ChannelsPanel({
             </thead>
             <tbody>
               {channels.map((channel) => (
-                <tr key={channel.id} className="border-t border-gray-800">
+                <tr key={channel.id} className="border-t border-border">
                   <td className="px-4 py-3">
-                    <div className="font-semibold text-white">{channel.name}</div>
-                    <div className="text-xs text-gray-500">{(channel as any).description}</div>
+                    <div className="font-semibold text-foreground">{channel.name}</div>
+                    <div className="text-xs text-muted-foreground">{(channel as any).description}</div>
                   </td>
                   <td className="px-4 py-3 capitalize">{channel.category}</td>
-                  <td className="px-4 py-3 text-gray-400">
+                  <td className="px-4 py-3 text-muted-foreground">
                     {(channel as any).created_at ? new Date((channel as any).created_at).toLocaleDateString() : '—'}
                   </td>
                   <td className="px-4 py-3">{(channel as any).member_count ?? '—'}</td>
@@ -179,7 +179,7 @@ export default function ChannelsPanel({
                     {channel.archived_at ? 'Archived' : channel.is_private ? 'Private' : 'Public'}
                   </td>
                   <td className="px-4 py-3 space-x-2">
-                    <Button variant="outline" size="sm" className="border-gray-700 text-gray-200" onClick={() => openEdit(channel)}>
+                    <Button variant="outline" size="sm" className="border-border text-foreground/90" onClick={() => openEdit(channel)}>
                       <Pencil className="h-4 w-4 mr-1" />
                       Edit
                     </Button>
@@ -192,7 +192,7 @@ export default function ChannelsPanel({
               ))}
               {!channels.length && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-gray-500">
+                  <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
                     {loading ? 'Loading channels...' : 'No channels available.'}
                   </td>
                 </tr>
@@ -210,25 +210,25 @@ export default function ChannelsPanel({
         confirmText="Save"
       >
         <div className="space-y-2">
-          <Label className="text-xs text-gray-400">Name</Label>
+          <Label className="text-xs text-muted-foreground">Name</Label>
           <Input
             value={editData.name}
             onChange={(e) => setEditData((d) => ({ ...d, name: e.target.value }))}
-            className="bg-gray-900 border-gray-800 text-gray-100"
+            className="bg-gray-900 border-border text-gray-100"
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-xs text-gray-400">Description</Label>
+          <Label className="text-xs text-muted-foreground">Description</Label>
           <Input
             value={editData.description}
             onChange={(e) => setEditData((d) => ({ ...d, description: e.target.value }))}
-            className="bg-gray-900 border-gray-800 text-gray-100"
+            className="bg-gray-900 border-border text-gray-100"
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-xs text-gray-400">Category</Label>
+          <Label className="text-xs text-muted-foreground">Category</Label>
           <select
-            className="w-full bg-gray-900 border border-gray-800 text-gray-100 rounded-md px-3 py-2"
+            className="w-full bg-panel border border-border text-foreground rounded-md px-3 py-2"
             value={editData.category}
             onChange={(e) => setEditData((d) => ({ ...d, category: e.target.value }))}
           >
@@ -239,21 +239,21 @@ export default function ChannelsPanel({
             ))}
           </select>
         </div>
-        <label className="flex items-center gap-2 text-sm text-gray-300">
+        <label className="flex items-center gap-2 text-sm text-foreground/80">
           <input
             type="checkbox"
             checked={editData.is_private}
             onChange={(e) => setEditData((d) => ({ ...d, is_private: e.target.checked }))}
-            className="rounded border-gray-700 bg-gray-900"
+            className="rounded border-border bg-panel"
           />
           Private
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-300">
+        <label className="flex items-center gap-2 text-sm text-foreground/80">
           <input
             type="checkbox"
             checked={editData.archived}
             onChange={(e) => setEditData((d) => ({ ...d, archived: e.target.checked }))}
-            className="rounded border-gray-700 bg-gray-900"
+            className="rounded border-border bg-panel"
           />
           Archived
         </label>
