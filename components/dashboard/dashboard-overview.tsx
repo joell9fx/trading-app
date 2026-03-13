@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseClient } from '@/lib/supabase/client';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -12,10 +11,15 @@ import {
   UserGroupIcon,
   ChatBubbleLeftRightIcon,
   ArrowRightIcon,
-  ClockIcon,
-  FireIcon,
+  CommandLineIcon,
   BookOpenIcon,
-  CpuChipIcon,
+  DocumentChartBarIcon,
+  SparklesIcon,
+  ClipboardDocumentCheckIcon,
+  Cog6ToothIcon,
+  BellIcon,
+  WalletIcon,
+  CurrencyDollarIcon,
 } from '@heroicons/react/24/outline';
 import { useCheckout } from './use-checkout';
 import { NextUpgradeCard } from './NextUpgradeCard';
@@ -27,11 +31,26 @@ import { MembershipTier, computeTier } from '@/lib/tier-utils';
 import { ACCESS_DEFAULTS, countUnlocked, type AccessModuleKey } from '@/lib/access-flags';
 
 interface DashboardOverviewProps {
-  user: any;
+  user: { email?: string; id?: string; [key: string]: unknown };
   access?: Record<AccessModuleKey, boolean>;
   unlockedCount?: number;
   onCheckout?: (serviceKey: ServiceKey) => void;
 }
+
+const SHORTCUTS: { id: string; label: string; description: string; icon: React.ComponentType<{ className?: string }>; section: string }[] = [
+  { id: 'terminal', label: 'Command Center', description: 'Unified performance & focus', icon: CommandLineIcon, section: 'terminal' },
+  { id: 'journal', label: 'Growth Journal', description: 'Log & review trades', icon: BookOpenIcon, section: 'journal' },
+  { id: 'analytics', label: 'Analytics', description: 'Charts & metrics', icon: ChartBarIcon, section: 'analytics' },
+  { id: 'ai-coach', label: 'AI Trade Coach', description: 'Insights & next actions', icon: SparklesIcon, section: 'ai-coach' },
+  { id: 'reports', label: 'Reports', description: 'Saved snapshots', icon: DocumentChartBarIcon, section: 'reports' },
+  { id: 'consistency', label: 'Consistency', description: 'Discipline scores', icon: ClipboardDocumentCheckIcon, section: 'consistency' },
+  { id: 'community-hub', label: 'Community', description: 'Discuss & share', icon: ChatBubbleLeftRightIcon, section: 'community-hub' },
+  { id: 'courses', label: 'Education', description: 'Courses & lessons', icon: AcademicCapIcon, section: 'courses' },
+  { id: 'signals', label: 'Signals', description: 'Trading setups', icon: ChartBarIcon, section: 'signals' },
+  { id: 'notifications', label: 'Notifications', description: 'Updates & alerts', icon: BellIcon, section: 'notifications' },
+  { id: 'funding', label: 'Funding', description: 'Prop accounts', icon: CurrencyDollarIcon, section: 'funding' },
+  { id: 'wallet', label: 'Rewards', description: 'Wallet & points', icon: WalletIcon, section: 'wallet' },
+];
 
 export default function DashboardOverview({ user, access, unlockedCount: unlockedCountProp, onCheckout }: DashboardOverviewProps) {
   const router = useRouter();
@@ -55,426 +74,153 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
     }
     const fetchStats = async () => {
       try {
-        // Fetch user's profile data
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        // Fetch total courses count
-        const { count: totalCoursesCount } = await supabase
-          .from('courses')
-          .select('*', { count: 'exact', head: true })
-          .eq('is_published', true);
-
-        // Fetch completed lessons count from progress table
-        const { count: completedLessonsCount } = await supabase
-          .from('progress')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .eq('completed', true);
-
-        // Fetch community posts count (check both posts and community_posts tables)
-        const { count: postsCount } = await supabase
-          .from('posts')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id);
-
-        const { count: communityPostsCount } = await supabase
-          .from('community_posts')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id);
-
-        // Fetch mentorship sessions count from bookings table
-        const { count: bookingsCount } = await supabase
-          .from('bookings')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .in('status', ['pending', 'confirmed']);
-
-        // Fetch active courses (courses with progress but not completed)
-        const { data: progressData } = await supabase
-          .from('progress')
-          .select('lesson_id, completed')
-          .eq('user_id', user.id);
-
-        // Get unique course IDs from lessons
-        if (progressData && progressData.length > 0) {
-          const lessonIds = progressData.map(p => p.lesson_id);
-          const { data: lessonsData } = await supabase
-            .from('lessons')
-            .select('course_id')
-            .in('id', lessonIds);
-
-          if (lessonsData) {
-            const uniqueCourseIds = Array.from(new Set(lessonsData.map(l => l.course_id)));
-            // Count courses where user has progress but hasn't completed all lessons
-            const activeCoursesCount = uniqueCourseIds.length;
-            
-            setStats({
-              totalCourses: totalCoursesCount || 0,
-              completedLessons: completedLessonsCount || 0,
-              communityPosts: (postsCount || 0) + (communityPostsCount || 0),
-              mentorshipSessions: bookingsCount || 0,
-              activeCourses: activeCoursesCount,
-            });
-          } else {
-            setStats({
-              totalCourses: totalCoursesCount || 0,
-              completedLessons: completedLessonsCount || 0,
-              communityPosts: (postsCount || 0) + (communityPostsCount || 0),
-              mentorshipSessions: bookingsCount || 0,
-              activeCourses: 0,
-            });
-          }
-        } else {
-          setStats({
-            totalCourses: totalCoursesCount || 0,
-            completedLessons: completedLessonsCount || 0,
-            communityPosts: (postsCount || 0) + (communityPostsCount || 0),
-            mentorshipSessions: bookingsCount || 0,
-            activeCourses: 0,
-          });
+        const [{ count: totalCoursesCount }, { count: completedLessonsCount }, { count: postsCount }, { count: communityPostsCount }, { count: bookingsCount }, { data: progressData }] = await Promise.all([
+          supabase.from('courses').select('*', { count: 'exact', head: true }).eq('is_published', true),
+          supabase.from('progress').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('completed', true),
+          supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+          supabase.from('community_posts').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+          supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('user_id', user.id).in('status', ['pending', 'confirmed']),
+          supabase.from('progress').select('lesson_id, completed').eq('user_id', user.id),
+        ]);
+        let activeCourses = 0;
+        if (progressData?.length) {
+          const lessonIds = progressData.map((p) => p.lesson_id);
+          const { data: lessonsData } = await supabase.from('lessons').select('course_id').in('id', lessonIds);
+          if (lessonsData) activeCourses = new Set(lessonsData.map((l) => l.course_id)).size;
         }
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-        // Fallback to default values on error
         setStats({
-          totalCourses: 0,
-          completedLessons: 0,
-          communityPosts: 0,
-          mentorshipSessions: 0,
-          activeCourses: 0,
+          totalCourses: totalCoursesCount ?? 0,
+          completedLessons: completedLessonsCount ?? 0,
+          communityPosts: (postsCount ?? 0) + (communityPostsCount ?? 0),
+          mentorshipSessions: bookingsCount ?? 0,
+          activeCourses,
         });
+      } catch (e) {
+        console.error('Overview stats', e);
       } finally {
         setLoading(false);
       }
     };
-
     fetchStats();
   }, [user?.id, supabase]);
 
+  const unlockedMap: Record<AccessModuleKey, boolean> = useMemo(() => ({ ...ACCESS_DEFAULTS, ...(access || {}) }), [access]);
+  const resolvedUnlockedCount = typeof unlockedCountProp === 'number' ? unlockedCountProp : countUnlocked(unlockedMap);
+  const tier: MembershipTier = (user?.membership_tier as MembershipTier) || computeTier(resolvedUnlockedCount);
+  const nextService = useMemo(() => {
+    const unlockedKeys = (Object.keys(unlockedMap) as AccessModuleKey[]).filter((k) => unlockedMap[k]);
+    if (unlockedKeys.length === 0) return ALL_SERVICES.find((s) => s.key === 'community') ?? null;
+    if (unlockedKeys.length <= 2) return ALL_SERVICES.find((s) => s.key === 'signals' && !unlockedMap[s.key]) ?? ALL_SERVICES.find((s) => !unlockedMap[s.key]) ?? null;
+    if (unlockedKeys.length >= 3) return ALL_SERVICES.find((s) => s.key === 'mentorship' && !unlockedMap[s.key]) ?? ALL_SERVICES.find((s) => !unlockedMap[s.key]) ?? null;
+    return ALL_SERVICES.find((s) => !unlockedMap[s.key]) ?? null;
+  }, [unlockedMap]);
+
+  const goTo = (section: string) => () => router.push(`/dashboard?section=${section}`);
+
   if (loading) {
     return (
-      <div className="animate-pulse space-y-6">
-        <div className="h-32 bg-gray-900 border border-gray-800 rounded-lg"></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-gray-900 border border-gray-800 p-6 rounded-lg">
-              <div className="h-4 bg-gray-800 rounded w-1/2 mb-2"></div>
-              <div className="h-8 bg-gray-800 rounded w-1/3"></div>
-            </div>
+      <div className="animate-pulse space-y-8">
+        <div className="h-24 bg-white/[0.04] rounded-xl" />
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="h-20 bg-white/[0.04] rounded-xl" />
           ))}
         </div>
       </div>
     );
   }
 
-  const userName = user.email?.split('@')[0] || 'Trader';
-  const currentHour = new Date().getHours();
-  const greeting = currentHour < 12 ? 'Good morning' : currentHour < 18 ? 'Good afternoon' : 'Good evening';
-
-  const unlockedMap: Record<AccessModuleKey, boolean> = { ...ACCESS_DEFAULTS, ...(access || {}) };
-  const totalCount = ALL_SERVICES.length;
-  const resolvedUnlockedCount = typeof unlockedCountProp === 'number' ? unlockedCountProp : countUnlocked(unlockedMap);
-  const tier: MembershipTier = (user?.membership_tier as MembershipTier) || computeTier(resolvedUnlockedCount);
-
-  const nextService = (() => {
-    // priority: none unlocked -> community, 1-2 -> signals, 3+ -> mentorship, else first locked
-    const unlockedKeys = (Object.keys(unlockedMap) as AccessModuleKey[]).filter((k) => unlockedMap[k]);
-    if (unlockedKeys.length === 0) {
-      return ALL_SERVICES.find((s) => s.key === 'community') || null;
-    }
-    if (unlockedKeys.length <= 2) {
-      return ALL_SERVICES.find((s) => s.key === 'signals' && !unlockedMap[s.key]) || ALL_SERVICES.find((s) => !unlockedMap[s.key]) || null;
-    }
-    if (unlockedKeys.length >= 3) {
-      return ALL_SERVICES.find((s) => s.key === 'mentorship' && !unlockedMap[s.key]) || ALL_SERVICES.find((s) => !unlockedMap[s.key]) || null;
-    }
-    return ALL_SERVICES.find((s) => !unlockedMap[s.key]) || null;
-  })();
+  const userName = (user?.email ?? '').split('@')[0] || 'Trader';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   return (
-    <div className="space-y-7">
-      {/* Progress & Upsell */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+    <div className="space-y-8">
+      {/* Hero: greeting + primary CTA */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1">{greeting}, {userName}</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-white tracking-tight">Control Centre</h1>
+          <p className="mt-1 text-sm text-gray-400 max-w-md">Your daily hub for performance, journal, and next actions.</p>
+        </div>
+        <Button
+          onClick={goTo('terminal')}
+          className="shrink-0 bg-amber-500 hover:bg-amber-400 text-black font-semibold border-0 shadow-lg shadow-amber-500/20"
+        >
+          <CommandLineIcon className="h-5 w-5 mr-2" />
+          Open Command Center
+          <ArrowRightIcon className="h-4 w-4 ml-2" />
+        </Button>
+      </div>
+
+      {/* Shortcuts grid */}
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-3">Quick access</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {SHORTCUTS.map((s) => {
+            const Icon = s.icon;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                onClick={goTo(s.section)}
+                className="group flex items-start gap-3 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/10 transition-all text-left focus:outline-none focus:ring-2 focus:ring-amber-400/30 focus:ring-offset-2 focus:ring-offset-[#0a0e14]"
+              >
+                <div className="p-2 rounded-lg bg-white/[0.06] group-hover:bg-amber-500/10 border border-white/[0.06] group-hover:border-amber-400/20 transition-colors">
+                  <Icon className="h-5 w-5 text-gray-400 group-hover:text-amber-400/90" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-white truncate">{s.label}</p>
+                  <p className="text-xs text-gray-500 truncate">{s.description}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Membership + upgrade: compact row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <MembershipCard tier={tier} />
         <NextUpgradeCard nextService={nextService} onCheckout={(key) => startCheckout(key)} />
       </div>
 
-      {/* Services Grid */}
-      <div className="rounded-2xl border border-white/8 bg-white/5 p-4 sm:p-6">
-        <ServicesGrid services={ALL_SERVICES as any} unlocked={unlockedMap} onCheckout={(_key) => openUpgrade()} />
-      </div>
-
-      {/* Hero Welcome + Member Updates — side-by-side on large screens for immediate visibility */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="lg:col-span-2 relative overflow-hidden rounded-2xl border border-white/10 bg-[#0f1624] p-8 text-white shadow-[0_20px_50px_-35px_rgba(0,0,0,0.85)]">
-          <div className="flex flex-col items-start gap-6">
-            <div className="space-y-3 max-w-2xl">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 border border-white/15 text-gray-200">
-                {greeting}, {userName}
-              </span>
-              <h1 className="text-3xl lg:text-4xl font-semibold leading-tight">
-                Welcome back to your trading desk 👋
-              </h1>
-              <p className="text-gray-300">
-                Continue your journey, unlock services, and keep your edge sharp with curated actions below.
-              </p>
-              <div className="flex flex-wrap gap-3 pt-2">
-                <Button
-                  onClick={() => router.push('/dashboard?section=learning-path')}
-                  className="bg-gold-500 hover:bg-gold-400 text-black"
-                >
-                  View learning path
-                  <ArrowRightIcon className="w-4 h-4 ml-2" />
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => router.push('/dashboard?section=notifications')}
-                  className="border-white/20 text-white hover:bg-white/10"
-                >
-                  Check notifications
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="min-w-0">
-          <ActivityFeed title="Member Updates" items={[]} />
+      {/* Services grid: unlock more */}
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-3">Services</p>
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 sm:p-5">
+          <ServicesGrid services={ALL_SERVICES as never} unlocked={unlockedMap} onCheckout={() => openUpgrade()} />
         </div>
       </div>
 
-      <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">Status</p>
-      {/* Status Indicators */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-        <Card className="bg-white/5 border border-white/10 p-4 sm:p-5 transition-all duration-200 ease-out hover:border-white/15 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs uppercase tracking-[0.18em] text-gray-400">Membership</span>
-            <span className="px-2 py-1 text-[11px] rounded-full bg-gold-500/15 border border-gold-500/25 text-gold-200">
-              {tier || 'Member'}
-            </span>
-          </div>
-          <p className="text-sm text-gray-300">Access level: {tier === 'Elite' ? 'Full access' : 'Core member'}</p>
+      {/* Status + activity row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="p-4 border-white/[0.06] bg-white/[0.02] rounded-xl">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">Membership</p>
+          <p className="text-sm font-medium text-white">{tier === 'Elite' ? 'Full access' : 'Core member'}</p>
+          <p className="text-xs text-gray-500 mt-0.5">{resolvedUnlockedCount} of 5 services unlocked</p>
         </Card>
-
-        <Card className="bg-white/5 border border-white/10 p-4 sm:p-5 transition-all duration-200 ease-out hover:border-white/15 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs uppercase tracking-[0.18em] text-gray-400">Unlocked</span>
-            <span className="px-2 py-1 text-[11px] rounded-full bg-white/10 border border-white/15 text-gray-100">
-              {resolvedUnlockedCount || 0} / 5
-            </span>
-          </div>
-          <p className="text-sm text-gray-300">
-            {resolvedUnlockedCount && resolvedUnlockedCount >= 4 ? 'Almost everything is open.' : 'Upgrade to unlock more services.'}
-          </p>
+        <Card className="p-4 border-white/[0.06] bg-white/[0.02] rounded-xl">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">Learning</p>
+          <p className="text-sm font-medium text-white">{stats.activeCourses} active · {stats.completedLessons} lessons done</p>
+          <button type="button" onClick={goTo('courses')} className="text-xs text-amber-400/90 hover:text-amber-300 mt-1 font-medium">
+            View education →
+          </button>
         </Card>
-
-        <Card className="bg-white/5 border border-white/10 p-4 sm:p-5 transition-all duration-200 ease-out hover:border-white/15 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs uppercase tracking-[0.18em] text-gray-400">Auto Trader</span>
-            <span className={`px-2 py-1 text-[11px] rounded-full ${access?.auto_trader ? 'bg-emerald-500/15 border border-emerald-400/30 text-emerald-200' : 'bg-white/10 border border-white/15 text-gray-100'}`}>
-              {access?.auto_trader ? 'Unlocked' : 'Locked'}
-            </span>
-          </div>
-          <p className="text-sm text-gray-300">
-            {access?.auto_trader ? 'Setup is ready inside Auto Trader.' : 'Locked—unlock to configure automation.'}
-          </p>
+        <Card className="p-4 border-white/[0.06] bg-white/[0.02] rounded-xl">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">Activity</p>
+          <p className="text-sm font-medium text-white">{stats.communityPosts} posts · {stats.mentorshipSessions} sessions</p>
+          <button type="button" onClick={goTo('community-hub')} className="text-xs text-amber-400/90 hover:text-amber-300 mt-1 font-medium">
+            Community →
+          </button>
         </Card>
       </div>
 
-      {/* Stats Grid - Redesigned */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <Card className="bg-white/5 border border-white/10 hover:border-gold-400/50 hover:shadow-lg hover:shadow-gold-500/10 transition-all cursor-pointer group">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gold-500/15 border border-gold-500/25 rounded-xl">
-                <AcademicCapIcon className="w-6 h-6 text-gold-300" />
-              </div>
-              <span className="text-xs font-semibold text-gold-200 bg-gold-500/15 border border-gold-500/25 px-2 py-1 rounded-full">
-                Active
-              </span>
-            </div>
-            <p className="text-sm font-medium text-gray-400 mb-1">Active Courses</p>
-            <p className="text-3xl font-bold text-white">{stats.activeCourses}</p>
-            <p className="text-xs text-gray-500 mt-2">of {stats.totalCourses} total</p>
-          </div>
-        </Card>
-
-        <Card className="bg-white/5 border border-white/10 hover:border-gold-400/50 hover:shadow-lg hover:shadow-gold-500/10 transition-all cursor-pointer group">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gold-500/15 border border-gold-500/25 rounded-xl">
-                <BookOpenIcon className="w-6 h-6 text-gold-300" />
-              </div>
-              <span className="text-xs font-semibold text-gold-200 bg-gold-500/15 border border-gold-500/25 px-2 py-1 rounded-full">
-                {stats.totalCourses > 0
-                  ? Math.round((stats.completedLessons / (stats.totalCourses * 5)) * 100)
-                  : 0}%
-              </span>
-            </div>
-            <p className="text-sm font-medium text-gray-400 mb-1">Completed Lessons</p>
-            <p className="text-3xl font-bold text-white">{stats.completedLessons}</p>
-            <p className="text-xs text-gray-500 mt-2">Keep it up!</p>
-          </div>
-        </Card>
-
-        <Card className="bg-white/5 border border-white/10 hover:border-gold-400/50 hover:shadow-lg hover:shadow-gold-500/10 transition-all cursor-pointer group">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gold-500/15 border border-gold-500/25 rounded-xl">
-                <UserGroupIcon className="w-6 h-6 text-gold-300" />
-              </div>
-              <span className="text-xs font-semibold text-gold-200 bg-gold-500/15 border border-gold-500/25 px-2 py-1 rounded-full">
-                <FireIcon className="w-3 h-3 inline" /> Active
-              </span>
-            </div>
-            <p className="text-sm font-medium text-gray-400 mb-1">Community Posts</p>
-            <p className="text-3xl font-bold text-white">{stats.communityPosts}</p>
-            <p className="text-xs text-gray-500 mt-2">Engage more!</p>
-          </div>
-        </Card>
-
-        <Card className="bg-white/5 border border-white/10 hover:border-gold-400/50 hover:shadow-lg hover:shadow-gold-500/10 transition-all cursor-pointer group">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gold-500/15 border border-gold-500/25 rounded-xl">
-                <ChatBubbleLeftRightIcon className="w-6 h-6 text-gold-300" />
-              </div>
-              <span className="text-xs font-semibold text-gold-200 bg-gold-500/15 border border-gold-500/25 px-2 py-1 rounded-full">
-                <ClockIcon className="w-3 h-3 inline" /> Scheduled
-              </span>
-            </div>
-            <p className="text-sm font-medium text-gray-400 mb-1">Mentorship Sessions</p>
-            <p className="text-3xl font-bold text-white">{stats.mentorshipSessions}</p>
-            <p className="text-xs text-gray-500 mt-2">Book more sessions</p>
-          </div>
-        </Card>
-      </div>
-
-      {/* Quick Actions - Redesigned */}
-      <div className="grid grid-cols-1 gap-4 sm:gap-6">
-        <Card className="p-6 bg-white/5 border border-white/10 hover:border-gold-400/50 transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-gray-400 mb-1">Momentum</p>
-              <h2 className="text-xl font-semibold text-white">Quick Actions</h2>
-            </div>
-            <ArrowRightIcon className="w-5 h-5 text-gray-400" />
-          </div>
-          <div className="space-y-3">
-            <button
-              onClick={() => router.push('/dashboard?section=courses')}
-              className="w-full flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:border-gold-400/40 hover:bg-white/10 transition-all group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f1c]"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gold-500/15 border border-gold-500/20 rounded-lg">
-                  <AcademicCapIcon className="w-5 h-5 text-gold-300" />
-                </div>
-                <span className="font-semibold text-white">Browse Courses</span>
-              </div>
-              <ArrowRightIcon className="w-5 h-5 text-gold-300 group-hover:translate-x-1 transition-transform" />
-            </button>
-            
-            <button
-              onClick={() => router.push('/community-hub')}
-              className="w-full flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:border-gold-400/40 hover:bg-white/10 transition-all group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f1c]"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gold-500/15 border border-gold-500/20 rounded-lg">
-                  <UserGroupIcon className="w-5 h-5 text-gold-300" />
-                </div>
-                <span className="font-semibold text-white">Join Community</span>
-              </div>
-              <ArrowRightIcon className="w-5 h-5 text-gold-300 group-hover:translate-x-1 transition-transform" />
-            </button>
-            
-            <button
-              onClick={() => router.push('/dashboard?section=mentorship')}
-              className="w-full flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:border-gold-400/40 hover:bg-white/10 transition-all group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f1c]"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gold-500/15 border border-gold-500/20 rounded-lg">
-                  <ChatBubbleLeftRightIcon className="w-5 h-5 text-gold-300" />
-                </div>
-                <span className="font-semibold text-white">Book Mentorship</span>
-              </div>
-              <ArrowRightIcon className="w-5 h-5 text-gold-300 group-hover:translate-x-1 transition-transform" />
-            </button>
-
-            <button
-              onClick={() => router.push('/dashboard/auto-trader')}
-              className="w-full flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:border-gold-400/40 hover:bg-white/10 transition-all group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f1c]"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gold-500/15 border border-gold-500/20 rounded-lg">
-                  <CpuChipIcon className="w-5 h-5 text-gold-300" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-semibold text-white">Auto Trader</span>
-                  <span className="text-xs text-gray-400">Automation overview & setup</span>
-                </div>
-              </div>
-              <ArrowRightIcon className="w-5 h-5 text-gold-300 group-hover:translate-x-1 transition-transform" />
-            </button>
-
-            <button
-              onClick={() => router.push('/dashboard/gold-to-glory')}
-              className="w-full flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-xl hover:border-gold-400/40 hover:bg-white/10 transition-all group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0f1c]"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gold-500/15 border border-gold-500/20 rounded-lg">
-                  <CpuChipIcon className="w-5 h-5 text-gold-300" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-semibold text-white">Gold to Glory (G2G)</span>
-                  <span className="text-xs text-gray-400">100 → 1000 Challenge</span>
-                </div>
-              </div>
-              <ArrowRightIcon className="w-5 h-5 text-gold-300 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-        </Card>
-
-        {/* Recent Activity / Featured Section */}
-        <Card className="p-6 bg-white/5 border border-white/10">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-gray-400 mb-1">Consistency</p>
-              <h2 className="text-xl font-semibold text-white">Your Progress</h2>
-            </div>
-            <div className="w-12 h-12 bg-gold-500/15 border border-gold-500/25 rounded-full flex items-center justify-center">
-              <ChartBarIcon className="w-6 h-6 text-gold-300" />
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-gold-300 rounded-full"></div>
-                <span className="text-sm font-medium text-gray-300">Learning streak</span>
-              </div>
-              <span className="text-sm font-semibold text-white">3 days</span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-gold-300 rounded-full"></div>
-                <span className="text-sm font-medium text-gray-300">This week's goal</span>
-              </div>
-              <span className="text-sm font-semibold text-white">5 lessons</span>
-            </div>
-            <div className="pt-4 border-t border-white/10">
-              <Link href="/courses">
-                <Button className="w-full bg-gold-500 hover:bg-gold-400 text-black">
-                  View All Courses
-                  <ArrowRightIcon className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </Card>
+      {/* Member updates / activity feed */}
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-3">Updates</p>
+        <ActivityFeed title="Member Updates" items={[]} />
       </div>
     </div>
   );
 }
-

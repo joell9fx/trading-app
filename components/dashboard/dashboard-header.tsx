@@ -27,8 +27,8 @@ export default function DashboardHeader({ user, onSignOut, onMenuToggle, onNotif
             </button>
             
             <div>
-              <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400">Dashboard</p>
-              <h1 className="text-lg font-semibold text-white">Trading Academy</h1>
+              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-gray-500">Workspace</p>
+              <h1 className="text-base font-semibold text-white tracking-tight">Trading Desk</h1>
             </div>
           </div>
 

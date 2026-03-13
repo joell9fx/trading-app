@@ -305,9 +305,8 @@ export function PerformanceAnalyticsSection() {
     filters.mood !== ALL_FILTER;
 
   const fetchEntries = useCallback(async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData?.user ?? null;
     if (!user) {
       setRows([]);
       setLoading(false);
@@ -465,7 +464,8 @@ export function PerformanceAnalyticsSection() {
   }, []);
 
   const handleGenerateReport = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData?.user ?? null;
     if (!user) {
       toast({ title: 'Sign in required', variant: 'destructive' });
       return;

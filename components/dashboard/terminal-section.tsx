@@ -594,9 +594,8 @@ export function TerminalSection() {
   const supabase = useMemo(() => createSupabaseClient(), []);
 
   const fetchData = useCallback(async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data } = await supabase.auth.getUser();
+    const user = data?.user ?? null;
     if (!user) {
       setEntries([]);
       setReports([]);

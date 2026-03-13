@@ -34,9 +34,8 @@ export default function TradeReviewPage() {
     }
     let mounted = true;
     (async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data } = await supabase.auth.getUser();
+      const user = data?.user ?? null;
       if (!user || !mounted) {
         if (mounted) {
           setError('Sign in required');

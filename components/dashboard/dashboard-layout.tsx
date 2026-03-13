@@ -27,14 +27,13 @@ import { LearningPathList } from './learning-path-list';
 import AutoTraderSection from './auto-trader-section';
 import { MentorChat } from './mentor-chat';
 import { GoldToGlory } from './gold-to-glory';
-import { 
-  HomeIcon, 
-  ChartBarIcon, 
-  ChatBubbleLeftRightIcon, 
-  AcademicCapIcon, 
+import {
+  HomeIcon,
+  ChartBarIcon,
+  ChatBubbleLeftRightIcon,
   UserIcon,
-  CpuChipIcon,
   ShieldCheckIcon,
+  CommandLineIcon,
 } from '@heroicons/react/24/outline';
 import { AdminHub } from './admin/admin-hub';
 import { RoleProvider, useRole } from './role-provider';
@@ -449,7 +448,7 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#05080f] via-[#060910] to-black text-gray-100">
+    <div className="min-h-screen bg-[#05080f] text-gray-100">
       <DashboardHeader 
         user={user} 
         onSignOut={handleSignOut}
@@ -458,7 +457,7 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
         unreadCount={unreadCount}
       />
       
-      <div className="relative flex gap-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-10 pt-3 lg:pt-6">
+      <div className="relative flex gap-4 lg:gap-6 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-24 lg:pb-10 pt-3 lg:pt-6">
         <DashboardSidebar
           activeSection={effectiveSection as any}
           onSectionChange={(section) => setActiveSection(section as DashboardTab)}
@@ -471,36 +470,24 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
           hasAdminAccess={hasAdminAccess}
           permissions={permissions}
         />
-        
-        <main className="flex-1">
-          <div className="min-h-[calc(100vh-6rem)] rounded-2xl border border-white/5 bg-white/5 backdrop-blur-sm shadow-[0_20px_60px_-35px_rgba(0,0,0,0.6)] p-5 sm:p-6 lg:p-8">
-            <div className="mb-6 flex flex-wrap items-center gap-3 text-xs text-gray-300">
-              <span className="px-3 py-1 rounded-full bg-white/10 border border-white/15 text-gray-100">
-                Unlocked {unlockedCount} of 5 services
-              </span>
-              {servicesLoading && <span className="text-xs text-gray-500">Refreshing access...</span>}
-              {loadingKey && (
-                <span className="text-xs text-gray-500">
-                  Starting checkout for {loadingKey}...
-                </span>
-              )}
-            </div>
-
+        <main className="flex-1 min-w-0">
+          <div className="min-h-[calc(100vh-5rem)] lg:min-h-[calc(100vh-6rem)] rounded-xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-4 sm:p-6 lg:p-8">
+            {loadingKey && (
+              <p className="mb-4 text-xs text-amber-400/90">Starting checkout for {loadingKey}…</p>
+            )}
             {renderSection()}
           </div>
         </main>
       </div>
 
-      {/* Mobile Bottom Nav */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-[#0b101a]/95 backdrop-blur-md border-t border-white/10 px-3 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-        <div className="grid grid-cols-6 gap-2">
+      {/* Mobile Bottom Nav: 5 primary actions */}
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-[#0a0e14]/98 backdrop-blur-md border-t border-white/[0.06]">
+        <div className="grid grid-cols-5 gap-1 px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           {[
-            { id: 'overview', label: 'Dashboard', icon: HomeIcon },
+            { id: 'overview', label: 'Home', icon: HomeIcon },
+            { id: 'terminal', label: 'Command', icon: CommandLineIcon },
             { id: 'signals', label: 'Signals', icon: ChartBarIcon },
             { id: 'community-hub', label: 'Community', icon: ChatBubbleLeftRightIcon },
-            { id: 'courses', label: 'Education', icon: AcademicCapIcon },
-            { id: 'auto-trader', label: 'Auto Trader', icon: CpuChipIcon },
-            { id: 'gold-to-glory', label: 'G2G', icon: CpuChipIcon },
             { id: 'profile', label: 'Account', icon: UserIcon },
           ].map((item) => {
             const isActive = effectiveSection === item.id;
@@ -508,42 +495,30 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
             return (
               <button
                 key={item.id}
+                type="button"
                 onClick={() => setActiveSection(item.id as DashboardTab)}
-                className={`flex flex-col items-center justify-center py-2.5 rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b101a] ${
-                  isActive
-                    ? 'text-white bg-white/10 border border-white/15 shadow-sm'
-                    : 'text-gray-400 hover:text-white'
+                className={`flex flex-col items-center justify-center py-2.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:ring-offset-2 focus:ring-offset-[#0a0e14] ${
+                  isActive ? 'text-amber-400 bg-amber-500/10' : 'text-gray-400 hover:text-white'
                 }`}
                 aria-current={isActive ? 'page' : undefined}
               >
-                <Icon className={`h-6 w-6 ${isActive ? 'text-gold-300' : 'text-gray-400'}`} />
-                <span className="text-[11px] font-semibold mt-1 text-center leading-tight">{item.label}</span>
+                <Icon className="h-6 w-6" />
+                <span className="text-[10px] font-medium mt-1 text-center leading-tight">{item.label}</span>
               </button>
             );
           })}
         </div>
-        {(() => {
-          if (!hasAdminAccess) return null;
-
-          return (
-            <div className="mt-2">
-              <button
-                onClick={() => {
-                  setActiveSection('admin');
-                  router.push('/dashboard/admin');
-                }}
-                className={`w-full flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b101a] ${
-                  effectiveSection === 'admin'
-                    ? 'text-white bg-white/10 border-white/20'
-                    : 'text-gold-200 bg-emerald-500/10 border-emerald-400/30'
-                }`}
-              >
-                <ShieldCheckIcon className="h-5 w-5" />
-                Admin
-              </button>
-            </div>
-          );
-        })()}
+        {hasAdminAccess && (
+          <div className="px-2 pb-2">
+            <a
+              href="/dashboard/admin"
+              className="flex items-center justify-center gap-2 w-full py-2 rounded-lg text-xs font-semibold text-amber-200 bg-amber-500/10 border border-amber-400/20"
+            >
+              <ShieldCheckIcon className="h-4 w-4" />
+              Admin
+            </a>
+          </div>
+        )}
       </nav>
     </div>
   );

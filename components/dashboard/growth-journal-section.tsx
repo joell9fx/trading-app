@@ -241,7 +241,8 @@ export function GrowthJournalSection() {
   const supabase = useMemo(() => createSupabaseClient(), []);
 
   const fetchEntries = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData?.user ?? null;
     if (!user) {
       setEntries([]);
       setLoading(false);
@@ -325,7 +326,8 @@ export function GrowthJournalSection() {
   const handleDelete = useCallback(
     async (entry: GrowthJournalEntry) => {
       if (!window.confirm('Delete this journal entry? This cannot be undone.')) return;
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: authData } = await supabase.auth.getUser();
+      const user = authData?.user ?? null;
       if (!user) {
         toast({ title: 'Sign in required', description: 'Please sign in to delete entries.', variant: 'destructive' });
         return;
@@ -366,7 +368,8 @@ export function GrowthJournalSection() {
       toast({ title: 'Invalid Result (R)', description: 'Enter a number, e.g. 3, 2.5, or -0.5.', variant: 'destructive' });
       return;
     }
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData?.user ?? null;
     if (!user) {
       toast({ title: 'Sign in required', description: 'Please sign in to save journal entries.', variant: 'destructive' });
       return;

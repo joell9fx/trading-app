@@ -12,14 +12,13 @@ export function LeaderboardView() {
 
   useEffect(() => {
     const load = async () => {
-      const supabase = createSupabaseClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setCurrentUserId(user?.id || null)
-    }
-    load()
-  }, [])
+      const supabase = createSupabaseClient();
+      const { data } = await supabase.auth.getUser();
+      const user = data?.user ?? null;
+      setCurrentUserId(user?.id ?? null);
+    };
+    load();
+  }, []);
 
   return (
     <div className="space-y-6">

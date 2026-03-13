@@ -56,9 +56,8 @@ export function AICoachSection() {
   const supabase = useMemo(() => createSupabaseClient(), []);
 
   const fetchData = useCallback(async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData?.user ?? null;
     if (!user) {
       setEntries([]);
       setLoading(false);
