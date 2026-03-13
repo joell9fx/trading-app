@@ -32,6 +32,7 @@ import {
   CalendarDaysIcon,
   AdjustmentsHorizontalIcon,
   NewspaperIcon,
+  FlagIcon,
 } from '@heroicons/react/24/outline';
 import { hasPermission, UserPermissions } from '@/lib/permissions';
 import { Crown, Lock } from 'lucide-react';
@@ -67,7 +68,8 @@ type DashboardSection =
   | 'consistency'
   | 'performance'
   | 'terminal'
-  | 'news';
+  | 'news'
+  | 'mission';
 
 interface NavItem {
   id: DashboardSection | string;
@@ -123,6 +125,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: 'performance', name: 'Performance Engine', icon: Cog6ToothIcon, requiredRole: 'MEMBER' },
       { id: 'ai-coach', name: 'AI Trade Coach', icon: SparklesIcon, requiredRole: 'MEMBER' },
       { id: 'consistency', name: 'Consistency', icon: ClipboardDocumentCheckIcon, requiredRole: 'MEMBER' },
+      { id: 'mission', name: 'Trader Mission', icon: FlagIcon, requiredRole: 'MEMBER' },
     ],
     defaultExpanded: true,
   },

@@ -53,6 +53,7 @@ import { ConsistencySection } from './consistency-section';
 import { PerformanceEngineSection } from './performance-engine-section';
 import { TerminalSection } from './terminal-section';
 import { MarketNewsSection } from './market-news-section';
+import { TraderMissionSection } from './trader-mission-section';
 import { DashboardCommandPalette } from './dashboard-command-palette';
 
 type DashboardTab = 
@@ -87,7 +88,8 @@ type DashboardTab =
   | 'consistency'
   | 'performance'
   | 'terminal'
-  | 'news';
+  | 'news'
+  | 'mission';
 
 export default function DashboardLayout(props: { initialSection?: DashboardTab }) {
   return (
@@ -127,6 +129,7 @@ const ALLOWED_SECTIONS: DashboardTab[] = [
   'performance',
   'terminal',
   'news',
+  'mission',
 ];
 
 function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?: DashboardTab }) {
@@ -445,6 +448,8 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
         return <TerminalSection />;
       case 'news':
         return <MarketNewsSection />;
+      case 'mission':
+        return <TraderMissionSection />;
       case 'admin':
         if (!hasAdminAccess) {
           return <AccessDenied feature="Admin Control Panel" requiredRole="ADMIN" />;
