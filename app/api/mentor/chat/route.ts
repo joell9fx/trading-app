@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { addXP } from '@/lib/xp-utils'
+import { requireServiceAccess } from '@/lib/api/require-service-access'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const access = await requireServiceAccess('signals')
+  if (access.error) return access.error
+  const { supabase, userId } = access.ctx
 
   try {
     const { message } = await req.json()
@@ -23,12 +17,12 @@ export async function POST(req: NextRequest) {
 
     const [{ data: trades }, { data: stats }, { data: patterns }, { data: lessons }, { data: memories }, { data: lastJournal }] =
       await Promise.all([
-      supabase.from('user_trades').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
-      supabase.from('performance_stats').select('*').eq('user_id', user.id).single(),
-      supabase.from('user_patterns').select('*').eq('user_id', user.id).order('last_detected', { ascending: false }).limit(20),
-        supabase.from('learning_paths').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10),
-        supabase.from('mentor_memory').select('memory_type, content').eq('user_id', user.id),
-        supabase.from('mentor_journal').select('summary, next_focus').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1),
+      supabase.from('user_trades').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(50),
+      supabase.from('performance_stats').select('*').eq('user_id', userId).single(),
+      supabase.from('user_patterns').select('*').eq('user_id', userId).order('last_detected', { ascending: false }).limit(20),
+        supabase.from('learning_paths').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10),
+        supabase.from('mentor_memory').select('memory_type, content').eq('user_id', userId),
+        supabase.from('mentor_journal').select('summary, next_focus').eq('user_id', userId).order('created_at', { ascending: false }).limit(1),
       ])
 
     const memoryContext = (memories || []).reduce((acc: any, m: any) => {
@@ -138,12 +132,12 @@ Speak like a professional mentor, not a chatbot. Keep responses under 6 sentence
 
     // Log chat history
     await supabase.from('mentor_chats').insert([
-      { user_id: user.id, message, role: 'user', sentiment },
-      { user_id: user.id, message: reply, role: 'assistant' },
+      { user_id: userId, message, role: 'user', sentiment },
+      { user_id: userId, message: reply, role: 'assistant' },
     ])
 
     try {
-      await addXP(supabase, user.id, 2, 'Mentor Chat Engagement')
+      await addXP(supabase, userId, 2, 'Mentor Chat Engagement')
     } catch (e) {
       // best effort
     }

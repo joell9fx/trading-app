@@ -44,6 +44,12 @@ export function useSignalsDashboard(userId: string | undefined) {
       const res = await fetch('/api/signals/dashboard', { cache: 'no-store' });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
+        if (res.status === 403) {
+          throw new Error(body?.error || 'Signals access required — unlock on Pricing or upgrade your plan.');
+        }
+        if (res.status === 401) {
+          throw new Error(body?.error || 'Please sign in again.');
+        }
         throw new Error(body?.error || `Request failed: ${res.status}`);
       }
       const json = await res.json();

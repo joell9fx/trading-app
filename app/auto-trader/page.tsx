@@ -16,6 +16,13 @@ const handleLearnMore = () => {
 export default function AutoTraderPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+      <div
+        role="status"
+        className="border-b border-amber-200/80 bg-amber-50 px-4 py-3 text-center text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100"
+      >
+        <strong className="font-semibold">Coming soon</strong>
+        {' — '}Auto Trader is not available for purchase or live use yet. This page is preview-only.
+      </div>
       {/* Hero Section */}
       <section className="relative px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl text-center">

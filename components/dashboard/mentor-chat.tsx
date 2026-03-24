@@ -21,13 +21,19 @@ export function MentorChat({ userId }: { userId: string }) {
   useEffect(() => {
     const load = async () => {
       const res = await fetch(`/api/mentor/history?user_id=${userId}`)
-      const json = await res.json()
+      const json = await res.json().catch(() => ({}))
       if (res.ok) {
         setMessages(json || [])
+      } else {
+        toast({
+          title: res.status === 403 ? 'Signals required' : 'Could not load chat',
+          description: json?.error || `Request failed (${res.status})`,
+          variant: 'destructive',
+        })
       }
     }
     load()
-  }, [userId])
+  }, [userId, toast])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -47,7 +53,17 @@ export function MentorChat({ userId }: { userId: string }) {
         body: JSON.stringify({ user_id: userId, message: newMsg.message }),
       })
       const json = await res.json()
-      if (!res.ok) throw new Error(json.error || 'Failed to send message')
+      if (!res.ok) {
+        if (res.status === 403) {
+          toast({
+            title: 'Signals required',
+            description: json?.error || 'Unlock Signals to use the AI mentor.',
+            variant: 'destructive',
+          })
+          return
+        }
+        throw new Error(json.error || 'Failed to send message')
+      }
       setMessages((prev) => [...prev, { role: 'assistant', message: json.reply }])
     } catch (error: any) {
       toast({ title: 'Error', description: error?.message || 'Failed to send', variant: 'destructive' })

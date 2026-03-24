@@ -27,16 +27,23 @@ export function JournalList() {
   const load = async () => {
     setLoading(true)
     const res = await fetch('/api/mentor/journal/list')
-    const json = await res.json()
+    const json = await res.json().catch(() => ({}))
     if (res.ok) {
       setEntries(json.entries || [])
+    } else {
+      toast({
+        title: res.status === 403 ? 'Signals required' : 'Could not load journal',
+        description: json?.error || `Request failed (${res.status})`,
+        variant: 'destructive',
+      })
+      setEntries([])
     }
     setLoading(false)
   }
 
   useEffect(() => {
     load()
-  }, [])
+  }, [toast])
 
   const submitReflection = async (journalId: string, text: string) => {
     setReflecting(journalId)

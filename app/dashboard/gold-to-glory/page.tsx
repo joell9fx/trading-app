@@ -2,7 +2,6 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import DashboardLayout from '@/components/dashboard/dashboard-layout';
-import { GoldToGlory } from '@/components/dashboard/gold-to-glory';
 
 export default async function GoldToGloryPage() {
   const cookieStore = cookies();

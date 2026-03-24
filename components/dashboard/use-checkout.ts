@@ -32,6 +32,7 @@ export function useCheckout() {
         throw new Error(result.error.message)
       }
     } catch (error: any) {
+      console.warn('[checkout] client error', error?.message || error)
       toast({
         title: 'Checkout error',
         description: error?.message || 'Unable to start checkout',

@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -72,12 +73,23 @@ export function SignalsSection({ user }: SignalsSectionProps) {
   }
 
   if (error) {
+    const accessGate =
+      /forbidden|signals access|unlock|403/i.test(error) || error.toLowerCase().includes('pricing')
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold text-white">Trading Signals</h1>
-        <Card className="bg-white/5 border border-white/10 p-6">
-          <p className="text-gray-400">Unable to load signals. Please try again later.</p>
-          <p className="text-sm text-rose-300/80 mt-2">{error}</p>
+        <Card className="bg-white/5 border border-white/10 p-6 space-y-4">
+          <p className="text-gray-400">
+            {accessGate
+              ? 'This area requires Signals access.'
+              : 'Unable to load signals. Please try again later.'}
+          </p>
+          <p className="text-sm text-rose-300/80">{error}</p>
+          {accessGate ? (
+            <Button asChild className="bg-gold-500 text-black hover:bg-gold-600">
+              <Link href="/pricing">Unlock on Pricing</Link>
+            </Button>
+          ) : null}
         </Card>
       </div>
     )

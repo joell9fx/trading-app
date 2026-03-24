@@ -1,22 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireServiceAccess } from '@/lib/api/require-service-access'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const access = await requireServiceAccess('signals')
+  if (access.error) return access.error
+  const { supabase, userId } = access.ctx
 
   try {
-    const { user_id } = await req.json()
-    const target = user_id || user.id
+    const reqBody = await req.json().catch(() => ({}))
+    const requested = typeof reqBody?.user_id === 'string' ? reqBody.user_id : null
+    if (requested && requested !== userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+    const target = userId
 
     const { data: chats } = await supabase
       .from('mentor_chats')
@@ -29,7 +27,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'OPENAI_API_KEY not configured' }, { status: 500 })
     }
 
-    const body = {
+    const openaiBody = {
       model: 'gpt-4o-mini',
       messages: [
         {
@@ -56,7 +54,7 @@ Output JSON with fields: goals, emotions, focus, recurring_patterns.
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(openaiBody),
     })
 
     if (!aiRes.ok) {

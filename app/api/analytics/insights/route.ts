@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireServiceAccess } from '@/lib/api/require-service-access'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
+  const access = await requireServiceAccess('signals')
+  if (access.error) return access.error
   try {
     const { trades } = await req.json()
     if (!trades || !Array.isArray(trades)) {

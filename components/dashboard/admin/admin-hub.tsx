@@ -236,7 +236,7 @@ export function AdminHub({ user }: AdminHubProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { title: 'Signals', desc: 'Publish, schedule, and monitor engagement.', href: '/dashboard?section=signals' },
-              { title: 'Auto Trader', desc: 'Toggle availability and rollout steps.', href: '/dashboard?section=auto-trader' },
+              { title: 'Auto Trader', desc: 'Coming soon — not available in dashboard navigation yet.', href: '/dashboard?section=overview' },
               { title: 'G2G challenge', desc: 'Update milestones and check-ins.', href: '/dashboard?section=gold-to-glory' },
               { title: 'Community', desc: 'Moderate threads and highlights.', href: '/dashboard?section=community-hub' },
             ].map((item) => (

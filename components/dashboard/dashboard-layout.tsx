@@ -24,7 +24,6 @@ import { useCheckout } from './use-checkout';
 import { WalletView } from './wallet-view';
 import { LeaderboardView } from './leaderboard-view';
 import { LearningPathList } from './learning-path-list';
-import AutoTraderSection from './auto-trader-section';
 import { MentorChat } from './mentor-chat';
 import { GoldToGlory } from './gold-to-glory';
 import {
@@ -82,7 +81,6 @@ type DashboardTab =
   | 'marketing'
   | 'campaigns'
   | 'optimizer'
-  | 'auto-trader'
   | 'reports'
   | 'ai-coach'
   | 'consistency'
@@ -110,7 +108,6 @@ const ALLOWED_SECTIONS: DashboardTab[] = [
   'ai',
   'funding',
   'notifications',
-  'auto-trader',
   'gold-to-glory',
   'mentor',
   'elite-membership',
@@ -175,6 +172,29 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
   }, []);
   const supabase = createSupabaseClient();
   const { toast } = useToast();
+
+  const noticeParam = searchParams.get('notice');
+  useEffect(() => {
+    if (noticeParam === 'auto_trader_soon') {
+      toast({
+        title: 'Auto Trader — coming soon',
+        description: 'This area is not available in the dashboard yet.',
+        duration: 8000,
+      });
+      router.replace('/dashboard?section=overview', { scroll: false });
+    }
+  }, [noticeParam, router, toast]);
+
+  useEffect(() => {
+    if (sectionFromUrl === 'auto-trader') {
+      toast({
+        title: 'Auto Trader — coming soon',
+        description: 'This area is not available in the dashboard yet.',
+        duration: 8000,
+      });
+      router.replace('/dashboard?section=overview', { scroll: false });
+    }
+  }, [sectionFromUrl, router, toast]);
 
   const { user, profile, role, loading: roleLoading, hasAdminAccess, hasOwnerAccess } = useRole();
   const roleForPermissions = (role === 'admin' || role === 'owner' ? 'ADMIN' : 'MEMBER') as UserRole;
@@ -404,12 +424,6 @@ function DashboardLayoutInner({ initialSection = 'overview' }: { initialSection?
             </p>
             <LearningPathList />
           </div>
-        );
-      case 'auto-trader':
-        return (
-          <AutoTraderSection
-            hasAccess={Boolean((access as any)?.auto_trader)}
-          />
         );
       case 'gold-to-glory':
         if (!ensureAccess('gold_to_glory')) return null;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { handleTradeXP, updatePerformanceStats } from '@/lib/performance'
+import { requireServiceAccess } from '@/lib/api/require-service-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,15 +18,10 @@ const tradeSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  const access = await requireServiceAccess('signals')
+  if (access.error) return access.error
   const supabase = createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const user = { id: access.ctx.userId }
 
   const body = await req.json()
   const parsed = tradeSchema.safeParse(body)

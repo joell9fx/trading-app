@@ -26,6 +26,7 @@ const columnMap: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   if (!stripe || !stripeWebhookSecret || !supabaseAdmin) {
+    console.warn('[checkout/webhook] not configured')
     return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
   }
 
@@ -36,9 +37,11 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(rawBody, sig as string, stripeWebhookSecret)
   } catch (err: any) {
-    console.error('Stripe webhook verification error:', err)
+    console.error('[checkout/webhook] signature verification failed', err?.message || err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
+
+  console.info('[checkout/webhook] event (legacy handler)', event.type, event.id)
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
@@ -53,9 +56,15 @@ export async function POST(req: NextRequest) {
         await supabaseAdmin.from('access_logs').insert([{ user_id, product }])
         await addXP(supabaseAdmin as any, user_id, 50, 'Paid feature unlock')
         await assignBadges(supabaseAdmin as any, user_id)
+        console.info('[checkout/webhook] profile flags updated', { user_id, product })
       } catch (err) {
-        console.error('Access update error:', err)
+        console.error('[checkout/webhook] access update error', err)
       }
+    } else {
+      console.warn('[checkout/webhook] skipped profile update (use /api/stripe/webhook for service_key flow)', {
+        hasUserId: !!user_id,
+        product,
+      })
     }
   }
 

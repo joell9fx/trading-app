@@ -1,13 +1,22 @@
-export const ALL_SERVICES = [
-  { key: 'community', name: 'Community Hub', description: 'Join live discussions and trade ideas.', credit_cost: 5 },
-  { key: 'signals', name: 'Trading Signals', description: 'Get daily setups and trade calls.', credit_cost: 8 },
-  { key: 'mentorship', name: 'Mentorship', description: '1-on-1 sessions with professional traders.', credit_cost: 10 },
-  { key: 'funding', name: 'Funding Account Support', description: 'Track prop firm evaluations and funding status.', credit_cost: 6 },
-  { key: 'courses', name: 'Trading Courses', description: 'Step-by-step video education library.', credit_cost: 4 },
-  { key: 'gold_to_glory', name: 'Gold to Glory', description: 'Follow the 100 → 1000 XAUUSD challenge.', credit_cost: 9 },
-  { key: 'elite_membership', name: 'Elite Membership', description: 'Premium membership benefits and perks.', credit_cost: 12 },
-  { key: 'vip_membership', name: 'VIP Membership', description: 'Top-tier VIP perks and concierge access.', credit_cost: 15 },
-] as const
+import { SERVICES_CATALOG } from '@/lib/services-catalog'
 
-export type ServiceKey = (typeof ALL_SERVICES)[number]['key']
+type CatalogKey = (typeof SERVICES_CATALOG)[number]['key']
+type ServiceKeyInternal = Exclude<CatalogKey, 'auto_trader'>
 
+const CREDITS: Record<ServiceKeyInternal, number> = {
+  community: 5,
+  signals: 8,
+  mentorship: 10,
+  funding: 6,
+  courses: 4,
+  gold_to_glory: 9,
+  elite_membership: 12,
+  vip_membership: 15,
+}
+
+export const ALL_SERVICES = SERVICES_CATALOG.filter(
+  (e): e is (typeof SERVICES_CATALOG)[number] & { key: ServiceKeyInternal } =>
+    e.key !== 'auto_trader',
+).map((e) => ({ ...e, credit_cost: CREDITS[e.key] }))
+
+export type ServiceKey = ServiceKeyInternal

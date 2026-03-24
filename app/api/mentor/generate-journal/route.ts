@@ -1,22 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireServiceAccess } from '@/lib/api/require-service-access'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
-
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const access = await requireServiceAccess('signals')
+  if (access.error) return access.error
+  const { supabase, userId: targetUser } = access.ctx
 
   try {
-    const { user_id } = await req.json()
-    const targetUser = user_id || user.id
+    await req.json().catch(() => ({}))
 
     const now = new Date()
     const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)

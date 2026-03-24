@@ -18,8 +18,8 @@ export function useUserServices(userId?: string) {
   const [services, setServices] = useState<Record<ServiceKey, boolean>>({ ...ACCESS_DEFAULTS })
   const [loading, setLoading] = useState(false)
 
-  const fetchServices = useCallback(async () => {
-    if (!userId) return
+  const fetchServices = useCallback(async (opts?: { quiet?: boolean }): Promise<boolean> => {
+    if (!userId) return false
     setLoading(true)
     try {
       const [profileResult, servicesResult] = await Promise.all([
@@ -66,13 +66,17 @@ export function useUserServices(userId?: string) {
       }
 
       setServices(unlocked)
+      return true
     } catch (error) {
       console.error('Error loading user services:', error)
-      toast({
-        title: 'Error',
-        description: 'Could not load your services',
-        variant: 'destructive',
-      })
+      if (!opts?.quiet) {
+        toast({
+          title: 'Error',
+          description: 'Could not load your services',
+          variant: 'destructive',
+        })
+      }
+      return false
     } finally {
       setLoading(false)
     }
@@ -96,7 +100,7 @@ export function useUserServices(userId?: string) {
       await fetchServices()
       return result
     },
-    [fetchServices]
+    [fetchServices],
   )
 
   const isUnlocked = useCallback(
