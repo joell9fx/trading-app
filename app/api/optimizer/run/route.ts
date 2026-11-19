@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/app/api/admin/auth'
 // @ts-ignore openai types resolution handled at runtime
 import OpenAI from 'openai'
 import { addXP } from '@/lib/xp-utils'
@@ -8,7 +8,10 @@ import { assignBadges } from '@/lib/badges'
 export const dynamic = 'force-dynamic'
 
 export async function POST() {
-  const supabase = createClient()
+  // Admin only: runs an OpenAI call per active campaign and writes results.
+  const { error: authError, ctx } = await requireAdmin()
+  if (authError || !ctx) return authError
+  const supabase = ctx.supabase
 
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {

@@ -1,17 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { z } from 'zod'
+import { requireAdminOrInternal } from '@/lib/api/internal-auth'
 import { addXP } from '@/lib/xp-utils'
 import { assignBadges } from '@/lib/badges'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: NextRequest) {
-  const supabase = createClient()
-  const { referred_user_id, amount } = await req.json()
+const BodySchema = z.object({
+  referred_user_id: z.string().uuid(),
+  amount: z.coerce.number().positive().max(100000),
+})
 
-  if (!referred_user_id || !amount || Number(amount) <= 0) {
-    return NextResponse.json({ error: 'Missing referred_user_id or amount' }, { status: 400 })
+export async function POST(req: NextRequest) {
+  const { error: authError, supabase } = await requireAdminOrInternal(req)
+  if (authError || !supabase) return authError
+
+  const parsed = BodySchema.safeParse(await req.json().catch(() => null))
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'referred_user_id (uuid) and a positive amount are required' }, { status: 400 })
   }
+  const { referred_user_id, amount } = parsed.data
 
   const { data: referral, error: refErr } = await supabase
     .from('referrals')

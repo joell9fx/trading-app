@@ -1,15 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { z } from 'zod'
+import { requireAdminOrInternal } from '@/lib/api/internal-auth'
+
+const BodySchema = z.object({ user_id: z.string().uuid() })
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient()
-  const { user_id } = await req.json()
+  const { error: authError, supabase } = await requireAdminOrInternal(req)
+  if (authError || !supabase) return authError
 
-  if (!user_id) {
-    return NextResponse.json({ error: 'Missing user_id' }, { status: 400 })
+  const parsed = BodySchema.safeParse(await req.json().catch(() => null))
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'user_id (uuid) is required' }, { status: 400 })
   }
+  const { user_id } = parsed.data
 
   const { data: referrals, error: refErr } = await supabase
     .from('referrals')

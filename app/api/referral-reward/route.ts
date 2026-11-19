@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { z } from 'zod'
+import { requireAdminOrInternal } from '@/lib/api/internal-auth'
 import { addXP } from '@/lib/xp-utils'
 import { assignBadges } from '@/lib/badges'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: NextRequest) {
-  const supabase = createClient()
-  const { referred_user_id } = await req.json()
+const BodySchema = z.object({ referred_user_id: z.string().uuid() })
 
-  if (!referred_user_id) {
-    return NextResponse.json({ error: 'Missing referred_user_id' }, { status: 400 })
+export async function POST(req: NextRequest) {
+  const { error: authError, supabase } = await requireAdminOrInternal(req)
+  if (authError || !supabase) return authError
+
+  const parsed = BodySchema.safeParse(await req.json().catch(() => null))
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'referred_user_id (uuid) is required' }, { status: 400 })
   }
+  const { referred_user_id } = parsed.data
 
   const { data: referral } = await supabase
     .from('referrals')
