@@ -41,6 +41,8 @@ const nextConfig = {
         destination: '/pricing',
         permanent: false,
       },
+      { source: '/contact', destination: '/support', permanent: false },
+      { source: '/learn', destination: '/courses', permanent: false },
       // Legacy path: ensure any request or cached link to /site.webmanifest gets the manifest
       {
         source: '/site.webmanifest',
