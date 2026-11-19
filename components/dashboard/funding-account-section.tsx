@@ -25,7 +25,7 @@ interface PropFirmSubmission {
   created_at: string
 }
 
-const FIRM_NAME = 'VisionEdge Funding'
+const FIRM_NAME = 'Trading Academy Funding'
 const PLATFORM_OPTIONS = ['MT4', 'MT5', 'cTrader', 'TradingView', 'Other']
 
 export function FundingAccountSection({ user }: FundingAccountSectionProps) {
@@ -131,7 +131,7 @@ export function FundingAccountSection({ user }: FundingAccountSectionProps) {
 
       toast({
         title: 'Submission sent',
-        description: '✅ Submission sent to VisionEdge Funding. You’ll be notified once reviewed.'
+        description: '✅ Submission sent to Trading Academy Funding. You’ll be notified once reviewed.'
       })
 
       setShowForm(false)

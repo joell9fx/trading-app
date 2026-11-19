@@ -95,7 +95,7 @@ export function FundingDashboard({ admin }: FundingDashboardProps) {
             <div>
               <h1 className="text-3xl font-bold text-white">Funding Submissions</h1>
               <p className="text-gray-400 mt-1">
-                Review, approve, or reject VisionEdge Funding submissions in real time.
+                Review, approve, or reject Trading Academy Funding submissions in real time.
               </p>
             </div>
             {admin?.name && (

@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       {
         role: 'system',
         content: `
-You are an expert media buyer for VisionEdge FX.
+You are an expert media buyer for Trading Academy.
 Generate high-performing ad concepts for ${platform}.
 Each concept should include: a campaign name, short ad copy, targeting audience, and a CTA.
 Use ${referralLink} as the landing page.
@@ -65,7 +65,7 @@ Brand style: black-gold, premium, confident.`,
       try {
         const img = await openai.images.generate({
           model: 'dall-e-2',
-          prompt: `Professional ad image for VisionEdge FX, trading charts, black-gold design, text overlay: "Level Up Your Trading Journey."`,
+          prompt: `Professional ad image for Trading Academy, trading charts, black-gold design, text overlay: "Level Up Your Trading Journey."`,
           size: '1024x1024',
           response_format: 'url',
         })

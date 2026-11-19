@@ -60,7 +60,7 @@ export async function POST(_req: NextRequest) {
     model: 'gpt-4o-mini',
     temperature: 0.3,
     messages: [
-      { role: 'system', content: 'You are the VisionEdge Chief Operations AI. Summarize key performance metrics, risks, and opportunities across all systems.' },
+      { role: 'system', content: 'You are the Trading Academy Chief Operations AI. Summarize key performance metrics, risks, and opportunities across all systems.' },
       { role: 'user', content: JSON.stringify(metrics) },
     ],
   })

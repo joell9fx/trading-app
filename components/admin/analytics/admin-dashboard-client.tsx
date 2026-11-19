@@ -108,7 +108,7 @@ export function AdminDashboardClient() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl text-gold-400 font-bold">🧠 VisionEdge Intelligence Hub</h1>
+          <h1 className="text-3xl text-gold-400 font-bold">🧠 Trading Academy Intelligence Hub</h1>
           <p className="text-sm text-gray-400">From insight to execution — this is where growth begins.</p>
         </div>
         <Button onClick={load} variant="outline" className="border-gray-700 text-gray-200 hover:border-gold-500/60">

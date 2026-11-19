@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
         <p>${
           message ||
           (status === 'Approved'
-            ? 'Congratulations! Your evaluation was approved by VisionEdge Funding.'
+            ? 'Congratulations! Your evaluation was approved by Trading Academy Funding.'
             : 'Your funding submission was updated.')
         }</p>
         ${notes ? `<p><strong>Admin Notes:</strong> ${notes}</p>` : ''}

@@ -21,7 +21,7 @@ function buildEmail(status: Status, notes?: string) {
 
   const description =
     status === 'Approved'
-      ? 'Congratulations! Your evaluation was approved by VisionEdge Funding.'
+      ? 'Congratulations! Your evaluation was approved by Trading Academy Funding.'
       : status === 'Rejected'
       ? 'Unfortunately, your submission did not meet the criteria this time.'
       : 'Your funding submission status was updated.'
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
       const title = status === 'Approved' ? '🎉 Funding Approved!' : '❌ Funding Application Rejected'
       const message =
         status === 'Approved'
-          ? 'Your funding submission has been approved by VisionEdge Funding.'
+          ? 'Your funding submission has been approved by Trading Academy Funding.'
           : `Your funding submission was rejected. ${admin_notes || 'Please contact support for more info.'}`
 
       const { data: notification, error: notificationError } = await supabase

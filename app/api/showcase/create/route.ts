@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     if (process.env.OPENAI_API_KEY) {
       try {
-        const prompt = `Create a clean black-gold card celebrating a trader milestone titled "${title}". Include subtle trading theme and VisionEdge aesthetic.`
+        const prompt = `Create a clean black-gold card celebrating a trader milestone titled "${title}". Include subtle trading theme and Trading Academy black-and-gold aesthetic.`
         const aiRes = await fetch('https://api.openai.com/v1/images/generations', {
           method: 'POST',
           headers: {

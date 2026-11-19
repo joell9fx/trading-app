@@ -91,7 +91,7 @@ export async function assignBadges(supabase: SupabaseClient, userId: string) {
   if (profile?.affiliate_tier === 'Silver') badges.push('🥈 Growth Partner')
   if (profile?.affiliate_tier === 'Gold') badges.push('🏆 Top Influencer')
   if ((profile?.affiliate_total_commission || 0) >= 100) badges.push('💸 Power Promoter')
-  if (profile?.affiliate_tier === 'Platinum' || profile?.affiliate_tier === 'Elite') badges.push('👑 VisionEdge Partner')
+  if (profile?.affiliate_tier === 'Platinum' || profile?.affiliate_tier === 'Elite') badges.push('👑 Trading Academy Partner')
   const premiumUnlocks = [
     profile?.has_signals_access,
     profile?.has_mentorship_access,

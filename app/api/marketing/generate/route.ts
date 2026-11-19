@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       {
         role: 'system',
         content: `
-You are a creative marketing strategist for VisionEdge FX.
+You are a creative marketing strategist for Trading Academy.
 Produce concise, high-converting promotional content in a confident voice.
 Focus on trading education, funding challenges, and community value.
 Always include a subtle CTA with this referral link: ${referralLink}.
@@ -69,7 +69,7 @@ ${customPrompt ? `Additional instructions: ${customPrompt}` : ''}`,
 
     if (asset_type === 'image' && process.env.OPENAI_API_KEY) {
       try {
-        const imagePrompt = `Create a clean black-gold trading community promo post for VisionEdge FX with text overlay: "Join the Movement". Style: sleek, premium, minimal, subtle glow.`
+        const imagePrompt = `Create a clean black-gold trading community promo post for Trading Academy with text overlay: "Join the Movement". Style: sleek, premium, minimal, subtle glow.`
         const imageGen = await openai.images.generate({
           model: 'dall-e-2',
           prompt: imagePrompt,
