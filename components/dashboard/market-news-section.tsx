@@ -6,6 +6,7 @@ import { EconomicCalendar } from './news/economic-calendar';
 import { GlobalNewsFeed } from './news/global-news-feed';
 import { MarketRiskRadar } from './news/market-risk-radar';
 import { CalendarDaysIcon, NewspaperIcon } from '@heroicons/react/24/outline';
+import { SampleDataNotice } from '@/components/ui/sample-data-notice'
 
 type NewsTab = 'calendar' | 'global';
 
@@ -28,6 +29,8 @@ export function MarketNewsSection() {
           Stay ahead of the markets with upcoming economic events and global macro developments.
         </p>
       </div>
+
+      <SampleDataNotice what="the risk radar, headlines and economic calendar (no live news feed is connected yet)" />
 
       <MarketRiskRadar />
 
