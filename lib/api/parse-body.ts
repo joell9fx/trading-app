@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import type { ZodType, ZodTypeDef } from 'zod'
+import { z, type ZodType, type ZodTypeDef } from 'zod'
 
 export type ParseBodyResult<T> = { data: T; error?: undefined } | { data?: undefined; error: NextResponse }
 
@@ -31,3 +31,6 @@ export async function parseBody<T>(
   }
   return { data: result.data }
 }
+
+/** Row id from a request body: a uuid or numeric id, sent as string or number. */
+export const idSchema = z.coerce.string().trim().min(1).max(64)

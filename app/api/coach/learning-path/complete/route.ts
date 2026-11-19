@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { addXP } from '@/lib/xp-utils'
 import { assignBadges } from '@/lib/badges'
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,8 +19,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { id } = await req.json()
-    if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    const body = await parseBody(req, z.object({ id: idSchema }))
+    if (body.error) return body.error
+    const { id } = body.data
 
     const { error } = await supabase
       .from('learning_paths')

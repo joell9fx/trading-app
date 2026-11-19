@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { addXP } from '@/lib/xp-utils'
 import { assignBadges } from '@/lib/badges'
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,12 +14,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await req.json()
-  const { campaign_id, spend, clicks, conversions, revenue, status } = body
-
-  if (!campaign_id) {
-    return NextResponse.json({ error: 'Missing campaign_id' }, { status: 400 })
-  }
+  const metric = z.coerce.number().finite().min(0).max(1e9).optional()
+  const parsed = await parseBody(
+    req,
+    z.object({
+      campaign_id: idSchema,
+      spend: metric,
+      clicks: metric,
+      conversions: metric,
+      revenue: metric,
+      status: z.string().trim().max(32).optional(),
+    }),
+  )
+  if (parsed.error) return parsed.error
+  const { campaign_id, spend, clicks, conversions, revenue, status } = parsed.data
 
   const fields: Record<string, any> = {}
   if (spend !== undefined) fields.spend = spend
