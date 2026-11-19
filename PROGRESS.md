@@ -17,14 +17,14 @@
 | Local `.env.local` | Supabase keys only. No Stripe, OpenAI or Resend keys. |
 | Migration test DB | Local Docker image `public.ecr.aws/supabase/postgres:17.6.1.159` is available. See `supabase/tests/README.md`. |
 
-## Health check (2026-11-20, after batch 5)
+## Health check (2026-11-20, after batch 6)
 | Check | Result |
 |---|---|
 | `npx tsc --noEmit` | ✅ pass (if you get TS6053 errors for `.next/types`, run `rm -rf .next/types`) |
 | `npx next lint` | ✅ 0 errors, 20 warnings (`<img>` vs `next/image`, alt text, hook deps) |
-| `npm test` | ✅ 19/19 (`__tests__/auth-helpers.test.ts`) |
+| `npm test` | ✅ 32/32 (`auth-helpers`, `api-helpers`) |
 | `npx next build` | ✅ 100 pages |
-| Prod smoke test (`next start`) | ✅ Dev routes 404; the protected API routes return 401 without a session; `/support` 200; `/contact` and `/prices` redirect |
+| Prod smoke test (`next start`) | ✅ Dev routes 404; protected API routes 401 without a session; bad candles input 400; cross-origin auth sync 403; `/support` 200 |
 | `supabase/tests/046_rls_test.sql` | ✅ 24/24 on a throwaway Supabase Postgres; 046 applies twice cleanly |
 
 ## Current state map
@@ -76,9 +76,20 @@
   - `community/simple`
 - **Admin/internal guard:** `lib/api/internal-auth.ts` `requireAdminOrInternal` (admin session, or the `x-internal-secret` header set to `SERVICE_WEBHOOK_SECRET`).
 - **Service-role client:** `lib/supabase/admin.ts`. Use it only after an auth check.
+- **Request validation:** `lib/api/parse-body.ts` `parseBody(req, schema)` returns `{data}` or a 400 `{error}`; `idSchema` for row ids.
+- **Rate limit:** `lib/api/rate-limit.ts` `rateLimitResponse(\`ai:${userId}\`)`, 20 requests per user per 10 min on the 12 member AI routes. In-memory, so per server instance (best effort).
+- **Referrals:** `lib/referrals/record-referral.ts` is shared by `/api/referral-track` and the auth sync route.
 - **Server-derived profile fields** (tier, badges, has_*_access after a validated unlock): `lib/privileged-profile.ts`.
 
 ## Fixed this session
+**Batch 6:**
+- `trades/candles` validates pair and range (max 1000 minutes) and builds the URL safely.
+- Auth sync (`/api/auth/callback` POST) rejects cross-origin requests (login CSRF) and invalid bodies, and records a pending referral on first sign-in.
+- `ai/chat` uses `getUser`, caps message size and drops client-sent system messages from history.
+- `coach/review-progress` and `coach/generate-learning-path` no longer act on another user's `user_id`.
+- Per-user rate limit on the member AI routes.
+- zod on admin tier/services/subscription/moderation and on eight member routes.
+
 **API security:**
 - Routes that wrote data with no auth now require admin or the internal secret: commission, evaluate-tier, referral-reward, leaderboard recalc, weekly XP, optimizer/run.
 - `referral-track` is now self-only and once-only.
@@ -114,9 +125,8 @@
    - Needs a squashed baseline from the live DB (**L effort, owner approval**).
 3. 🟡 **`types/supabase.ts` is very stale.** Regenerate it after the DB is restored and 046 applied.
 4. 🟡 **`components/dashboard/profile-section.tsx` calls hooks after an early return** (rules-of-hooks; the lint rule is disabled repo-wide).
-5. 🟡 **Signup with email confirmation on has no session,** so the referral code used is kept in user metadata (`referral_code_used`) but not yet recorded. The auth callback should call referral-track on first login.
-6. 🟡 **`api/auth/callback` POST** calls `setSession` with tokens from the request body. Review it.
-7. 🟡 **`trades/candles`** puts `pair` into the Binance URL unchecked. Validate it against `^[A-Z0-9]{5,12}$`.
+5. 🟡 **`showcase/like` has no per-user dedupe.** A member can like the same post repeatedly. Needs a `showcase_likes (user_id, post_id)` unique table (DB change, so after the restore).
+6. 🟡 **About 20 mutating routes still parse bodies by hand** (AI generate routes, superadmin form routes, community admin channels/messages/reports, operator execute, notifications/email). Lower risk: all are behind auth or admin.
 
 ## Database: migration 046 (written + tested, NOT applied)
 `supabase/migrations/046_security_hardening.sql`:
@@ -168,11 +178,14 @@
 | Shared `isAdminRole()` + service-role admin helper | S | high | ✅ done |
 | "Sample data" notice component | S | med | ✅ done |
 | Real profile stats | S | med | ✅ done |
-| zod schemas for all ~45 remaining mutating routes (shared `parseBody`) | M | high | next |
-| In-memory per-IP rate limit for `/api/ai/*`, `/api/mentor/chat`, `/api/trades/feedback` (no new infra) | S | med | next |
-| Validate `trades/candles` pair; safe-guard `auth/callback` POST | S | med | next |
-| Record pending referral (`referral_code_used`) on first login in the auth callback | S | med | next |
+| zod schemas on mutating routes (shared `parseBody`) | M | high | 🟡 ~18 done, ~20 left |
+| In-memory per-user rate limit on AI routes | S | med | ✅ done |
+| Validate `trades/candles`; same-origin check on auth sync | S | med | ✅ done |
+| Record pending referral on first sign-in | S | med | ✅ done |
+| Unit tests: rate limit, parseBody, same-origin | S | med | ✅ done |
 | Unit tests: pricing availability, credit costs, referral code builder | S | med | next |
+| Rate-limit `/api/referral-track` and showcase comment/like | S | med | next |
+| Fix the profile-section hook-order bug | S | med | next |
 | Fix the `<img>`/alt lint warnings (20) | S | low | |
 | Stripe refund/cancel webhook → revoke access | M | high | ⛔ payments approval |
 | Consolidate webhooks into `stripe/webhook`; delete legacy routes and `/prices` code | S | med | ⛔ deletion approval |
@@ -194,11 +207,11 @@
 - ⛔ Set `NEXT_PUBLIC_SUPPORT_EMAIL` in production.
 
 ## Next 5
-1. zod validation on the remaining mutating routes (a shared `parseBody` helper).
-2. A simple per-IP rate limit on the OpenAI-backed routes.
-3. Validate `trades/candles` input and review the `auth/callback` POST.
-4. Record the pending referral on first login.
-5. More unit tests (pricing availability, credit catalogue, referral utils).
+1. zod on the remaining ~20 mutating routes (community admin, superadmin forms, operator execute, notifications/email, AI generate).
+2. Fix the profile-section hook-order bug, then turn `react-hooks/rules-of-hooks` back on.
+3. Rate-limit referral-track and showcase comment/like.
+4. Unit tests for pricing availability, the credit catalogue and referral utils.
+5. Clear the 20 lint warnings (`<img>` → `next/image`, alt text, hook deps).
 
 ## Session log
 - **2026-11-19:** Local dev server set up. Public pages walked through. PR #1 opened: dev pages hidden in production, `/prices` redirect, titles, favicon.
@@ -212,4 +225,5 @@
   - Signup flow fixed.
   - `/admin/users`, `/superadmin/logs` and `/support` added; dead links fixed.
   - `.gitignore` `logs/` scoped to the repo root.
+- **2026-11-20, batch 6:** candles validation; auth sync same-origin check and pending referral; coach routes self-only; AI rate limit and `ai/chat` input validation; `parseBody` + zod on 12 routes; 13 new tests. Health check and smoke test green.
 - **2026-11-20, batch 5:** VisionEdge → Trading Academy, real profile stats, sample-data notices. Full health check green; production smoke test green.
