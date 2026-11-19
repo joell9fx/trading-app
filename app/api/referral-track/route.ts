@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { recordReferral } from '@/lib/referrals/record-referral'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,55 +29,10 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'referral_code is required' }, { status: 400 })
   }
-  const { referral_code } = parsed.data
 
-  const admin = createAdminClient()
-
-  const { data: me } = await admin.from('profiles').select('id, referred_by').eq('id', user.id).single()
-  if (me?.referred_by) {
-    return NextResponse.json({ success: true, already_referred: true })
+  const result = await recordReferral(createAdminClient(), user.id, parsed.data.referral_code)
+  if (result.status === 'error') {
+    return NextResponse.json({ error: 'Could not record referral' }, { status: 500 })
   }
-
-  const { data: referrer } = await admin
-    .from('profiles')
-    .select('id')
-    .eq('referral_code', referral_code)
-    .maybeSingle()
-
-  // Ignore unknown codes and self-referrals silently
-  if (!referrer || referrer.id === user.id) {
-    return NextResponse.json({ success: true })
-  }
-
-  const { data: existing } = await admin
-    .from('referrals')
-    .select('id')
-    .eq('referrer_id', referrer.id)
-    .eq('referred_user_id', user.id)
-    .maybeSingle()
-
-  if (!existing) {
-    const { error: insertError } = await admin
-      .from('referrals')
-      .insert([{ referrer_id: referrer.id, referred_user_id: user.id, referral_code }])
-    if (insertError) {
-      console.error('[referral-track] insert error:', insertError)
-      return NextResponse.json({ error: 'Could not record referral' }, { status: 500 })
-    }
-  }
-
-  await admin.from('profiles').update({ referred_by: referral_code }).eq('id', user.id).is('referred_by', null)
-
-  if (!existing) {
-    await admin.from('notifications').insert([
-      {
-        user_id: referrer.id,
-        type: 'referral',
-        title: '🎉 New Referral Joined!',
-        message: 'Someone joined using your referral link.',
-      },
-    ])
-  }
-
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true, already_referred: result.status === 'already_referred' })
 }
