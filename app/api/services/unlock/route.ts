@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { updateUserTier } from '@/lib/tier-utils'
 import { addXP } from '@/lib/xp-utils'
-import { accessColumnForService } from '@/lib/access-flags'
+import { accessColumnForService, type AccessModuleKey } from '@/lib/access-flags'
+import { INCLUDED_SERVICE_KEYS } from '@/lib/services-catalog'
+
+const SELF_UNLOCKABLE = new Set<string>(INCLUDED_SERVICE_KEYS)
 
 export const dynamic = 'force-dynamic'
 
@@ -30,7 +33,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'service_key is required' }, { status: 400 })
     }
 
-    const column = accessColumnForService(service_key)
+    // Paid services are granted only by the Stripe webhook, wallet credits,
+    // or an admin (/api/admin/users/[userId]/services). Members may only
+    // activate services that are included free with every account.
+    if (typeof service_key !== 'string' || !SELF_UNLOCKABLE.has(service_key)) {
+      return NextResponse.json(
+        { error: 'This service requires a purchase', code: 'PAYMENT_REQUIRED' },
+        { status: 402 },
+      )
+    }
+
+    const column = accessColumnForService(service_key as AccessModuleKey)
     if (!column && service_key !== 'community') {
       return NextResponse.json({ error: 'Unknown service_key' }, { status: 400 })
     }
