@@ -67,5 +67,16 @@ export async function POST(req: NextRequest) {
 
   await admin.from('profiles').update({ referred_by: referral_code }).eq('id', user.id).is('referred_by', null)
 
+  if (!existing) {
+    await admin.from('notifications').insert([
+      {
+        user_id: referrer.id,
+        type: 'referral',
+        title: '🎉 New Referral Joined!',
+        message: 'Someone joined using your referral link.',
+      },
+    ])
+  }
+
   return NextResponse.json({ success: true })
 }
