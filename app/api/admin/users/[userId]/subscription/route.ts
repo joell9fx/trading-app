@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../../../auth';
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +12,7 @@ export async function POST(
   try {
     const auth = await requireAdmin();
     if (auth.error) return auth.error;
-    const { supabase } = auth.ctx!;
+    const supabase = createAdminClient(); // service role: cross-user write, caller already verified
 
     const body = await request.json();
     const { planId, status = 'active' } = body;

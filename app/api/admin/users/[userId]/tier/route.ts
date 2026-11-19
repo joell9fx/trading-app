@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '../../../auth'
 import { updateUserTier } from '@/lib/tier-utils'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,7 +10,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
   if (auth.error) {
     return auth.error
   }
-  const { supabase } = auth.ctx!
+  const supabase = createAdminClient() // service role: cross-user write, caller already verified
 
   const { tier } = await req.json()
   if (!tier) {
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
   if (auth.error) {
     return auth.error
   }
-  const { supabase } = auth.ctx!
+  const supabase = createAdminClient() // service role: cross-user write, caller already verified
   try {
     const tier = await updateUserTier(supabase, params.userId)
     return NextResponse.json({ tier })

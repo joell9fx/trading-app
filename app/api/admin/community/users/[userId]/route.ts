@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logModerationAction, requireAdmin } from '../../utils';
+import { createAdminClient } from '@/lib/supabase/admin'
 
 function computeExpiry(minutes?: number | null) {
   if (!minutes || Number.isNaN(minutes)) return null;
@@ -14,7 +15,8 @@ export async function PATCH(
 ) {
   const { error, ctx } = await requireAdmin();
   if (error || !ctx) return error!;
-  const { supabase, adminId } = ctx;
+  const { adminId } = ctx;
+  const supabase = createAdminClient(); // service role: cross-user write, caller already verified
 
   const body = await request.json();
   const { action, reason, durationMinutes, role } = body as {
@@ -42,18 +44,20 @@ export async function PATCH(
   }
 
   if (action === 'role') {
-    const validRoles = ['VIEWER', 'MEMBER', 'TRADER', 'MODERATOR', 'ADMIN'];
-    if (!role || !validRoles.includes(role)) {
+    // Roles are lowercase since migration 041; owner is assigned via superadmin only.
+    const validRoles = ['member', 'admin'];
+    const normalizedRole = typeof role === 'string' ? role.toLowerCase() : '';
+    if (!validRoles.includes(normalizedRole)) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
     }
 
-    if (userId === adminId && role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Cannot demote self from ADMIN' }, { status: 400 });
+    if (userId === adminId && normalizedRole !== 'admin') {
+      return NextResponse.json({ error: 'Cannot demote yourself' }, { status: 400 });
     }
 
     const { error: updateError, data: updated } = await supabase
       .from('profiles')
-      .update({ role })
+      .update({ role: normalizedRole })
       .eq('id', userId)
       .select()
       .single();
@@ -65,7 +69,7 @@ export async function PATCH(
     await logModerationAction(supabase, adminId, {
       user_id: userId,
       action_type: 'change_role',
-      reason: reason || `Role -> ${role}`,
+      reason: reason || `Role -> ${normalizedRole}`,
     });
 
     return NextResponse.json({ user: updated, action: 'role' });

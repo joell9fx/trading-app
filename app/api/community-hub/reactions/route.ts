@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { isAdminRole, isModeratorRole } from '@/utils/auth';
 
 const reactionSchema = z.object({
   message_id: z.string().uuid(),
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
     .eq('id', message.channel_id)
     .single();
 
-  const isAdmin = role === 'ADMIN' || role === 'MODERATOR';
+  const isAdmin = isModeratorRole(role);
   if (channel?.slug === 'announcements' && !isAdmin) {
     return NextResponse.json({ error: 'Announcements are read-only for members' }, { status: 403 });
   }

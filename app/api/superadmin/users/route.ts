@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireOwner } from '../auth'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const auth = await requireOwner()
   if (auth.error) return auth.error
-  const { supabase } = auth.ctx!
+  const supabase = createAdminClient() // service role: cross-user write, caller already verified
 
   const { data, error } = await supabase
     .from('profiles')
@@ -24,7 +25,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const auth = await requireOwner()
   if (auth.error) return auth.error
-  const { supabase, user } = auth.ctx!
+  const { user } = auth.ctx!
+  const supabase = createAdminClient() // service role: cross-user write, caller already verified
 
   let payload: any
   try {

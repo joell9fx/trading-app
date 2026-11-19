@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { accessColumnForService, deriveAccessFromProfile, AccessModuleKey } from '@/lib/access-flags'
 import { requireAdmin } from '../../../auth'
 import { updateUserTier } from '@/lib/tier-utils'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,7 +14,7 @@ export async function GET(
   if (auth.error) {
     return auth.error
   }
-  const { supabase } = auth.ctx!
+  const supabase = createAdminClient() // service role: cross-user write, caller already verified
 
   const { data, error } = await supabase
     .from('profiles')
@@ -33,7 +34,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
   if (auth.error) {
     return auth.error
   }
-  const { supabase } = auth.ctx!
+  const supabase = createAdminClient() // service role: cross-user write, caller already verified
 
   const { service_key, is_unlocked } = await req.json()
   if (!service_key) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { isAdminRole, isModeratorRole } from '@/utils/auth';
 
 const channelSchema = z.object({
   name: z.string().min(2).max(80),
@@ -52,7 +53,7 @@ function canAccessChannel(
   channelSlug?: string | null
 ) {
   if (user?.banned) return false;
-  const isElevated = user?.role === 'ADMIN' || user?.role === 'MODERATOR' || user?.is_admin || user?.is_owner;
+  const isElevated = isModeratorRole(user?.role, user);
   if (isElevated) return true;
 
   const key = (channelSlug || '').toLowerCase();
@@ -76,7 +77,7 @@ export async function GET() {
     return NextResponse.json({ error: 'No access' }, { status: 403 });
   }
 
-  const isAdmin = role === 'ADMIN' || role === 'MODERATOR' || profile?.is_admin || profile?.is_owner;
+  const isAdmin = isModeratorRole(role, profile);
   const includePrivate = isAdmin;
 
   const { data: channels, error } = await supabase
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
 
   const { role, supabase, user, profile } = ctx;
   const requester = { ...profile, role };
-  const isAdmin = role === 'ADMIN' || role === 'MODERATOR' || profile?.is_admin || profile?.is_owner;
+  const isAdmin = isModeratorRole(role, profile);
   if (requester?.banned) {
     return NextResponse.json({ error: 'No access' }, { status: 403 });
   }
