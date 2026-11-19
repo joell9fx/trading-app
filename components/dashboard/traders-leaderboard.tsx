@@ -15,7 +15,7 @@ interface TraderRow {
     id: string
     name?: string | null
     full_name?: string | null
-    email?: string | null
+    username?: string | null
     membership_tier?: string | null
     xp?: number | null
     badges?: string[] | null
@@ -67,7 +67,7 @@ export function TradersLeaderboard() {
                 <tr key={t.user_id}>
                   <td className="px-3 py-2 text-sm text-white font-semibold">#{i + 1}</td>
                   <td className="px-3 py-2 text-sm text-gray-200">
-                    {t.profiles?.name || t.profiles?.full_name || t.profiles?.email || t.user_id}
+                    {t.profiles?.name || t.profiles?.full_name || (t.profiles?.username ? `@${t.profiles.username}` : 'Trader')}
                   </td>
                   <td className="px-3 py-2 text-sm text-white">{Math.round(t.win_rate || 0)}%</td>
                   <td className="px-3 py-2 text-sm text-white">{Math.round(t.consistency_score || 0)}</td>
