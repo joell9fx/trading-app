@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '../../../auth'
 import { updateUserTier } from '@/lib/tier-utils'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic'
+
+const TierSchema = z.object({ tier: z.enum(['Standard', 'Premium', 'Elite']) })
 
 export async function PUT(req: NextRequest, { params }: { params: { userId: string } }) {
   const auth = await requireAdmin()
@@ -12,10 +16,9 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
   }
   const supabase = createAdminClient() // service role: cross-user write, caller already verified
 
-  const { tier } = await req.json()
-  if (!tier) {
-    return NextResponse.json({ error: 'tier is required' }, { status: 400 })
-  }
+  const body = await parseBody(req, TierSchema)
+  if (body.error) return body.error
+  const { tier } = body.data
 
   const { error } = await supabase.from('profiles').update({ membership_tier: tier }).eq('id', params.userId)
   if (error) {

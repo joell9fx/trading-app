@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logModerationAction, requireAdmin } from '../../utils';
 import { createAdminClient } from '@/lib/supabase/admin'
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 function computeExpiry(minutes?: number | null) {
   if (!minutes || Number.isNaN(minutes)) return null;
@@ -18,13 +20,18 @@ export async function PATCH(
   const { adminId } = ctx;
   const supabase = createAdminClient(); // service role: cross-user write, caller already verified
 
-  const body = await request.json();
-  const { action, reason, durationMinutes, role } = body as {
-    action: 'mute' | 'ban' | 'unban' | 'unmute' | 'role';
-    reason?: string;
-    durationMinutes?: number;
-    role?: string;
-  };
+  const body = await parseBody(
+    request,
+    z.object({
+      action: z.enum(['mute', 'ban', 'unban', 'unmute', 'role']),
+      reason: z.string().trim().max(500).optional(),
+      // Up to one year
+      durationMinutes: z.coerce.number().int().positive().max(525_600).optional().nullable(),
+      role: z.string().trim().max(32).optional(),
+    }),
+  );
+  if (body.error) return body.error;
+  const { action, reason, durationMinutes, role } = body.data;
 
   if (!action) {
     return NextResponse.json({ error: 'Action required' }, { status: 400 });

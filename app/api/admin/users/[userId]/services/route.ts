@@ -3,6 +3,8 @@ import { accessColumnForService, deriveAccessFromProfile, AccessModuleKey } from
 import { requireAdmin } from '../../../auth'
 import { updateUserTier } from '@/lib/tier-utils'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,10 +38,12 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
   }
   const supabase = createAdminClient() // service role: cross-user write, caller already verified
 
-  const { service_key, is_unlocked } = await req.json()
-  if (!service_key) {
-    return NextResponse.json({ error: 'service_key is required' }, { status: 400 })
-  }
+  const body = await parseBody(
+    req,
+    z.object({ service_key: z.string().trim().min(1).max(64), is_unlocked: z.boolean() }),
+  )
+  if (body.error) return body.error
+  const { service_key, is_unlocked } = body.data
 
   const column = accessColumnForService(service_key as AccessModuleKey)
   if (!column && service_key !== 'community') {

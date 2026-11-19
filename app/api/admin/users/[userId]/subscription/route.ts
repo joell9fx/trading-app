@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../../../auth';
 import { createAdminClient } from '@/lib/supabase/admin'
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +16,15 @@ export async function POST(
     if (auth.error) return auth.error;
     const supabase = createAdminClient(); // service role: cross-user write, caller already verified
 
-    const body = await request.json();
-    const { planId, status = 'active' } = body;
+    const body = await parseBody(
+      request,
+      z.object({
+        planId: z.string().trim().min(1).max(128),
+        status: z.enum(['active', 'trialing', 'past_due', 'canceled', 'incomplete']).default('active'),
+      }),
+    );
+    if (body.error) return body.error;
+    const { planId, status } = body.data;
     const { userId } = params;
 
     if (!planId) {
