@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { AccessModuleKey, countUnlocked, deriveAccessFromProfile } from './access-flags'
+import { updateDerivedProfileFields } from './privileged-profile'
 
 export type MembershipTier = 'Standard' | 'Premium' | 'Elite'
 
@@ -41,7 +42,7 @@ export async function updateUserTier(supabase: SupabaseClient, userId: string) {
 
   const previous_tier = (profileResult.data?.membership_tier as MembershipTier | null) || 'Standard'
 
-  await supabase.from('profiles').update({ membership_tier: tier }).eq('id', userId)
+  await updateDerivedProfileFields(supabase, userId, { membership_tier: tier })
 
   await supabase.from('membership_history').insert([
     { user_id: userId, previous_tier, new_tier: tier },

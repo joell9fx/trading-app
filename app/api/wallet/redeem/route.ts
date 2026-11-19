@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { updateUserTier } from '@/lib/tier-utils'
 import { accessColumnForService, type AccessModuleKey } from '@/lib/access-flags'
 import { ALL_SERVICES } from '@/lib/services-list'
+import { updateDerivedProfileFields } from '@/lib/privileged-profile'
 
 // Credit prices are owned by the server; the client-sent cost is ignored.
 const CREDIT_COST: Record<string, number> = Object.fromEntries(
@@ -71,10 +72,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (column) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ [column]: true })
-        .eq('id', user.id)
+      const { error: profileError } = await updateDerivedProfileFields(supabase, user.id, { [column]: true })
 
       if (profileError) {
         console.error('Profile flag update error (wallet redeem):', profileError)

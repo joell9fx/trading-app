@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+import { describe, expect, it, jest } from '@jest/globals'
 import { assertAdmin, assertOwner, isAdminRole, isModeratorRole } from '@/utils/auth'
 import { secretMatches } from '@/lib/api/internal-auth'
 

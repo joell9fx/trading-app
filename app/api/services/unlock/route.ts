@@ -4,6 +4,7 @@ import { updateUserTier } from '@/lib/tier-utils'
 import { addXP } from '@/lib/xp-utils'
 import { accessColumnForService, type AccessModuleKey } from '@/lib/access-flags'
 import { INCLUDED_SERVICE_KEYS } from '@/lib/services-catalog'
+import { updateDerivedProfileFields } from '@/lib/privileged-profile'
 
 const SELF_UNLOCKABLE = new Set<string>(INCLUDED_SERVICE_KEYS)
 
@@ -60,10 +61,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (column) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ [column]: true })
-        .eq('id', user.id)
+      const { error: profileError } = await updateDerivedProfileFields(supabase, user.id, { [column]: true })
 
       if (profileError) {
         console.error('Profile flag update error:', profileError)

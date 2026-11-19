@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { MembershipTier } from './tier-utils'
+import { updateDerivedProfileFields } from './privileged-profile'
 
 export async function assignBadges(supabase: SupabaseClient, userId: string) {
   const { data: profile } = await supabase
@@ -141,6 +142,6 @@ export async function assignBadges(supabase: SupabaseClient, userId: string) {
   if ((completedPaths || 0) >= 1) badges.push('📘 Committed Learner')
   if ((completedPaths || 0) >= 3) badges.push('🎯 Adaptive Trader')
 
-  await supabase.from('profiles').update({ badges }).eq('id', userId)
+  await updateDerivedProfileFields(supabase, userId, { badges })
 }
 
