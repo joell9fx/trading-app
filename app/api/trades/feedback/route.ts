@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { addXP } from '@/lib/xp-utils'
 import { requireServiceAccess } from '@/lib/api/require-service-access'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   const access = await requireServiceAccess('signals')
   if (access.error) return access.error
+  const limited = rateLimitResponse(`ai:${access.ctx.userId}`)
+  if (limited) return limited
   const supabase = createClient()
   const user = { id: access.ctx.userId }
 

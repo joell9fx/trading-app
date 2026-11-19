@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireServiceAccess } from '@/lib/api/require-service-access'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   const access = await requireServiceAccess('signals')
   if (access.error) return access.error
+  const limited = rateLimitResponse(`ai:${access.ctx.userId}`)
+  if (limited) return limited
   try {
     const { trades } = await req.json()
     if (!trades || !Array.isArray(trades)) {

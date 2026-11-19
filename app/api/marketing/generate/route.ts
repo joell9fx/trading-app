@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import OpenAI from 'openai'
 import { addXP } from '@/lib/xp-utils'
 import { assignBadges } from '@/lib/badges'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +14,8 @@ export async function POST(req: NextRequest) {
     if (!auth.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const limited = rateLimitResponse(`ai:${auth.user.id}`)
+    if (limited) return limited
 
     const { asset_type, platform, tone, customPrompt } = await req.json()
     const userId = auth.user.id
