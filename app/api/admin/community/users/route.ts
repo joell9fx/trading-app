@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     .from('profiles')
     .select('id, email, name, full_name, role, created_at, updated_at');
 
-  if (role) profileQuery = profileQuery.eq('role', role);
+  if (role) profileQuery = profileQuery.eq('role', role.toLowerCase());
   if (joinedFrom) profileQuery = profileQuery.gte('created_at', joinedFrom);
   if (joinedTo) profileQuery = profileQuery.lte('created_at', joinedTo);
 

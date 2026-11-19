@@ -38,7 +38,7 @@ export function usePermissions(userId: string | undefined, initialRole?: UserRol
             .select('role')
             .eq('id', userId)
             .single();
-          roleToUse = (profile?.role || 'MEMBER') as UserRole;
+          roleToUse = (profile?.role || 'member').toString().toUpperCase() as UserRole; // DB roles are lowercase since 041
         }
 
         // Fetch active subscription (maybeSingle: zero rows is valid)

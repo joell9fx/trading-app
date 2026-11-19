@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import ModerationDashboard from './ModerationDashboard';
+import { isAdminRole } from '@/utils/auth'
 
 export default async function CommunityModerationPage() {
   const supabase = createClient();
@@ -12,9 +13,9 @@ export default async function CommunityModerationPage() {
     redirect('/signin?redirectTo=/admin/community');
   }
 
-  const { data: profile } = await supabase.from('profiles').select('role, name, email').eq('id', user.id).single();
+  const { data: profile } = await supabase.from('profiles').select('role, is_owner, name, email').eq('id', user.id).single();
 
-  if (profile?.role !== 'ADMIN') {
+  if (!isAdminRole(profile?.role, (profile as any)?.is_owner)) {
     redirect('/dashboard');
   }
 
