@@ -3,7 +3,7 @@ import { ResetPasswordForm } from '@/components/auth/reset-password-form'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 export const metadata = {
-  title: 'Reset Password - Trading Academy',
+  title: 'Reset Password',
   description: 'Reset your Trading Academy account password.',
 }
 

@@ -3,7 +3,7 @@ import { PricingPage } from '@/components/pricing/pricing-page'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 export const metadata = {
-  title: 'Pricing - Trading Academy',
+  title: 'Pricing',
   description: 'Choose the perfect plan for your trading journey. Start free or upgrade to Pro for advanced features and mentoring.',
 }
 

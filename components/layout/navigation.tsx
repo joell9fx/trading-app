@@ -17,7 +17,8 @@ export function Navigation() {
     { name: 'Community Hub', href: '/community-hub' },
     { name: 'Pricing', href: '/pricing' },
     { name: 'About', href: '/about' },
-    { name: '🧪 Test', href: '/test' },
+    // Dev-only: /test returns 404 in production (see middleware DEV_ONLY_PATHS)
+    ...(process.env.NODE_ENV !== 'production' ? [{ name: '🧪 Test', href: '/test' }] : []),
   ]
 
   return (
