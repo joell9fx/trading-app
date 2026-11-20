@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { addXP } from '@/lib/xp-utils'
 import { requireServiceAccess } from '@/lib/api/require-service-access'
 import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,17 +17,14 @@ export async function POST(req: NextRequest) {
   const user = { id: access.ctx.userId }
 
   try {
-    const { trade } = await req.json()
-    if (!trade?.id) {
-      return NextResponse.json({ error: 'trade is required' }, { status: 400 })
-    }
+    const body = await parseBody(req, z.object({ trade: z.object({ id: idSchema }).passthrough() }))
+    if (body.error) return body.error
+    const trade = body.data.trade as Record<string, any> & { id: string }
 
-    // Verify ownership
-    if (trade.user_id && trade.user_id !== user.id) {
-      const { data: owned } = await supabase.from('user_trades').select('user_id').eq('id', trade.id).single()
-      if (owned?.user_id !== user.id) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-      }
+    // Verify ownership against the database, never the client-sent user_id.
+    const { data: owned } = await supabase.from('user_trades').select('user_id').eq('id', trade.id).maybeSingle()
+    if (!owned || owned.user_id !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const summary = `
@@ -88,6 +87,7 @@ ${summary}
       .from('user_trades')
       .update({ ai_feedback: feedback, feedback_sentiment: sentiment })
       .eq('id', trade.id)
+      .eq('user_id', user.id)
 
     if (sentiment === 'positive') {
       try {

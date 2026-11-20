@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireServiceAccess } from '@/lib/api/require-service-access'
 import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,10 +12,9 @@ export async function POST(req: NextRequest) {
   const limited = rateLimitResponse(`ai:${access.ctx.userId}`)
   if (limited) return limited
   try {
-    const { trades } = await req.json()
-    if (!trades || !Array.isArray(trades)) {
-      return NextResponse.json({ error: 'trades array required' }, { status: 400 })
-    }
+    const input = await parseBody(req, z.object({ trades: z.array(z.record(z.unknown())).max(2000) }))
+    if (input.error) return input.error
+    const trades: any[] = input.data.trades
 
     const wins = trades.filter((t: any) => t.result === 'win').length
     const losses = trades.filter((t: any) => t.result === 'loss').length

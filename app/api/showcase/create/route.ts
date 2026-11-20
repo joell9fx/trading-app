@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,10 +20,16 @@ export async function POST(req: NextRequest) {
   if (limited) return limited
 
   try {
-    const { type, title, caption } = await req.json()
-    if (!type || !title) {
-      return NextResponse.json({ error: 'type and title are required' }, { status: 400 })
-    }
+    const body = await parseBody(
+      req,
+      z.object({
+        type: z.string().trim().min(1).max(40),
+        title: z.string().trim().min(1).max(150),
+        caption: z.string().trim().max(2000).optional(),
+      }),
+    )
+    if (body.error) return body.error
+    const { type, title, caption } = body.data
 
     let image_url: string | null = null
 

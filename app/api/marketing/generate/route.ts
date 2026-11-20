@@ -4,6 +4,8 @@ import OpenAI from 'openai'
 import { addXP } from '@/lib/xp-utils'
 import { assignBadges } from '@/lib/badges'
 import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,12 +19,18 @@ export async function POST(req: NextRequest) {
     const limited = rateLimitResponse(`ai:${auth.user.id}`)
     if (limited) return limited
 
-    const { asset_type, platform, tone, customPrompt } = await req.json()
+    const body = await parseBody(
+      req,
+      z.object({
+        asset_type: z.string().trim().min(1).max(40),
+        platform: z.string().trim().max(40).optional(),
+        tone: z.string().trim().max(40).optional(),
+        customPrompt: z.string().trim().max(2000).optional(),
+      }),
+    )
+    if (body.error) return body.error
+    const { asset_type, platform, tone, customPrompt } = body.data
     const userId = auth.user.id
-
-    if (!asset_type) {
-      return NextResponse.json({ error: 'Missing asset_type' }, { status: 400 })
-    }
 
     const { data: user } = await supabase
       .from('profiles')

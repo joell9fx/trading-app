@@ -4,6 +4,8 @@ import OpenAI from 'openai'
 import { addXP } from '@/lib/xp-utils'
 import { assignBadges } from '@/lib/badges'
 import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,12 +17,17 @@ export async function POST(req: NextRequest) {
     const limited = rateLimitResponse(`ai:${auth.user.id}`)
     if (limited) return limited
 
-    const { platform, goal, budget } = await req.json()
+    const body = await parseBody(
+      req,
+      z.object({
+        platform: z.string().trim().min(1).max(40),
+        goal: z.string().trim().min(1).max(500),
+        budget: z.coerce.number().finite().min(0).max(1e9).optional(),
+      }),
+    )
+    if (body.error) return body.error
+    const { platform, goal, budget } = body.data
     const userId = auth.user.id
-
-    if (!platform || !goal) {
-      return NextResponse.json({ error: 'Missing platform or goal' }, { status: 400 })
-    }
 
     const { data: user } = await supabase
       .from('profiles')
