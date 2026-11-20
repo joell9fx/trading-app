@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 import { isAdminRole, isModeratorRole } from '@/utils/auth';
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { escapeHtml } from '@/lib/escape-html'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,7 +30,7 @@ function buildEmail(status: Status, notes?: string) {
       : 'Your funding submission status was updated.'
 
   const notesBlock = notes
-    ? `<p><strong>Admin Notes:</strong> ${notes}</p>`
+    ? `<p><strong>Admin Notes:</strong> ${escapeHtml(notes)}</p>`
     : ''
 
   const html = `
@@ -60,12 +63,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { submissionId, status, admin_notes }: { submissionId: string; status?: Status; admin_notes?: string } =
-      await req.json()
-
-    if (!submissionId) {
-      return NextResponse.json({ error: 'submissionId is required' }, { status: 400 })
-    }
+    const body = await parseBody(
+      req,
+      z.object({
+        submissionId: idSchema,
+        status: z.enum(['Approved', 'Rejected', 'Pending']).optional(),
+        admin_notes: z.string().trim().max(2000).nullable().optional(),
+      }),
+    )
+    if (body.error) return body.error
+    const { submissionId, status, admin_notes } = body.data
 
     // Verify admin
     const { data: profile } = await supabase
@@ -136,7 +143,7 @@ export async function POST(req: NextRequest) {
 
       // Optional email
       if (resend && resendFrom) {
-        const { subject, html } = buildEmail(status, admin_notes)
+        const { subject, html } = buildEmail(status, admin_notes ?? undefined)
         const recipient = existing.email || profile?.email
         if (recipient) {
           try {

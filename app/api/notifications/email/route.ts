@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 import { isAdminRole, isModeratorRole } from '@/utils/auth';
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
+import { escapeHtml } from '@/lib/escape-html'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,11 +32,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email not configured' }, { status: 400 })
     }
 
-    const { to, status, notes, title, message } = await req.json()
-
-    if (!to || !status) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    }
+    const body = await parseBody(
+      req,
+      z.object({
+        to: z.string().trim().email().max(254),
+        status: z.string().trim().min(1).max(32),
+        notes: z.string().trim().max(2000).optional(),
+        title: z.string().trim().max(200).optional(),
+        message: z.string().trim().max(5000).optional(),
+      }),
+    )
+    if (body.error) return body.error
+    const { to, status, notes, title, message } = body.data
 
     const subject =
       status === 'Approved'
@@ -44,14 +54,14 @@ export async function POST(req: NextRequest) {
 
     const html = `
       <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-        <h2>${subject}</h2>
-        <p>${
+        <h2>${escapeHtml(subject)}</h2>
+        <p>${escapeHtml(
           message ||
           (status === 'Approved'
             ? 'Congratulations! Your evaluation was approved by Trading Academy Funding.'
             : 'Your funding submission was updated.')
-        }</p>
-        ${notes ? `<p><strong>Admin Notes:</strong> ${notes}</p>` : ''}
+        )}</p>
+        ${notes ? `<p><strong>Admin Notes:</strong> ${escapeHtml(notes)}</p>` : ''}
         <p>Log in to your dashboard for more details.</p>
       </div>
     `
