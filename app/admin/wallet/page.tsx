@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { isAdminRole } from '@/utils/auth'
 
 export default async function AdminWalletPage() {
   const supabase = createClient()
@@ -11,8 +12,8 @@ export default async function AdminWalletPage() {
     redirect('/signin?redirectTo=/admin/wallet')
   }
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (profile?.role !== 'ADMIN') {
+  const { data: profile } = await supabase.from('profiles').select('role, is_owner').eq('id', user.id).single()
+  if (!isAdminRole(profile?.role, (profile as any)?.is_owner)) {
     redirect('/dashboard')
   }
 

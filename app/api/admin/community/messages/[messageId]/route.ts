@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logModerationAction, requireAdmin } from '../../utils';
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 // GET returns a message plus recent channel context
 export async function GET(
@@ -65,13 +67,15 @@ export async function PATCH(
   if (error || !ctx) return error!;
   const { supabase, adminId } = ctx;
 
-  const body = await request.json();
-  const action = body?.action as 'delete' | 'restore' | 'pin' | 'unpin' | 'flag';
-  const reason = body?.reason as string | undefined;
-
-  if (!action) {
-    return NextResponse.json({ error: 'Action is required' }, { status: 400 });
-  }
+  const body = await parseBody(
+    request,
+    z.object({
+      action: z.enum(['delete', 'restore', 'pin', 'unpin', 'flag']),
+      reason: z.string().trim().max(500).optional(),
+    }),
+  );
+  if (body.error) return body.error;
+  const { action, reason } = body.data;
 
   const messageId = params.messageId;
 

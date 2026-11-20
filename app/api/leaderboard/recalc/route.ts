@@ -1,10 +1,11 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextResponse, type NextRequest } from 'next/server'
+import { requireAdminOrInternal } from '@/lib/api/internal-auth'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST() {
-  const supabase = createClient()
+export async function POST(req: NextRequest) {
+  const { error: authError, supabase } = await requireAdminOrInternal(req)
+  if (authError || !supabase) return authError
 
   const { data: users, error } = await supabase
     .from('profiles')

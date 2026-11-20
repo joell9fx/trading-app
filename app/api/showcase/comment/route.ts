@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,12 +16,13 @@ export async function POST(req: NextRequest) {
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const limited = rateLimitResponse(`showcase-comment:${user.id}`, { limit: 10, windowMs: 60_000 })
+  if (limited) return limited
 
   try {
-    const { post_id, comment } = await req.json()
-    if (!post_id || !comment) {
-      return NextResponse.json({ error: 'post_id and comment are required' }, { status: 400 })
-    }
+    const body = await parseBody(req, z.object({ post_id: idSchema, comment: z.string().trim().min(1).max(2000) }))
+    if (body.error) return body.error
+    const { post_id, comment } = body.data
 
     const { error } = await supabase.from('showcase_comments').insert([{ user_id: user.id, post_id, comment }])
     if (error) {

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { SampleDataNotice } from '@/components/ui/sample-data-notice';
 import {
   ShieldCheck,
   Users,
@@ -123,6 +124,7 @@ export function AdminHub({ user }: AdminHubProps) {
 
   return (
     <div className="space-y-8">
+      <SampleDataNotice what="the system status, audit log and feature toggles below (toggles don't save yet)" />
       <div className="flex flex-col lg:flex-row items-start justify-between gap-6 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-[0_18px_50px_-35px_rgba(0,0,0,0.8)]">
         <div className="space-y-3 w-full">
           <div className="flex flex-wrap items-center gap-2">

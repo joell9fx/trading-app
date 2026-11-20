@@ -23,7 +23,9 @@ type ModerationUser = {
   mute?: any;
 };
 
-const roleOptions = ['ALL', 'VIEWER', 'MEMBER', 'TRADER', 'MODERATOR', 'ADMIN'];
+// Lowercase to match profiles.role since migration 041. Owner is set via superadmin only.
+const roleOptions = ['ALL', 'member', 'admin', 'owner'];
+const assignableRoles = ['member', 'admin'];
 const statusOptions = ['all', 'active', 'muted', 'banned'];
 
 export default function UsersPanel({ adminId }: { adminId: string }) {
@@ -228,8 +230,7 @@ export default function UsersPanel({ adminId }: { adminId: string }) {
               value={nextRole}
               onChange={(e) => setNextRole(e.target.value)}
             >
-              {roleOptions
-                .filter((r) => r !== 'ALL')
+              {assignableRoles
                 .map((r) => (
                   <option key={r} value={r}>
                     {r}

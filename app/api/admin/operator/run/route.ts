@@ -72,7 +72,7 @@ export async function POST() {
       {
         role: 'system',
         content: `
-You are the digital COO of VisionEdge FX.
+You are the digital COO of Trading Academy.
 Analyze business health using metrics and forecasts.
 Output JSON:
 {

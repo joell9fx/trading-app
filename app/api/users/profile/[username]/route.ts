@@ -17,24 +17,19 @@ export async function GET(_req: NextRequest, { params }: { params: { username: s
     return NextResponse.json({ error: 'Profile not available' }, { status: 403 })
   }
 
-  const { data: journal } = await supabase
-    .from('mentor_journal')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(3)
-
   const { data: showcase } = await supabase
     .from('user_showcase_posts')
-    .select('*')
+    .select('id, title, caption, image_url, created_at')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(3)
 
+  // Never expose private data (mentor journal, email) on public profiles.
+  const { is_profile_public: _isPublic, ...publicUser } = user
+
   return NextResponse.json({
-    user,
+    user: publicUser,
     badges: { badges: user.badges || [] },
-    journal: journal || [],
     showcase: showcase || [],
   })
 }

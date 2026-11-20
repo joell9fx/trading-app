@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { handleCommunityXP } from '@/lib/community-xp';
+import { isAdminRole, isModeratorRole } from '@/utils/auth';
 
 const ATTACHMENT_LIMIT_BYTES = 8 * 1024 * 1024; // 8MB per file
 const ALLOWED_ATTACHMENT_PREFIXES = ['image/', 'application/pdf'];
@@ -55,7 +56,7 @@ function canAccessChannel(
   channelSlug?: string | null
 ) {
   if (user?.banned) return false;
-  const isElevated = user?.role === 'ADMIN' || user?.role === 'MODERATOR' || user?.is_admin || user?.is_owner;
+  const isElevated = isModeratorRole(user?.role, user);
   if (isElevated) return true;
 
   const key = (channelSlug || '').toLowerCase();
@@ -118,7 +119,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Channel not found' }, { status: 404 });
   }
 
-  const isAdmin = role === 'ADMIN' || role === 'MODERATOR' || requester?.is_admin || requester?.is_owner;
+  const isAdmin = isModeratorRole(role, requester);
   if (channel.is_private && !isAdmin) {
     return NextResponse.json({ error: 'No access' }, { status: 403 });
   }
@@ -209,7 +210,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Channel not found' }, { status: 404 });
   }
 
-  const isAdmin = role === 'ADMIN' || role === 'MODERATOR' || requester?.is_admin || requester?.is_owner;
+  const isAdmin = isModeratorRole(role, requester);
   if (channel.slug === 'announcements' && !isAdmin) {
     return NextResponse.json({ error: 'Only admins can post in announcements' }, { status: 403 });
   }
@@ -318,7 +319,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid payload', issues: parsed.error.issues }, { status: 400 });
   }
 
-  if (role !== 'ADMIN' && role !== 'MODERATOR') {
+  if (!isModeratorRole(role, ctx.profile)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

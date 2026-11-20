@@ -389,6 +389,55 @@ export function PerformanceAnalyticsSection() {
     return byDate.slice(0, 5);
   }, [filteredRows]);
 
+  const handleFilterChange = useCallback(<K extends keyof PerformanceFilters>(
+    key: K,
+    value: PerformanceFilters[K]
+  ) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  const handleGenerateReport = useCallback(async () => {
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData?.user ?? null;
+    if (!user) {
+      toast({ title: 'Sign in required', variant: 'destructive' });
+      return;
+    }
+    if (filteredRows.length === 0) {
+      toast({ title: 'No data to report', description: 'Add journal entries or adjust filters.', variant: 'destructive' });
+      return;
+    }
+    setGeneratingReport(true);
+    try {
+      const report = generatePerformanceReport(filteredRows, filters);
+      const { error } = await supabase.from('performance_reports').insert({
+        user_id: user.id,
+        report_type: 'custom',
+        title: 'Performance Report',
+        date_from: filters.dateFrom || null,
+        date_to: filters.dateTo || null,
+        total_trades: report.total_trades,
+        win_rate: report.win_rate,
+        total_r: report.total_r,
+        avg_r: report.avg_r,
+        best_trade: report.best_trade,
+        worst_trade: report.worst_trade,
+        report_data: report.report_data as unknown as Record<string, unknown>,
+      });
+      if (error) throw error;
+      toast({ title: 'Report saved' });
+      router.replace('/dashboard?section=reports');
+    } catch (e) {
+      toast({
+        title: 'Failed to save report',
+        description: e instanceof Error ? e.message : 'Unknown error',
+        variant: 'destructive',
+      });
+    } finally {
+      setGeneratingReport(false);
+    }
+  }, [supabase, filteredRows, filters, toast, router]);
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -456,54 +505,6 @@ export function PerformanceAnalyticsSection() {
   const formatR = (v: number) => (v >= 0 ? `+${v}` : String(v));
   const formatPct = (v: number) => `${v.toFixed(1)}%`;
 
-  const handleFilterChange = useCallback(<K extends keyof PerformanceFilters>(
-    key: K,
-    value: PerformanceFilters[K]
-  ) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  }, []);
-
-  const handleGenerateReport = useCallback(async () => {
-    const { data: authData } = await supabase.auth.getUser();
-    const user = authData?.user ?? null;
-    if (!user) {
-      toast({ title: 'Sign in required', variant: 'destructive' });
-      return;
-    }
-    if (filteredRows.length === 0) {
-      toast({ title: 'No data to report', description: 'Add journal entries or adjust filters.', variant: 'destructive' });
-      return;
-    }
-    setGeneratingReport(true);
-    try {
-      const report = generatePerformanceReport(filteredRows, filters);
-      const { error } = await supabase.from('performance_reports').insert({
-        user_id: user.id,
-        report_type: 'custom',
-        title: 'Performance Report',
-        date_from: filters.dateFrom || null,
-        date_to: filters.dateTo || null,
-        total_trades: report.total_trades,
-        win_rate: report.win_rate,
-        total_r: report.total_r,
-        avg_r: report.avg_r,
-        best_trade: report.best_trade,
-        worst_trade: report.worst_trade,
-        report_data: report.report_data as unknown as Record<string, unknown>,
-      });
-      if (error) throw error;
-      toast({ title: 'Report saved' });
-      router.replace('/dashboard?section=reports');
-    } catch (e) {
-      toast({
-        title: 'Failed to save report',
-        description: e instanceof Error ? e.message : 'Unknown error',
-        variant: 'destructive',
-      });
-    } finally {
-      setGeneratingReport(false);
-    }
-  }, [supabase, filteredRows, filters, toast, router]);
 
   return (
     <div className="space-y-6">

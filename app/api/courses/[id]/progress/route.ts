@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic';
 
@@ -105,15 +107,9 @@ export async function POST(
     }
 
     const { id: courseId } = params;
-    const body = await request.json();
-    const { lessonId, completed } = body;
-
-    if (!lessonId) {
-      return NextResponse.json(
-        { error: 'Lesson ID is required' },
-        { status: 400 }
-      );
-    }
+    const body = await parseBody(request, z.object({ lessonId: idSchema, completed: z.boolean().optional() }));
+    if (body.error) return body.error;
+    const { lessonId, completed } = body.data;
 
     // Verify user is enrolled
     const { data: enrollment } = await supabase

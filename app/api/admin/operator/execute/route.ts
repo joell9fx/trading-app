@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '../../auth'
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,10 +10,12 @@ export async function POST(req: NextRequest) {
   if (auth.error) return auth.error
   const { supabase } = auth.ctx!
 
-  const { id, action } = await req.json()
-  if (!id || !action) {
-    return NextResponse.json({ error: 'Missing id or action' }, { status: 400 })
-  }
+  const body = await parseBody(
+    req,
+    z.object({ id: idSchema, action: z.enum(['approve', 'dismiss', 'execute']) }),
+  )
+  if (body.error) return body.error
+  const { id, action } = body.data
 
   let status = 'pending'
   if (action === 'approve') status = 'approved'

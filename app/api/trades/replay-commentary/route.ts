@@ -1,17 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireServiceAccess } from '@/lib/api/require-service-access'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   const access = await requireServiceAccess('signals')
   if (access.error) return access.error
+  const limited = rateLimitResponse(`ai:${access.ctx.userId}`)
+  if (limited) return limited
 
   try {
-    const { trade, candles } = await req.json()
-    if (!trade || !candles) {
-      return NextResponse.json({ error: 'trade and candles are required' }, { status: 400 })
-    }
+    const input = await parseBody(
+      req,
+      z.object({ trade: z.record(z.unknown()), candles: z.array(z.unknown()).max(2000) }),
+    )
+    if (input.error) return input.error
+    const { trade, candles } = input.data
 
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({ commentary: 'AI commentary unavailable (missing OPENAI_API_KEY).' })

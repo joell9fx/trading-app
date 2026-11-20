@@ -138,6 +138,7 @@ export function CampaignManager() {
             <p className="text-xs text-gray-400">Platform: {output.platform}</p>
             {output.ad_copy && <Textarea readOnly value={output.ad_copy} className="bg-gray-900 border-gray-700 text-sm" />}
             {output.image_url && (
+              // eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains
               <img src={output.image_url} className="rounded-xl border border-gold-500/40" alt="Ad creative" />
             )}
             <Button variant="outline" className="border-gray-700 text-gray-200 hover:border-gold-500/60">

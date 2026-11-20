@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, Users, BarChart3, Settings, Home, Shield, Briefcase, Zap } from 'lucide-react';
+import { BookOpen, Users, BarChart3, Home, Shield, Briefcase, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -13,7 +13,6 @@ const navItems = [
   { href: '/admin/notifications', label: 'System Notifications ⚡️', icon: Zap },
   { href: '/admin/community', label: 'Community Moderation', icon: Shield },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
 export function AdminNav() {

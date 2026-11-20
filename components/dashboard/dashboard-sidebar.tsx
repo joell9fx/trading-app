@@ -218,8 +218,9 @@ export default function DashboardSidebar({
   }, [activeSection]);
 
   useEffect(() => {
-    if (activeGroupId && !expandedGroups.has(activeGroupId)) {
+    if (activeGroupId) {
       setExpandedGroups((prev) => {
+        if (prev.has(activeGroupId)) return prev;
         const next = new Set(prev);
         next.add(activeGroupId);
         try {

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { HubMessage, HubUser } from './types';
 import { Message } from './message';
 import { ScrollText, Pin } from 'lucide-react';
+import { isModeratorRole } from '@/utils/auth';
 
 interface ChatWindowProps {
   messages: HubMessage[];
@@ -35,7 +36,7 @@ export function ChatWindow({
   }, [messages]);
 
   const pinned = useMemo(() => messages.filter((m) => m.is_pinned), [messages]);
-  const isModerator = currentUser.role === 'ADMIN' || currentUser.role === 'MODERATOR';
+  const isModerator = isModeratorRole(currentUser.role, currentUser as any);
 
   return (
     <div className="flex flex-col h-full bg-gray-950/60 border border-gray-800 rounded-2xl shadow-xl overflow-hidden">

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../../utils';
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 export async function PATCH(
   request: NextRequest,
@@ -9,14 +11,18 @@ export async function PATCH(
   if (error || !ctx) return error!;
   const { supabase } = ctx;
 
-  const body = await request.json();
-  const { name, description, category, is_private, archived } = body as {
-    name?: string;
-    description?: string | null;
-    category?: string;
-    is_private?: boolean;
-    archived?: boolean;
-  };
+  const body = await parseBody(
+    request,
+    z.object({
+      name: z.string().trim().min(2).max(80).optional(),
+      description: z.string().trim().max(500).nullable().optional(),
+      category: z.string().trim().min(1).max(40).optional(),
+      is_private: z.boolean().optional(),
+      archived: z.boolean().optional(),
+    }),
+  );
+  if (body.error) return body.error;
+  const { name, description, category, is_private, archived } = body.data;
 
   const updates: Record<string, any> = {};
   if (typeof name === 'string') updates.name = name;

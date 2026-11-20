@@ -75,9 +75,18 @@ export function SignUpForm() {
 
     try {
       // Create user account
+      const refParam = searchParams.get('ref')
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          // handle_new_user() reads name/full_name from metadata when it creates the profile
+          data: {
+            name: formData.name,
+            full_name: formData.name,
+            ...(refParam ? { referral_code_used: refParam } : {}),
+          },
+        },
       })
 
       if (authError) {
@@ -91,49 +100,27 @@ export function SignUpForm() {
       }
 
       if (authData.user) {
-        const refParam = searchParams.get('ref')
-        let referrerId: string | null = null
-
-        if (refParam) {
-          const { data: refProfile } = await supabase
+        // The profile row is created by the handle_new_user() trigger (role
+        // 'member'). Here we only fill in the referral code, best effort: when
+        // email confirmation is on there is no session yet, and /api/referrals
+        // creates the code lazily on first visit instead.
+        if (authData.session) {
+          const { error: profileError } = await supabase
             .from('profiles')
-            .select('id')
-            .eq('referral_code', refParam)
-            .single()
-          referrerId = refProfile?.id || null
-        }
+            .update({ name: formData.name, referral_code: buildReferralCode(authData.user.id) })
+            .eq('id', authData.user.id)
+          if (profileError) {
+            console.error('Profile update error:', profileError)
+          }
 
-        const referral_code = buildReferralCode(authData.user.id)
-
-        // Create profile record
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: authData.user.id,
-              email: formData.email,
-              name: formData.name,
-              role: 'MEMBER',
-              referral_code,
-              created_at: new Date().toISOString(),
-            },
-          ])
-
-        if (profileError) {
-          console.error('Profile creation error:', profileError)
-          // Don't fail the signup if profile creation fails, just log it
-        }
-
-        if (referrerId) {
-          await supabase.from('referrals').insert([{ referrer_id: referrerId, referred_id: authData.user.id }])
-          await supabase.from('notifications').insert([
-            {
-              user_id: referrerId,
-              type: 'referral',
-              title: '🎉 New Referral Joined!',
-              message: `${formData.email} joined using your link.`,
-            },
-          ])
+          if (refParam) {
+            // Server records the referral and notifies the referrer
+            await fetch('/api/referral-track', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ referral_code: refParam }),
+            }).catch((err) => console.error('Referral tracking error:', err))
+          }
         }
 
         await addXP(supabase, authData.user.id, 10, 'sign up')

@@ -8,7 +8,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from('performance_stats')
-    .select('user_id, win_rate, consistency_score, total_trades, avg_rr, total_profit, profiles:profiles!performance_stats_user_id_fkey(id, name, full_name, email, membership_tier, xp, badges)')
+    .select('user_id, win_rate, consistency_score, total_trades, avg_rr, total_profit, profiles:profiles!performance_stats_user_id_fkey(id, name, full_name, username, membership_tier, xp, badges)')
     .order('consistency_score', { ascending: false })
     .order('win_rate', { ascending: false })
     .limit(50)

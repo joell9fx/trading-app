@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import AnalyticsDashboard from './AnalyticsDashboard';
+import { isAdminRole } from '@/utils/auth'
 
 export default async function AdminAnalyticsPage() {
   const supabase = createClient();
@@ -12,8 +13,8 @@ export default async function AdminAnalyticsPage() {
     redirect('/signin?redirectTo=/admin/analytics');
   }
 
-  const { data: profile } = await supabase.from('profiles').select('role, name, email').eq('id', user.id).single();
-  if (profile?.role !== 'ADMIN') {
+  const { data: profile } = await supabase.from('profiles').select('role, is_owner, name, email').eq('id', user.id).single();
+  if (!isAdminRole(profile?.role, (profile as any)?.is_owner)) {
     redirect('/dashboard');
   }
 

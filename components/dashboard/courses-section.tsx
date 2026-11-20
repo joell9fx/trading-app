@@ -151,6 +151,13 @@ export function CoursesSection({ user }: CoursesSectionProps) {
           loadEnrollments()
           return
         }
+        if (response.status === 402) {
+          toast({
+            title: 'Purchase required',
+            description: `${courseTitle} is a paid course and isn't available to buy yet.`,
+          })
+          return
+        }
         throw new Error(data.error || 'Failed to enroll')
       }
 

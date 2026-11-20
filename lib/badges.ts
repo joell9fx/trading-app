@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { MembershipTier } from './tier-utils'
+import { updateDerivedProfileFields } from './privileged-profile'
 
 export async function assignBadges(supabase: SupabaseClient, userId: string) {
   const { data: profile } = await supabase
@@ -90,7 +91,7 @@ export async function assignBadges(supabase: SupabaseClient, userId: string) {
   if (profile?.affiliate_tier === 'Silver') badges.push('🥈 Growth Partner')
   if (profile?.affiliate_tier === 'Gold') badges.push('🏆 Top Influencer')
   if ((profile?.affiliate_total_commission || 0) >= 100) badges.push('💸 Power Promoter')
-  if (profile?.affiliate_tier === 'Platinum' || profile?.affiliate_tier === 'Elite') badges.push('👑 VisionEdge Partner')
+  if (profile?.affiliate_tier === 'Platinum' || profile?.affiliate_tier === 'Elite') badges.push('👑 Trading Academy Partner')
   const premiumUnlocks = [
     profile?.has_signals_access,
     profile?.has_mentorship_access,
@@ -141,6 +142,6 @@ export async function assignBadges(supabase: SupabaseClient, userId: string) {
   if ((completedPaths || 0) >= 1) badges.push('📘 Committed Learner')
   if ((completedPaths || 0) >= 3) badges.push('🎯 Adaptive Trader')
 
-  await supabase.from('profiles').update({ badges }).eq('id', userId)
+  await updateDerivedProfileFields(supabase, userId, { badges })
 }
 

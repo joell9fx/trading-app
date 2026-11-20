@@ -31,7 +31,7 @@ export async function POST() {
       {
         role: 'system',
         content: `
-You are a cybersecurity & GDPR auditor for VisionEdge FX.
+You are a cybersecurity & GDPR auditor for Trading Academy.
 Analyze configs and patterns for vulnerabilities, auth leaks, and compliance gaps.
 Output JSON array: [{category, issue, severity, recommendation}]`,
       },

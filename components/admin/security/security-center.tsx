@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
@@ -23,7 +23,7 @@ export function SecurityCenter() {
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     try {
       const [aRes, rRes] = await Promise.all([fetch('/api/admin/security/logs'), fetch('/api/admin/security/report')])
@@ -40,11 +40,11 @@ export function SecurityCenter() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
 
   useEffect(() => {
     load()
-  }, [])
+  }, [load])
 
   const runNow = async () => {
     setRunning(true)

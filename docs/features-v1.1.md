@@ -1,4 +1,4 @@
-# VisionEdge FX v1.1 — Feature Specs & Ticket Seeds
+# Trading Academy v1.1 — Feature Specs & Ticket Seeds
 
 Use this to spin epics/tickets and track acceptance criteria. Align with the 30-day roadmap in `/docs/v1.1-plan.md`.
 

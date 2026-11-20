@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../utils';
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
 
 function slugify(value: string) {
   return value
@@ -49,12 +51,17 @@ export async function POST(request: NextRequest) {
   if (error || !ctx) return error!;
   const { supabase } = ctx;
 
-  const body = await request.json();
-  const { name, description, category = 'general', is_private = false } = body;
-
-  if (!name || typeof name !== 'string' || name.length < 2) {
-    return NextResponse.json({ error: 'Channel name is required' }, { status: 400 });
-  }
+  const body = await parseBody(
+    request,
+    z.object({
+      name: z.string().trim().min(2, 'Channel name is required').max(80),
+      description: z.string().trim().max(500).nullable().optional(),
+      category: z.string().trim().min(1).max(40).default('general'),
+      is_private: z.boolean().default(false),
+    }),
+  );
+  if (body.error) return body.error;
+  const { name, description, category, is_private } = body.data;
 
   const slug = slugify(name);
   const insertPayload = {

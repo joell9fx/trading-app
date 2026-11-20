@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Cookie Policy - Trading Academy',
+  title: 'Cookie Policy',
   description: 'Cookie policy for Trading Academy.',
 }
 

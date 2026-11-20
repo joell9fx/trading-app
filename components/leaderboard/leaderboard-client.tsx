@@ -33,7 +33,7 @@ export function LeaderboardClient() {
   return (
     <Card className="bg-black border border-gold-500/40 p-6 rounded-2xl space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl text-gold-400 font-bold">🏆 VisionEdge Leaderboard</h2>
+        <h2 className="text-2xl text-gold-400 font-bold">🏆 Trading Academy Leaderboard</h2>
         <div className="flex gap-2 text-sm">
           {(['xp', 'consistency', 'lessons', 'referrals'] as const).map((m) => (
             <Button
@@ -57,7 +57,8 @@ export function LeaderboardClient() {
             <div className="flex items-center gap-3">
               <span className="text-gold-400 font-bold w-6">{i + 1}</span>
               {u.avatar_url ? (
-                <img src={u.avatar_url} className="w-10 h-10 rounded-full border border-gold-500 object-cover" />
+                // eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains
+                <img src={u.avatar_url} alt={`${u.username} avatar`} className="w-10 h-10 rounded-full border border-gold-500 object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-full border border-gold-500 bg-gray-800" />
               )}

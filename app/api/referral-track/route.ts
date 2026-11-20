@@ -1,40 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { recordReferral } from '@/lib/referrals/record-referral'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
+const BodySchema = z.object({
+  referral_code: z.string().trim().min(1).max(64),
+})
+
+/**
+ * Records who referred the signed-in user. A user can only set their own
+ * referrer, only once, and never to themselves.
+ */
 export async function POST(req: NextRequest) {
   const supabase = createClient()
-  const { referral_code, new_user_id } = await req.json()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
 
-  if (!referral_code || !new_user_id) {
-    return NextResponse.json({ error: 'Missing referral_code or new_user_id' }, { status: 400 })
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const limited = rateLimitResponse(`referral-track:${user.id}`, { limit: 5, windowMs: 10 * 60_000 })
+  if (limited) return limited
+
+  const parsed = BodySchema.safeParse(await req.json().catch(() => null))
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'referral_code is required' }, { status: 400 })
   }
 
-  const { data: referrer } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('referral_code', referral_code)
-    .single()
-
-  if (!referrer) {
-    return NextResponse.json({ success: true }) // Ignore invalid codes silently
+  const result = await recordReferral(createAdminClient(), user.id, parsed.data.referral_code)
+  if (result.status === 'error') {
+    return NextResponse.json({ error: 'Could not record referral' }, { status: 500 })
   }
-
-  // Avoid duplicate rows
-  const { data: existing } = await supabase
-    .from('referrals')
-    .select('id')
-    .eq('referrer_id', referrer.id)
-    .eq('referred_user_id', new_user_id)
-    .maybeSingle()
-
-  if (!existing) {
-    await supabase.from('referrals').insert([{ referrer_id: referrer.id, referred_user_id: new_user_id, referral_code }])
-  }
-
-  await supabase.from('profiles').update({ referred_by: referral_code }).eq('id', new_user_id)
-
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true, already_referred: result.status === 'already_referred' })
 }
-

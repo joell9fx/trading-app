@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createSupabaseClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -47,7 +47,8 @@ interface ProfileSectionProps {
 }
 
 export function ProfileSection({ user }: ProfileSectionProps) {
-  // Safety check for user object
+  // Safety check for user object. Hooks live in ProfileSectionContent so they
+  // are never called conditionally.
   if (!user || !user.id || !user.email) {
     return (
       <div className="space-y-6">
@@ -64,6 +65,10 @@ export function ProfileSection({ user }: ProfileSectionProps) {
     );
   }
 
+  return <ProfileSectionContent user={user} />
+}
+
+function ProfileSectionContent({ user }: ProfileSectionProps) {
   const [profile, setProfile] = useState({
     name: user.name || user.email?.split('@')[0] || '',
     bio: user.bio || '',
@@ -82,25 +87,66 @@ export function ProfileSection({ user }: ProfileSectionProps) {
   const [subscription, setSubscription] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   
-  const supabase = createSupabaseClient()
+  const supabase = useMemo(() => createSupabaseClient(), [])
   const { toast } = useToast()
 
   const loadProfileStats = useCallback(async () => {
     try {
-      // Fetch user stats
-      // This is a placeholder - you can implement actual stats fetching
+      const [progressRes, postsRes, sessionsRes] = await Promise.all([
+        supabase.from('progress').select('lesson_id').eq('user_id', user.id).eq('completed', true),
+        // Community hub messages store the author in author_id; legacy rows use user_id
+        supabase
+          .from('messages')
+          .select('id', { count: 'exact', head: true })
+          .or(`author_id.eq.${user.id},user_id.eq.${user.id}`),
+        supabase
+          .from('bookings')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .in('status', ['confirmed', 'completed']),
+      ])
+
+      const completedLessonIds = (progressRes.data || []).map((p: { lesson_id: string }) => p.lesson_id)
+
+      // A course counts as completed when every one of its lessons is completed
+      let coursesCompleted = 0
+      if (completedLessonIds.length > 0) {
+        const { data: doneLessons } = await supabase
+          .from('lessons')
+          .select('course_id')
+          .in('id', completedLessonIds)
+        const doneByCourse = new Map<string, number>()
+        for (const l of doneLessons || []) {
+          doneByCourse.set(l.course_id, (doneByCourse.get(l.course_id) || 0) + 1)
+        }
+        if (doneByCourse.size > 0) {
+          const { data: allLessons } = await supabase
+            .from('lessons')
+            .select('course_id')
+            .in('course_id', Array.from(doneByCourse.keys()))
+          const totalByCourse = new Map<string, number>()
+          for (const l of allLessons || []) {
+            totalByCourse.set(l.course_id, (totalByCourse.get(l.course_id) || 0) + 1)
+          }
+          doneByCourse.forEach((done, courseId) => {
+            const total = totalByCourse.get(courseId) || 0
+            if (total > 0 && done >= total) coursesCompleted += 1
+          })
+        }
+      }
+
       setStats({
-        coursesCompleted: 3,
-        lessonsCompleted: 12,
-        communityPosts: 5,
-        mentorshipSessions: 2,
+        coursesCompleted,
+        lessonsCompleted: completedLessonIds.length,
+        communityPosts: postsRes.count || 0,
+        mentorshipSessions: sessionsRes.count || 0,
       })
     } catch (error) {
       console.error('Error loading stats:', error)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [supabase, user.id])
 
   const loadSubscription = useCallback(async () => {
     try {

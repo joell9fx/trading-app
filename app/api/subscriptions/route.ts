@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { z } from 'zod';
+import { requireAdmin } from '@/app/api/admin/auth';
+import { createAdminClient } from '@/lib/supabase/admin';
+
+const CreateSubscriptionSchema = z.object({
+  userId: z.string().uuid(),
+  planId: z.string().min(1),
+  status: z.enum(['active', 'trialing', 'cancelled', 'past_due']).default('active'),
+});
 
 export const dynamic = 'force-dynamic';
 
@@ -56,29 +65,23 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/subscriptions - Create or update subscription
+// POST /api/subscriptions - Admin: create or replace a user's subscription.
+// Paid subscriptions for members are created by the Stripe webhook only.
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    const { error: adminError } = await requireAdmin();
+    if (adminError) return adminError;
 
-    const body = await request.json();
-    const { planId, status = 'active' } = body;
-
-    if (!planId) {
+    const parsed = CreateSubscriptionSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Plan ID is required' },
+        { error: 'userId (uuid) and planId are required' },
         { status: 400 }
       );
     }
+    const { userId, planId, status } = parsed.data;
+    const supabase = createAdminClient();
+    const user = { id: userId };
 
     // Check if plan exists
     const { data: plan, error: planError } = await supabase

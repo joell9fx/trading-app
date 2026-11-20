@@ -35,7 +35,7 @@ export function VisionTimelineClient({ timeline }: { timeline: TimelineEvent[] }
   return (
     <Card className="bg-surface border border-primary/40 p-6 rounded-2xl">
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <h2 className="text-2xl text-primary font-bold">🛤️ Your VisionEdge Journey</h2>
+        <h2 className="text-2xl text-primary font-bold">🛤️ Your Trading Academy Journey</h2>
         <div className="ml-auto flex gap-2 text-xs">
           {['all', 'journal', 'lesson', 'badge', 'start'].map((f) => (
             <Button
