@@ -473,6 +473,7 @@ export function TradeAnnotationEditor({
             ref={containerRef}
             className="relative inline-block max-w-full overflow-hidden rounded-lg border border-border-subtle bg-panel"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains */}
             <img
               ref={(el) => {
                 imageRef.current = el;

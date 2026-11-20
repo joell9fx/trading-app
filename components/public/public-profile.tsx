@@ -15,6 +15,7 @@ export function PublicProfile({ profile }: PublicProfileProps) {
     <div className="min-h-screen bg-black text-white p-6 space-y-6">
       <div className="flex items-center gap-4 mb-6">
         {user.avatar_url && (
+          // eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains
           <img src={user.avatar_url} alt={`@${user.username}`} className="w-20 h-20 rounded-full border-2 border-gold-500 object-cover" />
         )}
         <div>
@@ -45,6 +46,7 @@ export function PublicProfile({ profile }: PublicProfileProps) {
           <div key={s.id} className="bg-neutral-900 border border-gray-700 p-3 mb-3 rounded-lg">
             <h4 className="text-white font-semibold">{s.title}</h4>
             <p className="text-gray-400 text-sm">{s.caption}</p>
+            {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains */}
             {s.image_url && <img src={s.image_url} alt={s.title || 'Showcase image'} className="mt-2 rounded-xl border border-gold-500/40" />}
           </div>
         ))}

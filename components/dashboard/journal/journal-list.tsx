@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -24,7 +24,7 @@ export function JournalList() {
   const [reflecting, setReflecting] = useState<string | null>(null)
   const { toast } = useToast()
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     const res = await fetch('/api/mentor/journal/list')
     const json = await res.json().catch(() => ({}))
@@ -39,11 +39,11 @@ export function JournalList() {
       setEntries([])
     }
     setLoading(false)
-  }
+  }, [toast])
 
   useEffect(() => {
     load()
-  }, [toast])
+  }, [load])
 
   const submitReflection = async (journalId: string, text: string) => {
     setReflecting(journalId)

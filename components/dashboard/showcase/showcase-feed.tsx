@@ -86,6 +86,7 @@ export function ShowcaseFeed() {
 
           {post.image_url && (
             <div className="rounded-xl overflow-hidden border border-gold-500/20">
+              {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains */}
               <img src={post.image_url} alt={post.title} className="w-full object-cover" />
             </div>
           )}

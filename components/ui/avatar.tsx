@@ -21,6 +21,7 @@ export function Avatar({ src, alt = 'Avatar', className, fallback = '👤', ...p
     )
   }
 
+  // eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains
   return <img src={src} alt={alt} className={cn('h-10 w-10 rounded-full object-cover', className)} {...props} />
 }
 

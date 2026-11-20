@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseClient } from '@/lib/supabase/client';
 
@@ -28,14 +28,14 @@ function normalizeRole(input?: string | null): Role {
 
 export function RoleProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const supabase = createSupabaseClient();
+  const supabase = useMemo(() => createSupabaseClient(), []);
   const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
   const [role, setRole] = useState<Role>('member');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(undefined);
     try {
@@ -109,12 +109,11 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase, router]);
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [load]);
 
   const value = useMemo<RoleContextValue>(
     () => ({
@@ -127,7 +126,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       hasAdminAccess: role === 'admin' || role === 'owner',
       hasOwnerAccess: role === 'owner',
     }),
-    [user, profile, role, loading, error]
+    [user, profile, role, loading, error, load]
   );
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;

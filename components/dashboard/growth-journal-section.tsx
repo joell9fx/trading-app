@@ -804,6 +804,7 @@ export function GrowthJournalSection() {
             </div>
             {form.screenshotUrl.trim() && !screenshotFile && (
               <div className="mt-2 flex items-start gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains */}
                 <img
                   src={form.screenshotUrl.trim()}
                   alt="Current screenshot"
@@ -1029,6 +1030,7 @@ export function GrowthJournalSection() {
                   )}
                   {entry.screenshotUrl && (
                     <div className="mt-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains */}
                       <img
                         src={entry.screenshotUrl}
                         alt="Trade screenshot"

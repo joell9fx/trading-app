@@ -163,6 +163,7 @@ export function MarketingToolkit() {
         {output && (
           <div className="mt-4 space-y-3">
             {output.image_url && (
+              // eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains
               <img src={output.image_url} className="rounded-xl border border-gold-500/40" alt="Generated marketing" />
             )}
             {output.content && (
