@@ -47,7 +47,8 @@ interface ProfileSectionProps {
 }
 
 export function ProfileSection({ user }: ProfileSectionProps) {
-  // Safety check for user object
+  // Safety check for user object. Hooks live in ProfileSectionContent so they
+  // are never called conditionally.
   if (!user || !user.id || !user.email) {
     return (
       <div className="space-y-6">
@@ -64,6 +65,10 @@ export function ProfileSection({ user }: ProfileSectionProps) {
     );
   }
 
+  return <ProfileSectionContent user={user} />
+}
+
+function ProfileSectionContent({ user }: ProfileSectionProps) {
   const [profile, setProfile] = useState({
     name: user.name || user.email?.split('@')[0] || '',
     bio: user.bio || '',
