@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireOwner } from '../auth'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,13 +37,17 @@ export async function POST(req: NextRequest) {
     payload = Object.fromEntries(form.entries())
   }
 
-  const { user_id, field, value } = payload
-
-  if (!user_id || !['is_admin', 'is_owner', 'banned'].includes(field)) {
+  const parsed = z
+    .object({
+      user_id: z.string().trim().uuid(),
+      field: z.enum(['is_admin', 'is_owner', 'banned']),
+      value: z.union([z.boolean(), z.enum(['true', 'false'])]).transform((v) => v === true || v === 'true'),
+    })
+    .safeParse(payload)
+  if (!parsed.success) {
     return NextResponse.json({ error: 'user_id and valid field are required' }, { status: 400 })
   }
-
-  const nextValue = `${value}` === 'true' || value === true
+  const { user_id, field, value: nextValue } = parsed.data
 
   const { data: targetProfile, error: targetError } = await supabase
     .from('profiles')

@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireOwner } from '../auth'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
+
+const emptyToNull = (v: unknown) => (v === '' || v === undefined ? null : v)
+const AnnouncementSchema = z.object({
+  title: z.preprocess(emptyToNull, z.string().trim().max(200).nullable()),
+  message: z.string().trim().min(1).max(2000),
+  // Stored as sent (datetime-local strings carry no zone), but must parse as a date.
+  expires_at: z.preprocess(emptyToNull, z.string().max(40).refine((v) => !Number.isNaN(Date.parse(v)), 'Invalid date').nullable()),
+})
 
 export async function GET() {
   const auth = await requireOwner()
@@ -34,13 +43,11 @@ export async function POST(req: NextRequest) {
     payload = Object.fromEntries(form.entries())
   }
 
-  const title = payload.title || null
-  const message = payload.message || null
-  const expires_at = payload.expires_at || null
-
-  if (!message) {
-    return NextResponse.json({ error: 'message is required' }, { status: 400 })
+  const parsed = AnnouncementSchema.safeParse(payload)
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'message is required (max 2000 characters)' }, { status: 400 })
   }
+  const { title, message, expires_at } = parsed.data
 
   const { data, error } = await supabase
     .from('announcements')
