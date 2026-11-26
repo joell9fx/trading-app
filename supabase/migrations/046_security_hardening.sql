@@ -205,6 +205,13 @@ begin
     new_j := new_j - 'referral_code';
   end if;
 
+  -- A profile with no role may be filled in as 'member' (matches
+  -- prevent_profile_role_change; the dashboard does this for legacy rows)
+  if old_j->>'role' is null and new_j->>'role' = 'member' then
+    old_j := old_j - 'role';
+    new_j := new_j - 'role';
+  end if;
+
   foreach col in array guarded loop
     if (new_j -> col) is distinct from (old_j -> col) then
       raise exception 'Updating % is not allowed', col using errcode = '42501';
