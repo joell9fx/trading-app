@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { useToast } from '@/hooks/use-toast'
+import { LoadError } from '@/components/ui/load-error'
 
 interface LearningPath {
   id: string
@@ -21,14 +22,19 @@ interface LearningPath {
 export function LearningPathList() {
   const [paths, setPaths] = useState<LearningPath[]>([])
   const [loading, setLoading] = useState(true)
+  const [failed, setFailed] = useState(false)
   const { toast } = useToast()
 
   const load = async () => {
     setLoading(true)
-    const res = await fetch('/api/user/learning-paths')
-    const json = await res.json()
-    if (res.ok) {
+    setFailed(false)
+    try {
+      const res = await fetch('/api/user/learning-paths')
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error)
       setPaths(json.paths || [])
+    } catch {
+      setFailed(true)
     }
     setLoading(false)
   }
@@ -56,7 +62,8 @@ export function LearningPathList() {
     <Card className="bg-black border border-gold-500/40 p-6 rounded-2xl">
       <h2 className="text-2xl text-gold-400 font-bold mb-4">📚 My Learning Path</h2>
       {loading && <p className="text-gray-400">Loading...</p>}
-      {!loading && paths.length === 0 && <p className="text-gray-400">No learning paths yet.</p>}
+      {!loading && failed && <LoadError what="your learning paths" onRetry={load} />}
+      {!loading && !failed && paths.length === 0 && <p className="text-gray-400">No learning paths yet.</p>}
       {!loading &&
         paths.map((p) => (
           <div key={p.id} className="mb-4 p-4 rounded-xl bg-neutral-900 border border-gray-700">

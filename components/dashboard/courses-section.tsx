@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import { useCourses, useCourseStats } from '@/hooks/use-courses'
 import { CourseWithLessons } from '@/types/course'
+import { LoadError } from '@/components/ui/load-error'
 import {
   AcademicCapIcon,
   ChartBarIcon,
@@ -63,7 +64,7 @@ export function CoursesSection({ user }: CoursesSectionProps) {
   
   const supabase = createSupabaseClient()
   
-  const { data: coursesData, isLoading: coursesLoading } = useCourses({
+  const { data: coursesData, isLoading: coursesLoading, isError: coursesFailed, refetch: refetchCourses } = useCourses({
     is_published: true,
     ...(difficultyFilter !== 'all' && { difficulty: difficultyFilter }),
     ...(searchQuery && { search: searchQuery }),
@@ -85,12 +86,13 @@ export function CoursesSection({ user }: CoursesSectionProps) {
       const courseIds = courses.map((c: CourseWithLessons) => c.id)
       
       // Fetch all enrollments for user
-      const { data: enrollmentData } = await supabase
+      const { data: enrollmentData, error: enrollmentError } = await supabase
         .from('course_enrollments')
         .select('course_id, status')
         .eq('user_id', user.id)
         .in('course_id', courseIds)
         .eq('status', 'active')
+      if (enrollmentError) throw enrollmentError
 
       // Fetch progress for each enrolled course
       const enrollmentsMap: Record<string, CourseEnrollment> = {}
@@ -121,8 +123,14 @@ export function CoursesSection({ user }: CoursesSectionProps) {
       setEnrollments(enrollmentsMap)
     } catch (error) {
       console.error('Error loading enrollments:', error)
+      // Without this, enrolled members would look unenrolled and be asked to enrol again.
+      toast({
+        title: "Couldn't load your enrolments",
+        description: 'Your course progress may be out of date. Refresh the page to try again.',
+        variant: 'destructive',
+      })
     }
-  }, [courses, supabase, user.id])
+  }, [courses, supabase, user.id, toast])
 
   useEffect(() => {
     if (courses.length > 0) {
@@ -353,6 +361,8 @@ export function CoursesSection({ user }: CoursesSectionProps) {
             </Card>
           ))}
         </div>
+      ) : coursesFailed ? (
+        <LoadError what="courses" onRetry={() => refetchCourses()} />
       ) : filteredCourses.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course: CourseWithLessons) => {

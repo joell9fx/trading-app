@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { LoadError } from '@/components/ui/load-error'
 
 interface ReferralRow {
   id: string
@@ -19,22 +20,29 @@ export function ReferralCenter() {
   const [referralLink, setReferralLink] = useState<string>('')
   const [referrals, setReferrals] = useState<ReferralRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [failed, setFailed] = useState(false)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setFailed(false)
+    try {
+      const res = await fetch('/api/referrals')
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok || !json?.referral_code) throw new Error(json?.error || 'No referral code')
+      setReferralCode(json.referral_code)
+      // Absolute link so it works when shared; fall back to this site's origin.
+      const domain = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+      setReferralLink(`${domain}/signup?ref=${encodeURIComponent(json.referral_code)}`)
+      setReferrals(json.referrals || [])
+    } catch {
+      setFailed(true)
+    }
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      const res = await fetch('/api/referrals')
-      if (res.ok) {
-        const json = await res.json()
-        setReferralCode(json.referral_code)
-        const domain = process.env.NEXT_PUBLIC_SITE_URL || ''
-        setReferralLink(`${domain}/signup?ref=${json.referral_code}`)
-        setReferrals(json.referrals || [])
-      }
-      setLoading(false)
-    }
     load()
-  }, [])
+  }, [load])
 
   const signupCount = referrals.length
   const convertedCount = referrals.filter((r) => r.status === 'converted').length
@@ -57,6 +65,10 @@ export function ReferralCenter() {
 
   if (loading) {
     return <div className="text-gray-300">Loading referrals...</div>
+  }
+
+  if (failed) {
+    return <LoadError what="your referral link" onRetry={load} />
   }
 
   return (

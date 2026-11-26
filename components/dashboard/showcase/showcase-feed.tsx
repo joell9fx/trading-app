@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
 import { useToast } from '@/hooks/use-toast'
+import { LoadError } from '@/components/ui/load-error'
 
 interface ShowcasePost {
   id: string
@@ -22,14 +23,19 @@ interface ShowcasePost {
 export function ShowcaseFeed() {
   const [posts, setPosts] = useState<ShowcasePost[]>([])
   const [loading, setLoading] = useState(true)
+  const [failed, setFailed] = useState(false)
   const { toast } = useToast()
 
   const load = async () => {
     setLoading(true)
-    const res = await fetch('/api/showcase/list')
-    const json = await res.json()
-    if (res.ok) {
+    setFailed(false)
+    try {
+      const res = await fetch('/api/showcase/list')
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error)
       setPosts(json.posts || [])
+    } catch {
+      setFailed(true)
     }
     setLoading(false)
   }
@@ -71,7 +77,8 @@ export function ShowcaseFeed() {
   return (
     <div className="space-y-4">
       {loading && <p className="text-gray-400">Loading feed...</p>}
-      {!loading && posts.length === 0 && <p className="text-gray-400">No showcase posts yet.</p>}
+      {!loading && failed && <LoadError what="the showcase" onRetry={load} />}
+      {!loading && !failed && posts.length === 0 && <p className="text-gray-400">No showcase posts yet.</p>}
       {posts.map((post) => (
         <Card key={post.id} className="bg-neutral-900 border border-gold-500/30 p-4 rounded-xl space-y-3">
           <div className="flex items-center gap-3">
