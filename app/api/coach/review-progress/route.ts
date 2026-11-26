@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
       .eq('user_id', targetUser)
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'coach/review-progress', 400)
     }
 
     if (!process.env.OPENAI_API_KEY) {

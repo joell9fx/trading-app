@@ -4,6 +4,7 @@ import { updateUserTier } from '@/lib/tier-utils'
 import { accessColumnForService, type AccessModuleKey } from '@/lib/access-flags'
 import { ALL_SERVICES } from '@/lib/services-list'
 import { updateDerivedProfileFields } from '@/lib/privileged-profile'
+import { serverError } from '@/lib/api/errors'
 
 // Credit prices are owned by the server; the client-sent cost is ignored.
 const CREDIT_COST: Record<string, number> = Object.fromEntries(
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
     ])
 
     if (spendError) {
-      return NextResponse.json({ error: spendError.message }, { status: 400 })
+      return serverError(spendError, 'wallet/redeem', 400)
     }
 
     const { error: unlockError } = await supabase
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
       .upsert({ user_id: user.id, service_key, is_unlocked: true }, { onConflict: 'user_id,service_key' })
 
     if (unlockError) {
-      return NextResponse.json({ error: unlockError.message }, { status: 400 })
+      return serverError(unlockError, 'wallet/redeem', 400)
     }
 
     if (column) {

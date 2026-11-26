@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../utils';
+import { serverError } from '@/lib/api/errors'
 
 export async function GET(request: NextRequest) {
   const { error, ctx } = await requireAdmin();
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error: queryError } = await query;
   if (queryError) {
-    return NextResponse.json({ error: 'Failed to load messages', details: queryError.message }, { status: 500 });
+    return serverError(queryError, 'admin/community/messages', 500, 'Failed to load messages');
   }
 
   return NextResponse.json({ messages: data || [] });

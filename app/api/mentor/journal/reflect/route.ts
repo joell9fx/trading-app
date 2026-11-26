@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireServiceAccess } from '@/lib/api/require-service-access'
 import { z } from 'zod'
 import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
     ])
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'mentor/journal/reflect', 400)
     }
 
     return NextResponse.json({ success: true })

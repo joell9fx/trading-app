@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
       .eq('user_id', user.id)
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'referrals/redeem', 400)
     }
 
     return NextResponse.json({ success: true })

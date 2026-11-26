@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { parseBody, idSchema } from '@/lib/api/parse-body'
 import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     const { error } = await supabase.rpc('increment_field', { table_name: 'user_showcase_posts', field_name: 'likes', row_id: post_id })
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'showcase/like', 400)
     }
 
     return NextResponse.json({ success: true })

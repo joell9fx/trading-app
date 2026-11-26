@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { parseBody, idSchema } from '@/lib/api/parse-body'
 import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     const { error } = await supabase.from('showcase_comments').insert([{ user_id: user.id, post_id, comment }])
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'showcase/comment', 400)
     }
 
     try {

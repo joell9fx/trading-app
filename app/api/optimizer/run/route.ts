@@ -4,6 +4,7 @@ import { requireAdmin } from '@/app/api/admin/auth'
 import OpenAI from 'openai'
 import { addXP } from '@/lib/xp-utils'
 import { assignBadges } from '@/lib/badges'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,7 +26,7 @@ export async function POST() {
     .eq('status', 'active')
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'optimizer/run', 400)
   }
 
   for (const c of campaigns || []) {

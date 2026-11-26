@@ -5,6 +5,7 @@ import { updateUserTier } from '@/lib/tier-utils'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 import { parseBody } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,7 +26,7 @@ export async function GET(
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'admin/users/[userId]/services', 400)
   }
 
   return NextResponse.json({ access: deriveAccessFromProfile(data) })
@@ -57,7 +58,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
       .eq('id', params.userId)
 
     if (updateError) {
-      return NextResponse.json({ error: updateError.message }, { status: 400 })
+      return serverError(updateError, 'admin/users/[userId]/services', 400)
     }
   }
 
@@ -82,7 +83,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'admin/users/[userId]/services', 400)
   }
 
   try {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '../../auth'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +16,7 @@ export async function GET() {
     .limit(100)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'admin/security/logs', 400)
   }
 
   return NextResponse.json({ audits: data || [] })

@@ -4,6 +4,7 @@ import { addXP } from '@/lib/xp-utils'
 import { assignBadges } from '@/lib/badges'
 import { z } from 'zod'
 import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
       .eq('id', id)
       .eq('user_id', user.id)
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    if (error) return serverError(error, 'coach/learning-path/complete', 400)
 
     try {
       await addXP(supabase, user.id, 30, 'Lesson Completed')

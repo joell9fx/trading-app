@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error('Prop firm submission insert error:', error)
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'prop-firm/send', 400)
     }
 
     return NextResponse.json({ message: 'Submission successful', data })

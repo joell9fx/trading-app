@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../utils';
 import { z } from 'zod'
 import { parseBody } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 function slugify(value: string) {
   return value
@@ -21,7 +22,7 @@ export async function GET() {
     .select('id, name, description, slug, category, is_private, created_at, updated_at, archived_at');
 
   if (channelError) {
-    return NextResponse.json({ error: 'Failed to load channels', details: channelError.message }, { status: 500 });
+    return serverError(channelError, 'admin/community/channels', 500, 'Failed to load channels');
   }
 
   // Compute member counts per channel (messages authors)
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (insertError) {
-    return NextResponse.json({ error: 'Failed to save channel', details: insertError.message }, { status: 500 });
+    return serverError(insertError, 'admin/community/channels', 500, 'Failed to save channel');
   }
 
   return NextResponse.json({ channel }, { status: 201 });

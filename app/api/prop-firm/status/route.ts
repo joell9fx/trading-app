@@ -5,6 +5,7 @@ import { isAdminRole, isModeratorRole } from '@/utils/auth';
 import { z } from 'zod'
 import { parseBody, idSchema } from '@/lib/api/parse-body'
 import { escapeHtml } from '@/lib/escape-html'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -109,7 +110,7 @@ export async function POST(req: NextRequest) {
 
     if (updateError) {
       console.error('Update submission error:', updateError)
-      return NextResponse.json({ error: updateError.message }, { status: 400 })
+      return serverError(updateError, 'prop-firm/status', 400)
     }
 
     let notificationInserted = null

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireOwner } from '../auth'
 import { z } from 'zod'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +25,7 @@ export async function GET() {
     .limit(50)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'superadmin/announcement', 400)
   }
 
   return NextResponse.json({ announcements: data })
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'superadmin/announcement', 400)
   }
 
   await supabase.from('admin_logs').insert({

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { handleCommunityXP } from '@/lib/community-xp';
 import { isAdminRole, isModeratorRole } from '@/utils/auth';
+import { serverError } from '@/lib/api/errors'
 
 const ATTACHMENT_LIMIT_BYTES = 8 * 1024 * 1024; // 8MB per file
 const ALLOWED_ATTACHMENT_PREFIXES = ['image/', 'application/pdf'];
@@ -167,7 +168,7 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     logApiError('community-hub/messages.GET.query', error, { channelId });
-    return NextResponse.json({ error: 'Failed to load messages', details: error.message }, { status: 500 });
+    return serverError(error, 'community-hub/messages', 500, 'Failed to load messages');
   }
 
   return NextResponse.json({
@@ -277,7 +278,7 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     logApiError('community-hub/messages.POST.insert', error, { channel_id, user_id: user.id });
-    return NextResponse.json({ error: 'Failed to send message', details: error.message }, { status: 500 });
+    return serverError(error, 'community-hub/messages', 500, 'Failed to send message');
   }
 
   try {
@@ -351,7 +352,7 @@ export async function PATCH(request: NextRequest) {
 
   if (error) {
     logApiError('community-hub/messages.PATCH.update', error, { message_id, action });
-    return NextResponse.json({ error: 'Failed to update message', details: error.message }, { status: 500 });
+    return serverError(error, 'community-hub/messages', 500, 'Failed to update message');
   }
 
   return NextResponse.json({ message });

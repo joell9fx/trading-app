@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { requireAdminOrInternal } from '@/lib/api/internal-auth'
 import { addXP } from '@/lib/xp-utils'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
     .gte('created_at', sevenDaysAgo)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'community/leaderboard/weekly', 400)
   }
 
   if (!stats || stats.length === 0) {

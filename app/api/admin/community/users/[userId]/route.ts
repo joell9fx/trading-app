@@ -3,6 +3,7 @@ import { logModerationAction, requireAdmin } from '../../utils';
 import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 import { parseBody } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 function computeExpiry(minutes?: number | null) {
   if (!minutes || Number.isNaN(minutes)) return null;
@@ -70,7 +71,7 @@ export async function PATCH(
       .single();
 
     if (updateError) {
-      return NextResponse.json({ error: 'Failed to update role', details: updateError.message }, { status: 500 });
+      return serverError(updateError, 'admin/community/users/[userId]', 500, 'Failed to update role');
     }
 
     await logModerationAction(supabase, adminId, {
@@ -96,7 +97,7 @@ export async function PATCH(
       .single();
 
     if (insertError) {
-      return NextResponse.json({ error: 'Failed to ban user', details: insertError.message }, { status: 500 });
+      return serverError(insertError, 'admin/community/users/[userId]', 500, 'Failed to ban user');
     }
 
     await logModerationAction(supabase, adminId, {
@@ -123,7 +124,7 @@ export async function PATCH(
       .single();
 
     if (insertError) {
-      return NextResponse.json({ error: 'Failed to mute user', details: insertError.message }, { status: 500 });
+      return serverError(insertError, 'admin/community/users/[userId]', 500, 'Failed to mute user');
     }
 
     await logModerationAction(supabase, adminId, {

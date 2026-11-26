@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { requireAdmin } from '../auth'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,7 +47,7 @@ export async function GET() {
     .limit(100)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return serverError(error, 'admin/verification', 500)
   }
 
   return NextResponse.json({ verifications: data || [] })
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
   const { data, error } = await query.select('*').single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'admin/verification', 400)
   }
 
   await supabase.from('admin_logs').insert({

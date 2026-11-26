@@ -5,6 +5,7 @@ import { addXP } from '@/lib/xp-utils'
 import { accessColumnForService, type AccessModuleKey } from '@/lib/access-flags'
 import { INCLUDED_SERVICE_KEYS } from '@/lib/services-catalog'
 import { updateDerivedProfileFields } from '@/lib/privileged-profile'
+import { serverError } from '@/lib/api/errors'
 
 const SELF_UNLOCKABLE = new Set<string>(INCLUDED_SERVICE_KEYS)
 
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error('Unlock upsert error:', error)
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'services/unlock', 400)
     }
 
     if (column) {

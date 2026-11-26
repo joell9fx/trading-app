@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireServiceAccess } from '@/lib/api/require-service-access'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +16,7 @@ export async function GET(_req: NextRequest) {
     .order('week_start', { ascending: false })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'mentor/journal/list', 400)
   }
 
   return NextResponse.json({ entries: data || [] })

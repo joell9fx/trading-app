@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { requireAdminOrInternal } from '@/lib/api/internal-auth'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
     .order('xp', { ascending: false })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'leaderboard/recalc', 400)
   }
 
   if (!users) return NextResponse.json({ success: true, updated: 0 })

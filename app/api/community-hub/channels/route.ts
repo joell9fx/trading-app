@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { isAdminRole, isModeratorRole } from '@/utils/auth';
+import { serverError } from '@/lib/api/errors'
 
 const channelSchema = z.object({
   name: z.string().min(2).max(80),
@@ -87,7 +88,7 @@ export async function GET() {
     .order('name', { ascending: true });
 
   if (error) {
-    return NextResponse.json({ error: 'Failed to load channels', details: error.message }, { status: 500 });
+    return serverError(error, 'community-hub/channels', 500, 'Failed to load channels');
   }
 
   const visibleChannels = (channels || []).filter((ch) => {
@@ -146,7 +147,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: 'Failed to save channel', details: error.message }, { status: 500 });
+    return serverError(error, 'community-hub/channels', 500, 'Failed to save channel');
   }
 
   return NextResponse.json({ channel }, { status: 201 });

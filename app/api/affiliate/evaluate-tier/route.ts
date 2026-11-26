@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { requireAdminOrInternal } from '@/lib/api/internal-auth'
+import { serverError } from '@/lib/api/errors'
 
 const BodySchema = z.object({ user_id: z.string().uuid() })
 
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
     .eq('status', 'converted')
 
   if (refErr) {
-    return NextResponse.json({ error: refErr.message }, { status: 400 })
+    return serverError(refErr, 'affiliate/evaluate-tier', 400)
   }
 
   const referralCount = referrals?.length || 0
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
     .order('min_referrals', { ascending: true })
 
   if (tierErr || !tiers) {
-    return NextResponse.json({ error: tierErr?.message || 'No tiers configured' }, { status: 400 })
+    return serverError(tierErr ?? 'no tiers', 'affiliate/evaluate-tier', 400, 'No affiliate tiers configured')
   }
 
   const tier = [...tiers].reverse().find((t) => referralCount >= (t.min_referrals || 0)) || tiers[0]

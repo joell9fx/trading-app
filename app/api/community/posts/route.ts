@@ -140,7 +140,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         ...buildFallbackResponse(channelId, limit, offset),
         warning: 'Database query failed. Returning demo posts.',
-        details: error.message,
       });
     }
     return NextResponse.json({

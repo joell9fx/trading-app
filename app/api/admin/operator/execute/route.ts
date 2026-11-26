@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '../../auth'
 import { z } from 'zod'
 import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
 
   const { error } = await supabase.from('business_actions').update(update).eq('id', id)
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'admin/operator/execute', 400)
   }
 
   return NextResponse.json({ message: 'Updated' })

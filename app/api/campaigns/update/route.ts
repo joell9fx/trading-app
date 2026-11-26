@@ -4,6 +4,7 @@ import { addXP } from '@/lib/xp-utils'
 import { assignBadges } from '@/lib/badges'
 import { z } from 'zod'
 import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
 
   const { error: updError } = await supabase.from('ad_campaigns').update(fields).eq('id', campaign_id).eq('user_id', auth.user.id)
   if (updError) {
-    return NextResponse.json({ error: updError.message }, { status: 400 })
+    return serverError(updError, 'campaigns/update', 400)
   }
 
   // Recompute ROI

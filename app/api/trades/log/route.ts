@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { handleTradeXP, updatePerformanceStats } from '@/lib/performance'
 import { requireServiceAccess } from '@/lib/api/require-service-access'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (insertError) {
-    return NextResponse.json({ error: insertError.message }, { status: 400 })
+    return serverError(insertError, 'trades/log', 400)
   }
 
   try {

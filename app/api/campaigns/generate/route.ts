@@ -6,6 +6,7 @@ import { assignBadges } from '@/lib/badges'
 import { rateLimitResponse } from '@/lib/api/rate-limit'
 import { z } from 'zod'
 import { parseBody } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -101,7 +102,7 @@ Brand style: black-gold, premium, confident.`,
       .select()
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'campaigns/generate', 400)
     }
 
     await addXP(supabase, userId, 20, 'Ad Campaign Created')

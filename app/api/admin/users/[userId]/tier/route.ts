@@ -4,6 +4,7 @@ import { updateUserTier } from '@/lib/tier-utils'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 import { parseBody } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +23,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 
   const { error } = await supabase.from('profiles').update({ membership_tier: tier }).eq('id', params.userId)
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'admin/users/[userId]/tier', 400)
   }
 
   await supabase.from('membership_history').insert([
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
     const tier = await updateUserTier(supabase, params.userId)
     return NextResponse.json({ tier })
   } catch (error: any) {
-    return NextResponse.json({ error: error?.message || 'Tier update failed' }, { status: 400 })
+    return serverError(error, 'admin/users/tier', 400, 'Tier update failed')
   }
 }
 

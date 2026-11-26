@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { logModerationAction, requireAdmin } from '../../utils';
 import { z } from 'zod'
 import { parseBody } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 // GET returns a message plus recent channel context
 export async function GET(
@@ -91,7 +92,7 @@ export async function PATCH(
       .single();
 
     if (reportError) {
-      return NextResponse.json({ error: 'Failed to flag message', details: reportError.message }, { status: 500 });
+      return serverError(reportError, 'admin/community/messages/[messageId]', 500, 'Failed to flag message');
     }
 
     await logModerationAction(supabase, adminId, {
@@ -131,7 +132,7 @@ export async function PATCH(
     .single();
 
   if (updateError) {
-    return NextResponse.json({ error: 'Failed to update message', details: updateError.message }, { status: 500 });
+    return serverError(updateError, 'admin/community/messages/[messageId]', 500, 'Failed to update message');
   }
 
   await logModerationAction(supabase, adminId, {

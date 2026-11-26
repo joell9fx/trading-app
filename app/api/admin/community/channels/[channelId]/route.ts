@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../../utils';
 import { z } from 'zod'
 import { parseBody } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export async function PATCH(
   request: NextRequest,
@@ -39,7 +40,7 @@ export async function PATCH(
     .single();
 
   if (updateError) {
-    return NextResponse.json({ error: 'Failed to update channel', details: updateError.message }, { status: 500 });
+    return serverError(updateError, 'admin/community/channels/[channelId]', 500, 'Failed to update channel');
   }
 
   return NextResponse.json({ channel });
@@ -59,7 +60,7 @@ export async function DELETE(
     .eq('id', params.channelId);
 
   if (archiveError) {
-    return NextResponse.json({ error: 'Failed to archive channel', details: archiveError.message }, { status: 500 });
+    return serverError(archiveError, 'admin/community/channels/[channelId]', 500, 'Failed to archive channel');
   }
 
   return NextResponse.json({ status: 'archived' });

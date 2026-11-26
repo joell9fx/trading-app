@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { logModerationAction, requireAdmin } from '../../utils';
 import { z } from 'zod'
 import { parseBody } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export async function PATCH(
   request: NextRequest,
@@ -35,7 +36,7 @@ export async function PATCH(
     .single();
 
   if (updateError || !report) {
-    return NextResponse.json({ error: 'Failed to update report', details: updateError?.message }, { status: 500 });
+    return serverError(updateError, 'admin/community/reports/[reportId]', 500, 'Failed to update report');
   }
 
   if (action === 'remove' && report.message_id) {

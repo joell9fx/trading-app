@@ -1,11 +1,12 @@
 /**
  * @jest-environment node
  */
-import { describe, it, expect, beforeEach } from '@jest/globals'
+import { describe, it, expect, beforeEach, jest } from '@jest/globals'
 import { z } from 'zod'
 import { checkRateLimit, rateLimitResponse, __resetRateLimits } from '@/lib/api/rate-limit'
 import { parseBody, idSchema } from '@/lib/api/parse-body'
 import { isSameOriginRequest } from '@/lib/api/same-origin'
+import { serverError } from '@/lib/api/errors'
 
 const jsonRequest = (body: unknown, headers: Record<string, string> = {}) =>
   new Request('http://localhost:3000/api/x', {
@@ -97,5 +98,25 @@ describe('isSameOriginRequest', () => {
 
   it('rejects a malformed Origin', () => {
     expect(isSameOriginRequest(req({ origin: 'not a url', host: 'localhost:3000' }))).toBe(false)
+  })
+})
+
+describe('serverError', () => {
+  it('logs the real error but returns a generic message', async () => {
+    const log = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const res = serverError({ message: 'relation "public.secret_table" does not exist' }, 'ctx', 400)
+    expect(res.status).toBe(400)
+    const body = await res.json()
+    expect(JSON.stringify(body)).not.toContain('secret_table')
+    expect(log).toHaveBeenCalledWith('[ctx]', expect.anything())
+    log.mockRestore()
+  })
+
+  it('defaults to 500 and allows a custom message', async () => {
+    const log = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const res = serverError(new Error('boom'), 'ctx', undefined, 'Failed to load channels')
+    expect(res.status).toBe(500)
+    expect(await res.json()).toEqual({ error: 'Failed to load channels' })
+    log.mockRestore()
   })
 })

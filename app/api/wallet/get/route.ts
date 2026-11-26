@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest) {
     .maybeSingle()
 
   if (balanceError) {
-    return NextResponse.json({ error: balanceError.message }, { status: 400 })
+    return serverError(balanceError, 'wallet/get', 400)
   }
 
   const { data: rewards } = await supabase
