@@ -17,15 +17,17 @@
 | Local `.env.local` | Supabase keys only. No Stripe, OpenAI or Resend keys. |
 | Migration test DB | Local Docker image `public.ecr.aws/supabase/postgres:17.6.1.159` is available. See `supabase/tests/README.md`. |
 
-## Health check (2026-11-20, after batch 7)
+## Health check (2026-11-26, after batch 8)
 | Check | Result |
 |---|---|
 | `npx tsc --noEmit` | ✅ pass (if you get TS6053 errors for `.next/types`, run `rm -rf .next/types`) |
 | `npx next lint` | ✅ 0 errors, 0 warnings. `rules-of-hooks` is enforced again. |
-| `npm test` | ✅ 56/56 (`auth-helpers`, `api-helpers`, `catalog-and-access`) |
+| `npm test` | ✅ 71/71 (6 suites) |
+| CI | `.github/workflows/ci.yml` runs tsc, lint (`--max-warnings 0`) and jest on PRs. Not yet seen running on GitHub. |
 | `npx next build` | ✅ 100 pages |
 | Prod smoke test (`next start`) | ✅ Dev routes 404; protected API routes 401 without a session; bad candles input 400; cross-origin auth sync 403; `/support` 200 |
 | `supabase/tests/046_rls_test.sql` | ✅ 24/24 on a throwaway Supabase Postgres; 046 applies twice cleanly |
+| `supabase/tests/047_trader_missions_test.sql` | ✅ 13/13; 047 applies twice cleanly |
 
 ## Current state map
 **Legend:** ✅ done · 🟡 partial · 🔴 broken · ⚪ stub · 🧪 dev-only · 🔁 duplicate or redirect
@@ -39,7 +41,7 @@
 | `/support` | ✅ | Uses `NEXT_PUBLIC_SUPPORT_EMAIL`, falling back to the Community Hub |
 | `/signin` `/signup` `/forgot-password` `/reset-password` | ✅ | Signup relies on the `handle_new_user` trigger; referrals go through `/api/referral-track` |
 | `/community-hub` | ✅ | Members only |
-| `/leaderboard`, `/u/[username]` | ✅ | Public profile no longer exposes the mentor journal; 404 via `notFound()` |
+| `/leaderboard`, `/u/[username]` | ✅ | Profile loads directly via `lib/public-profile.ts` (was crashing on a relative self-fetch). Leaderboard has an error state with retry. |
 | `/auto-trader` | ⚪ | Deliberately "coming soon" |
 | `/privacy` `/terms` `/cookies` | ⚪ | Placeholder. **Owner must supply legal copy.** |
 | `/test` `/preview` `/local-preview` | 🧪 | 404 in production |
@@ -55,7 +57,7 @@
 | news | 🟡 | Placeholder feed, labelled "Sample data" |
 | admin (hub) | 🟡 | Mock data, labelled; toggles don't save |
 | elite-membership, vip-membership | ⚪ | Static text |
-| mission | 🟡 | Plan stored only in localStorage |
+| mission | 🟡 | Syncs to `trader_missions` (047, not applied); falls back to localStorage until then |
 
 ### Admin
 - **Working (✅):**
@@ -82,6 +84,14 @@
 - **Server-derived profile fields** (tier, badges, has_*_access after a validated unlock): `lib/privileged-profile.ts`.
 
 ## Fixed this session
+**Batch 8:**
+- Public profile pages (`/u/[username]`) always returned a blank 500: the page fetched its own API with a relative URL. Now it loads the profile directly.
+- Branded `not-found`, `error` and `global-error` pages (there were none, so failures were blank pages).
+- Leaderboard shows "couldn't load, try again" instead of "No leaderboard data" when the API fails.
+- Getting-started checklist on the dashboard overview, driven by real activity.
+- Trader Mission syncs to Supabase (migration 047, written and tested, not applied).
+- CI workflow; tests for `recordReferral`, onboarding and mission merging.
+
 **Batch 7:**
 - `trades/feedback` skipped its ownership check when the client left out `user_id`, so a member could overwrite another user's trade feedback. It now checks the database and scopes the update to the caller.
 - Admin notes are HTML-escaped in the funding emails (`notifications/email`, `prop-firm/status`).
@@ -136,6 +146,9 @@
 5. 🟡 **`showcase/like` has no per-user dedupe.** A member can like the same post repeatedly. Needs a `showcase_likes (user_id, post_id)` unique table (DB change, so after the restore).
 6. 🟡 **Routes still without zod:** `admin/users/[userId]/role`, `checkout`, `services/unlock` and `wallet/redeem` check types by hand; the mentor/coach generate routes ignore most of the body; `services/webhook` is legacy (proposed for deletion).
 7. 🟡 **Rate limits are per server instance** (in-memory). A shared store would need a paid service.
+
+## Database: migration 047 (written + tested, NOT applied)
+`supabase/migrations/047_trader_missions.sql`: one new table `trader_missions (user_id, mission_date)` with jsonb parts, own-row RLS, admin read (via `is_admin()` from 046), a 16 KB size cap and an `updated_at` trigger. Additive only. Apply after 046.
 
 ## Database: migration 046 (written + tested, NOT applied)
 `supabase/migrations/046_security_hardening.sql`:
@@ -193,24 +206,26 @@
 | Record pending referral on first sign-in | S | med | ✅ done |
 | Unit tests: rate limit, parseBody, same-origin | S | med | ✅ done |
 | Unit tests: catalogue, Stripe price map, tiers, access flags, redirects | S | med | ✅ done |
-| Unit tests for `recordReferral` with a fake Supabase client | S | med | next |
+| Unit tests for `recordReferral` with a fake Supabase client | S | med | ✅ done |
+| Show onboarding progress server-side (persist dismissal) | S | low | |
+| Add `next build` to CI (needs build-time env vars as GitHub secrets) | S | med | ⛔ needs owner to add secrets |
 | Rate-limit `/api/referral-track` and showcase comment/like | S | med | ✅ done |
 | Fix the profile-section hook-order bug | S | med | ✅ done |
 | Fix the `<img>`/alt lint warnings (20) | S | low | ✅ done |
-| Basic GitHub Actions CI (tsc, lint, jest) | S | high | next (free tier) |
-| Error and empty states for dashboard sections when Supabase is down | M | med | next |
+| Basic GitHub Actions CI (tsc, lint, jest) | S | high | ✅ done |
+| Error pages + leaderboard error state | M | med | ✅ done (other dashboard sections still need checking once logins work) |
 | Stripe refund/cancel webhook → revoke access | M | high | ⛔ payments approval |
 | Consolidate webhooks into `stripe/webhook`; delete legacy routes and `/prices` code | S | med | ⛔ deletion approval |
 | Sentry error tracking | M | high | ⛔ new service |
 | Playwright E2E (auth, checkout, chat) | L | high | ⛔ L effort |
 | Mentorship booking calendar | L | high | ⛔ L effort |
 | Squash migrations into a clean baseline from the live DB | L | high | ⛔ L + DB |
-| Onboarding walkthrough | M | med | |
-| Persist mission plan in Supabase | M | med | |
+| Onboarding checklist | M | med | ✅ done |
+| Persist mission plan in Supabase | M | med | ✅ code done; ⛔ 047 needs applying |
 | Regenerate `types/supabase.ts` | S | high | ⛔ blocked on DB |
 
 ## Waiting on owner
-- ⛔ Restore the Supabase project, then approve applying migration 046.
+- ⛔ Restore the Supabase project, then approve applying migrations 046 and 047.
 - ⛔ Unblock the Vercel account.
 - ⛔ Legal copy (terms, privacy, cookies, risk disclosure).
 - ⛔ Marketing claims (10,000+ students, 95% success, testimonials) and the "we pass your prop challenge" service, which may break prop firms' rules.
@@ -219,11 +234,11 @@
 - ⛔ Set `NEXT_PUBLIC_SUPPORT_EMAIL` in production.
 
 ## Next 5
-1. GitHub Actions CI running tsc, lint and jest on PRs (no paid service).
-2. Unit tests for `recordReferral` with a fake Supabase client.
-3. Friendly error/empty states for dashboard sections when Supabase is unreachable.
-4. Onboarding walkthrough for new members (M).
-5. Persist the mission plan in Supabase instead of localStorage (M; needs a table, so write the migration but don't apply it).
+1. Check CI's first run on PR #1 and fix anything environment-specific.
+2. Audit the other public and dashboard data loaders for the same "silent empty state on failure" pattern as the leaderboard.
+3. Move `role-provider.tsx`'s browser-side profile insert/role write to the server (needed once 046 is applied).
+4. Stop API routes returning raw database error text (e.g. `leaderboard` returns "TypeError: fetch failed").
+5. Accessibility pass on the public pages (headings, focus states, contrast).
 
 ## Session log
 - **2026-11-19:** Local dev server set up. Public pages walked through. PR #1 opened: dev pages hidden in production, `/prices` redirect, titles, favicon.
@@ -237,6 +252,7 @@
   - Signup flow fixed.
   - `/admin/users`, `/superadmin/logs` and `/support` added; dead links fixed.
   - `.gitignore` `logs/` scoped to the repo root.
+- **2026-11-26, batch 8:** CI workflow; recordReferral tests; found and fixed the public-profile crash; error/404 pages; leaderboard error state; onboarding checklist; Trader Mission sync + migration 047 (tested, not applied). Health check and smoke test green.
 - **2026-11-20, batch 7:** hook order fixed and the lint rule restored; trade-feedback ownership hole closed; email notes escaped; more rate limits; zod across the remaining admin, superadmin and AI routes; 24 new tests; lint fully clean. Health check and smoke test green.
 - **2026-11-20, batch 6:** candles validation; auth sync same-origin check and pending referral; coach routes self-only; AI rate limit and `ai/chat` input validation; `parseBody` + zod on 12 routes; 13 new tests. Health check and smoke test green.
 - **2026-11-20, batch 5:** VisionEdge → Trading Academy, real profile stats, sample-data notices. Full health check green; production smoke test green.
