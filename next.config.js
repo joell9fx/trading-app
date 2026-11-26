@@ -35,6 +35,14 @@ const nextConfig = {
         destination: '/',
         permanent: true,
       },
+      // Legacy pricing page: /pricing is the live, Stripe-wired plans page
+      {
+        source: '/prices',
+        destination: '/pricing',
+        permanent: false,
+      },
+      { source: '/contact', destination: '/support', permanent: false },
+      { source: '/learn', destination: '/courses', permanent: false },
       // Legacy path: ensure any request or cached link to /site.webmanifest gets the manifest
       {
         source: '/site.webmanifest',

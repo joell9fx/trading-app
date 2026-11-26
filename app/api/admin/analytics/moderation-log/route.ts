@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, logModerationAction } from '../../community/utils';
+import { serverError } from '@/lib/api/errors'
 
 const DEFAULT_LIMIT = 50;
 
@@ -74,7 +75,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error: queryError, count } = await query;
   if (queryError) {
-    return NextResponse.json({ error: 'Failed to load moderation actions', details: queryError.message }, { status: 500 });
+    return serverError(queryError, 'admin/analytics/moderation-log', 500, 'Failed to load moderation actions');
   }
 
   if (format === 'csv') {

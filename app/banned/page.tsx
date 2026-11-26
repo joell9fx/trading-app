@@ -10,7 +10,7 @@ export default function BannedPage() {
         <p className="text-xs uppercase tracking-[0.2em] text-red-300">Access Restricted</p>
         <h1 className="text-3xl font-bold text-white">Account Disabled</h1>
         <p className="text-sm text-muted-foreground">
-          Your account has been restricted by VisionEdge administration. If you believe this is a mistake,
+          Your account has been restricted by Trading Academy administration. If you believe this is a mistake,
           please contact support to review your status.
         </p>
         <div className="flex items-center justify-center gap-3 pt-2">

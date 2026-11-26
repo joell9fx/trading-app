@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { createServerClient } from '@supabase/ssr';
 import DiagnosticsButton from '@/components/diagnostics/DiagnosticsButton';
 import { Card } from '@/components/ui/card';
+import { isAdminRole } from '@/utils/auth'
 
 export const dynamic = 'force-dynamic';
 
@@ -35,7 +36,7 @@ export default async function AdminToolsPage() {
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
-  if (profile?.role !== 'ADMIN') {
+  if (!isAdminRole(profile?.role, (profile as any)?.is_owner)) {
     redirect('/dashboard');
   }
 

@@ -53,7 +53,7 @@ export function SignalsHistory({ data = EMPTY_HISTORY }: SignalsHistoryProps) {
     winLoss: 'all' as WinLossFilter,
   });
 
-  const entries = data?.entries ?? [];
+  const entries = useMemo(() => data?.entries ?? [], [data]);
   const assets = useMemo(() => {
     const set = new Set(entries.map((e) => e.asset));
     return ['all', ...Array.from(set).sort()];

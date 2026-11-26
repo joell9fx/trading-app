@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireServiceAccess } from '@/lib/api/require-service-access'
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,10 +12,9 @@ export async function POST(req: NextRequest) {
   const { supabase, userId } = access.ctx
 
   try {
-    const { journal_id, reflection } = await req.json()
-    if (!journal_id || !reflection) {
-      return NextResponse.json({ error: 'journal_id and reflection are required' }, { status: 400 })
-    }
+    const body = await parseBody(req, z.object({ journal_id: idSchema, reflection: z.string().trim().min(1).max(5000) }))
+    if (body.error) return body.error
+    const { journal_id, reflection } = body.data
 
     const { error } = await supabase.from('user_reflections').insert([
       {
@@ -23,7 +25,7 @@ export async function POST(req: NextRequest) {
     ])
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'mentor/journal/reflect', 400)
     }
 
     return NextResponse.json({ success: true })

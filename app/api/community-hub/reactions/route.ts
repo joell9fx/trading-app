@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { isAdminRole, isModeratorRole } from '@/utils/auth';
+import { serverError } from '@/lib/api/errors'
 
 const reactionSchema = z.object({
   message_id: z.string().uuid(),
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
     .eq('id', message.channel_id)
     .single();
 
-  const isAdmin = role === 'ADMIN' || role === 'MODERATOR';
+  const isAdmin = isModeratorRole(role);
   if (channel?.slug === 'announcements' && !isAdmin) {
     return NextResponse.json({ error: 'Announcements are read-only for members' }, { status: 403 });
   }
@@ -89,7 +91,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (insertError) {
-    return NextResponse.json({ error: 'Failed to add reaction', details: insertError.message }, { status: 500 });
+    return serverError(insertError, 'community-hub/reactions', 500, 'Failed to add reaction');
   }
 
   return NextResponse.json({ state: 'added', emoji, message_id });

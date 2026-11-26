@@ -25,7 +25,7 @@ export default async function SuperAdminLayout({ children }: { children: ReactNo
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="w-full bg-gold-500/15 border-b border-gold-500/40 px-4 py-3 text-center text-sm font-semibold tracking-wide">
-        👑 SUPER ADMIN MODE — You are operating as the VisionEdge Owner. Actions here affect the entire ecosystem.
+        👑 SUPER ADMIN MODE — You are operating as the Trading Academy Owner. Actions here affect the entire ecosystem.
       </div>
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         <header className="flex items-center justify-between">

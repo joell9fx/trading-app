@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import OpenAI from 'openai'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +25,7 @@ export async function GET(_req: NextRequest) {
 
     if (campaignsError) {
       console.error('optimizer summary campaigns fetch failed', campaignsError)
-      return NextResponse.json({ error: campaignsError.message }, { status: 500 })
+      return serverError(campaignsError, 'optimizer/summary', 500)
     }
 
     const campaignIds = (campaigns ?? []).map((c) => c.id)
@@ -41,7 +42,7 @@ export async function GET(_req: NextRequest) {
 
     if (error) {
       console.error('optimizer summary logs fetch failed', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return serverError(error, 'optimizer/summary', 500)
     }
 
     const logs = data ?? []

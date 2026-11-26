@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
 import { Loader2, Copy, Download } from 'lucide-react'
+import { LoadError } from '@/components/ui/load-error'
 
 type AssetType = 'caption' | 'email' | 'ad' | 'image'
 
@@ -33,10 +34,17 @@ export function MarketingToolkit() {
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState<StatResponse | null>(null)
 
+  const [statsFailed, setStatsFailed] = useState(false)
+
   const loadStats = async () => {
-    const res = await fetch('/api/marketing/stats')
-    if (res.ok) {
-      setStats(await res.json())
+    setStatsFailed(false)
+    try {
+      const res = await fetch('/api/marketing/stats')
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error)
+      setStats(json)
+    } catch {
+      setStatsFailed(true)
     }
   }
 
@@ -163,6 +171,7 @@ export function MarketingToolkit() {
         {output && (
           <div className="mt-4 space-y-3">
             {output.image_url && (
+              // eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains
               <img src={output.image_url} className="rounded-xl border border-gold-500/40" alt="Generated marketing" />
             )}
             {output.content && (
@@ -216,7 +225,8 @@ export function MarketingToolkit() {
         <Card className="bg-gray-950 border border-gray-800 p-4 rounded-2xl">
           <h3 className="text-white font-semibold mb-2">Recent Assets</h3>
           <div className="space-y-2 text-sm text-gray-300 max-h-48 overflow-auto">
-            {(stats?.recent || []).length === 0 && <p className="text-gray-500">No assets yet.</p>}
+            {statsFailed && <LoadError what="your recent assets" onRetry={loadStats} />}
+            {!statsFailed && (stats?.recent || []).length === 0 && <p className="text-gray-500">No assets yet.</p>}
             {(stats?.recent || []).map((r) => (
               <div key={r.id} className="border border-gray-800 rounded-lg p-2">
                 <div className="flex items-center justify-between text-xs text-gray-400 mb-1">

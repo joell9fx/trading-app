@@ -13,6 +13,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Bell, Loader2, Settings } from 'lucide-react';
+import { isModeratorRole } from '@/utils/auth';
 
 interface CommunityHubProps {
   user: HubUser;
@@ -64,7 +65,7 @@ export function CommunityHub({ user }: CommunityHubProps) {
   const profileCache = useRef<Map<string, any>>(new Map());
   const realtimeChannelRef = useRef<any>(null);
 
-  const isModerator = user.role === 'ADMIN' || user.role === 'MODERATOR';
+  const isModerator = isModeratorRole(user.role, user as any);
   const isRealChannel = activeChannel ? isValidUUID(activeChannel.id) : false;
 
   // Load channels on mount

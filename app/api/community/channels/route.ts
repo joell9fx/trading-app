@@ -92,7 +92,6 @@ export async function GET(request: NextRequest) {
         channels: FALLBACK_CHANNELS,
         source: 'fallback',
         warning: 'Database query failed. Returning demo channels.',
-        details: error.message,
       });
     }
     return NextResponse.json({

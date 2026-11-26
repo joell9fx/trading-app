@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireOwner } from '../auth'
+import { z } from 'zod'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,7 +12,7 @@ export async function GET() {
 
   const { data, error } = await supabase.from('system_flags').select('key, value')
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'superadmin/system-flags', 400)
   }
 
   return NextResponse.json({ flags: data })
@@ -29,19 +31,23 @@ export async function POST(req: NextRequest) {
     payload = Object.fromEntries(form.entries())
   }
 
-  const { key, value } = payload
-  if (!key) {
+  const parsed = z
+    .object({
+      key: z.string().trim().regex(/^[a-z0-9_.-]{1,64}$/i, 'Invalid key'),
+      value: z.union([z.boolean(), z.enum(['true', 'false'])]).transform((v) => v === true || v === 'true').optional().default(false),
+    })
+    .safeParse(payload)
+  if (!parsed.success) {
     return NextResponse.json({ error: 'key is required' }, { status: 400 })
   }
-
-  const boolValue = `${value}` === 'true' || value === true
+  const { key, value: boolValue } = parsed.data
 
   const { error } = await supabase
     .from('system_flags')
     .upsert({ key, value: boolValue, updated_at: new Date().toISOString() })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'superadmin/system-flags', 400)
   }
 
   await supabase.from('admin_logs').insert({

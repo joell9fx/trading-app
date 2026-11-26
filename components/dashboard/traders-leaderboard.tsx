@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { LoadError } from '@/components/ui/load-error'
 
 interface TraderRow {
   user_id: string
@@ -15,7 +16,7 @@ interface TraderRow {
     id: string
     name?: string | null
     full_name?: string | null
-    email?: string | null
+    username?: string | null
     membership_tier?: string | null
     xp?: number | null
     badges?: string[] | null
@@ -25,23 +26,32 @@ interface TraderRow {
 export function TradersLeaderboard() {
   const [rows, setRows] = useState<TraderRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [failed, setFailed] = useState(false)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setFailed(false)
+    try {
+      const res = await fetch('/api/traders/leaderboard')
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error)
+      setRows(json.traders || [])
+    } catch {
+      setFailed(true)
+    }
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      const res = await fetch('/api/traders/leaderboard')
-      const json = await res.json()
-      if (res.ok) {
-        setRows(json.traders || [])
-      }
-      setLoading(false)
-    }
     load()
-  }, [])
+  }, [load])
 
   return (
     <Card className="bg-gray-900 border border-gray-800 p-4 rounded-2xl">
       <h2 className="text-white text-lg font-semibold mb-3">Performance Leaderboard</h2>
+      {!loading && failed ? (
+        <LoadError what="the performance leaderboard" onRetry={load} />
+      ) : (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-800">
           <thead className="bg-gray-900/70">
@@ -67,7 +77,7 @@ export function TradersLeaderboard() {
                 <tr key={t.user_id}>
                   <td className="px-3 py-2 text-sm text-white font-semibold">#{i + 1}</td>
                   <td className="px-3 py-2 text-sm text-gray-200">
-                    {t.profiles?.name || t.profiles?.full_name || t.profiles?.email || t.user_id}
+                    {t.profiles?.name || t.profiles?.full_name || (t.profiles?.username ? `@${t.profiles.username}` : 'Trader')}
                   </td>
                   <td className="px-3 py-2 text-sm text-white">{Math.round(t.win_rate || 0)}%</td>
                   <td className="px-3 py-2 text-sm text-white">{Math.round(t.consistency_score || 0)}</td>
@@ -84,13 +94,14 @@ export function TradersLeaderboard() {
             {!loading && rows.length === 0 && (
               <tr>
                 <td className="px-3 py-2 text-sm text-gray-400" colSpan={6}>
-                  No traders yet.
+                  No ranked traders yet. Log trades in your journal to appear here.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+      )}
     </Card>
   )
 }

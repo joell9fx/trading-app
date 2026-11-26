@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireOwner } from '../auth'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { z } from 'zod'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const auth = await requireOwner()
   if (auth.error) return auth.error
-  const { supabase } = auth.ctx!
+  const supabase = createAdminClient() // service role: cross-user write, caller already verified
 
   const { data, error } = await supabase
     .from('profiles')
@@ -15,7 +18,7 @@ export async function GET() {
     .limit(200)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'superadmin/users', 400)
   }
 
   return NextResponse.json({ users: data })
@@ -24,7 +27,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const auth = await requireOwner()
   if (auth.error) return auth.error
-  const { supabase, user } = auth.ctx!
+  const { user } = auth.ctx!
+  const supabase = createAdminClient() // service role: cross-user write, caller already verified
 
   let payload: any
   try {
@@ -34,13 +38,17 @@ export async function POST(req: NextRequest) {
     payload = Object.fromEntries(form.entries())
   }
 
-  const { user_id, field, value } = payload
-
-  if (!user_id || !['is_admin', 'is_owner', 'banned'].includes(field)) {
+  const parsed = z
+    .object({
+      user_id: z.string().trim().uuid(),
+      field: z.enum(['is_admin', 'is_owner', 'banned']),
+      value: z.union([z.boolean(), z.enum(['true', 'false'])]).transform((v) => v === true || v === 'true'),
+    })
+    .safeParse(payload)
+  if (!parsed.success) {
     return NextResponse.json({ error: 'user_id and valid field are required' }, { status: 400 })
   }
-
-  const nextValue = `${value}` === 'true' || value === true
+  const { user_id, field, value: nextValue } = parsed.data
 
   const { data: targetProfile, error: targetError } = await supabase
     .from('profiles')
@@ -65,7 +73,7 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'superadmin/users', 400)
   }
 
   await supabase.from('admin_logs').insert({

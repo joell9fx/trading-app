@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,18 +17,26 @@ export async function POST(req: NextRequest) {
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const limited = rateLimitResponse(`ai:${user.id}`)
+  if (limited) return limited
 
   try {
-    const { type, title, caption } = await req.json()
-    if (!type || !title) {
-      return NextResponse.json({ error: 'type and title are required' }, { status: 400 })
-    }
+    const body = await parseBody(
+      req,
+      z.object({
+        type: z.string().trim().min(1).max(40),
+        title: z.string().trim().min(1).max(150),
+        caption: z.string().trim().max(2000).optional(),
+      }),
+    )
+    if (body.error) return body.error
+    const { type, title, caption } = body.data
 
     let image_url: string | null = null
 
     if (process.env.OPENAI_API_KEY) {
       try {
-        const prompt = `Create a clean black-gold card celebrating a trader milestone titled "${title}". Include subtle trading theme and VisionEdge aesthetic.`
+        const prompt = `Create a clean black-gold card celebrating a trader milestone titled "${title}". Include subtle trading theme and Trading Academy black-and-gold aesthetic.`
         const aiRes = await fetch('https://api.openai.com/v1/images/generations', {
           method: 'POST',
           headers: {
@@ -53,7 +65,7 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'showcase/create', 400)
     }
 
     try {

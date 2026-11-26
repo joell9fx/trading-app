@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,11 +22,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { full_name, account_id, platform, email, user_id } = await req.json()
-
-    if (!full_name || !account_id || !platform || !email) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    }
+    const body = await parseBody(
+      req,
+      z.object({
+        full_name: z.string().trim().min(1).max(120),
+        account_id: z.string().trim().min(1).max(64),
+        platform: z.string().trim().min(1).max(64),
+        email: z.string().trim().email().max(254),
+        user_id: z.string().optional(),
+      }),
+    )
+    if (body.error) return body.error
+    const { full_name, account_id, platform, email, user_id } = body.data
 
     if (user_id && user_id !== user.id) {
       return NextResponse.json({ error: 'User mismatch' }, { status: 403 })
@@ -42,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error('Prop firm submission insert error:', error)
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'prop-firm/send', 400)
     }
 
     return NextResponse.json({ message: 'Submission successful', data })

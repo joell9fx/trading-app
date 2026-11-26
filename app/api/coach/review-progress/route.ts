@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,10 +15,12 @@ export async function POST(req: NextRequest) {
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const limited = rateLimitResponse(`ai:${user.id}`)
+  if (limited) return limited
 
   try {
-    const { user_id } = await req.json()
-    const targetUser = user_id || user.id
+    // Members can only review their own progress.
+    const targetUser = user.id
 
     const { data: paths, error } = await supabase
       .from('learning_paths')
@@ -24,7 +28,7 @@ export async function POST(req: NextRequest) {
       .eq('user_id', targetUser)
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'coach/review-progress', 400)
     }
 
     if (!process.env.OPENAI_API_KEY) {

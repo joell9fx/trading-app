@@ -1,4 +1,4 @@
-# VisionEdge FX – Post-Launch Monitoring & Alert-Response Runbook
+# Trading Academy – Post-Launch Monitoring & Alert-Response Runbook
 
 ## Daily health checks (AM)
 - Uptime (UptimeRobot/Cron): API < 300 ms avg, > 99.5% availability.
@@ -28,7 +28,7 @@
 - Slack webhook example (append to `scripts/launch_validation.sh`):
   - `curl -X POST -H "Content-Type: application/json" -d "{\"text\":\"🚨 Launch Validation Failed on $(hostname): check logs/launch-validation.txt\"}" $SLACK_WEBHOOK_URL`
 - Discord webhook example:
-  - `curl -H "Content-Type: application/json" -X POST -d "{\"content\":\"⚠️ VisionEdge FX validation issue – check logs.\"}" $DISCORD_WEBHOOK_URL`
+  - `curl -H "Content-Type: application/json" -X POST -d "{\"content\":\"⚠️ Trading Academy validation issue – check logs.\"}" $DISCORD_WEBHOOK_URL`
 - Cron schedule (09:00 UTC daily):
   - `0 9 * * * /path/to/scripts/launch_validation.sh > /dev/null`
 
@@ -48,5 +48,5 @@
 - Benchmark: page load < 3s; API latency < 1s.
 
 ## Stability gate
-- If all daily/weekly checks stay green for 30 days, declare VisionEdge FX v1.0 Stable Channel and begin v1.1 planning.
+- If all daily/weekly checks stay green for 30 days, declare Trading Academy v1.0 Stable Channel and begin v1.1 planning.
 

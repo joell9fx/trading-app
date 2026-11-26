@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { LoadError } from '@/components/ui/load-error'
 
 interface Entry {
   username: string
@@ -15,25 +16,37 @@ export function LeaderboardClient() {
   const [metric, setMetric] = useState<'xp' | 'consistency' | 'lessons' | 'referrals'>('xp')
   const [entries, setEntries] = useState<Entry[]>([])
   const [loading, setLoading] = useState(true)
+  const [failed, setFailed] = useState(false)
 
-  const load = async (m: string) => {
+  const load = useCallback(async (m: string, signal?: AbortSignal) => {
     setLoading(true)
-    const res = await fetch(`/api/leaderboard?metric=${m}`)
-    const json = await res.json()
-    if (res.ok) {
+    setFailed(false)
+    try {
+      const res = await fetch(`/api/leaderboard?metric=${m}`, { signal })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`)
       setEntries(json.entries || [])
+    } catch (err) {
+      if ((err as Error)?.name === 'AbortError') return
+      setEntries([])
+      setFailed(true)
     }
     setLoading(false)
-  }
+  }, [])
 
   useEffect(() => {
-    load(metric)
-  }, [metric])
+    // Abort the previous request so a slow response can't overwrite a newer metric.
+    const controller = new AbortController()
+    load(metric, controller.signal)
+    return () => controller.abort()
+  }, [metric, load])
 
   return (
     <Card className="bg-black border border-gold-500/40 p-6 rounded-2xl space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl text-gold-400 font-bold">🏆 VisionEdge Leaderboard</h2>
+        <h1 className="text-2xl text-gold-400 font-bold">
+          <span aria-hidden="true">🏆 </span>Trading Academy Leaderboard
+        </h1>
         <div className="flex gap-2 text-sm">
           {(['xp', 'consistency', 'lessons', 'referrals'] as const).map((m) => (
             <Button
@@ -49,7 +62,10 @@ export function LeaderboardClient() {
       </div>
 
       {loading && <p className="text-gray-400">Loading...</p>}
-      {!loading && entries.length === 0 && <p className="text-gray-400">No leaderboard data.</p>}
+      {!loading && failed && <LoadError what="the leaderboard" onRetry={() => load(metric)} />}
+      {!loading && !failed && entries.length === 0 && (
+        <p className="text-gray-400">No rankings yet. Earn XP by completing lessons and challenges to appear here.</p>
+      )}
 
       <div className="space-y-3">
         {entries.map((u, i) => (
@@ -57,7 +73,8 @@ export function LeaderboardClient() {
             <div className="flex items-center gap-3">
               <span className="text-gold-400 font-bold w-6">{i + 1}</span>
               {u.avatar_url ? (
-                <img src={u.avatar_url} className="w-10 h-10 rounded-full border border-gold-500 object-cover" />
+                // eslint-disable-next-line @next/next/no-img-element -- user-uploaded or generated image from an arbitrary host; next/image needs allow-listed domains
+                <img src={u.avatar_url} alt={`${u.username} avatar`} className="w-10 h-10 rounded-full border border-gold-500 object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-full border border-gold-500 bg-gray-800" />
               )}

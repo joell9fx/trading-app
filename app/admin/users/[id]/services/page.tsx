@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { UserServicesManager } from '@/components/admin/users/UserServicesManager'
+import { isAdminRole } from '@/utils/auth'
 
 export default async function AdminUserServicesPage({ params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -13,12 +14,11 @@ export default async function AdminUserServicesPage({ params }: { params: { id: 
   }
 
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
+    .from('profiles').select('role, is_owner')
     .eq('id', user.id)
     .single()
 
-  if (profile?.role !== 'ADMIN') {
+  if (!isAdminRole(profile?.role, (profile as any)?.is_owner)) {
     redirect('/dashboard')
   }
 

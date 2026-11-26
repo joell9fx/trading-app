@@ -3,7 +3,7 @@ import { SignUpForm } from '@/components/auth/signup-form'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 
 export const metadata = {
-  title: 'Sign Up - Trading Academy',
+  title: 'Sign Up',
   description: 'Create your Trading Academy account to start your trading journey.',
 }
 

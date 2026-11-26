@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { serverError } from '@/lib/api/errors'
 
 const reportSchema = z.object({
   message_id: z.string().uuid(),
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: 'Failed to file report', details: error.message }, { status: 500 });
+    return serverError(error, 'community-hub/reports', 500, 'Failed to file report');
   }
 
   return NextResponse.json({ report }, { status: 201 });

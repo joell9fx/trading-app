@@ -37,7 +37,7 @@ export function SignalsSection({ user }: SignalsSectionProps) {
     status: 'all' as 'all' | SignalStatus,
   })
 
-  const signals: SignalFeedItem[] = data?.signals ?? []
+  const signals: SignalFeedItem[] = useMemo(() => data?.signals ?? [], [data])
   const filtered = useMemo(() => {
     return signals.filter((s) => {
       const assetOk = filters.asset === 'all' || s.asset === filters.asset

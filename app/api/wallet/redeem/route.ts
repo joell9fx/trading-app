@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { updateUserTier } from '@/lib/tier-utils'
-import { accessColumnForService } from '@/lib/access-flags'
+import { accessColumnForService, type AccessModuleKey } from '@/lib/access-flags'
+import { ALL_SERVICES } from '@/lib/services-list'
+import { updateDerivedProfileFields } from '@/lib/privileged-profile'
+import { serverError } from '@/lib/api/errors'
+
+// Credit prices are owned by the server; the client-sent cost is ignored.
+const CREDIT_COST: Record<string, number> = Object.fromEntries(
+  ALL_SERVICES.map((s) => [s.key, s.credit_cost]),
+)
 
 export const dynamic = 'force-dynamic'
 
@@ -18,12 +26,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { service_key, cost } = await req.json()
-    if (!service_key || typeof cost !== 'number') {
-      return NextResponse.json({ error: 'service_key and cost required' }, { status: 400 })
+    const body = await req.json().catch(() => null)
+    const service_key: unknown = body?.service_key
+    const cost = typeof service_key === 'string' ? CREDIT_COST[service_key] : undefined
+    if (typeof service_key !== 'string' || typeof cost !== 'number' || cost <= 0) {
+      return NextResponse.json({ error: 'Unknown or non-redeemable service_key' }, { status: 400 })
     }
 
-    const column = accessColumnForService(service_key)
+    const column = accessColumnForService(service_key as AccessModuleKey)
     if (!column && service_key !== 'community') {
       return NextResponse.json({ error: 'Unknown service_key' }, { status: 400 })
     }
@@ -51,7 +61,7 @@ export async function POST(req: NextRequest) {
     ])
 
     if (spendError) {
-      return NextResponse.json({ error: spendError.message }, { status: 400 })
+      return serverError(spendError, 'wallet/redeem', 400)
     }
 
     const { error: unlockError } = await supabase
@@ -59,14 +69,11 @@ export async function POST(req: NextRequest) {
       .upsert({ user_id: user.id, service_key, is_unlocked: true }, { onConflict: 'user_id,service_key' })
 
     if (unlockError) {
-      return NextResponse.json({ error: unlockError.message }, { status: 400 })
+      return serverError(unlockError, 'wallet/redeem', 400)
     }
 
     if (column) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ [column]: true })
-        .eq('id', user.id)
+      const { error: profileError } = await updateDerivedProfileFields(supabase, user.id, { [column]: true })
 
       if (profileError) {
         console.error('Profile flag update error (wallet redeem):', profileError)

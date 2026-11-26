@@ -70,9 +70,9 @@ export function Footer() {
 
             {/* Quick Links */}
             <div>
-              <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">
+              <h2 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">
                 Quick Links
-              </h3>
+              </h2>
               <ul className="space-y-3">
                 {navigation.main.map((item) => (
                   <li key={item.name}>
@@ -89,9 +89,9 @@ export function Footer() {
 
             {/* Legal */}
             <div>
-              <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">
+              <h2 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">
                 Legal
-              </h3>
+              </h2>
               <ul className="space-y-3">
                 {navigation.legal.map((item) => (
                   <li key={item.name}>

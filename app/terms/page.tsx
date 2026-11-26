@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Terms of Service - Trading Academy',
+  title: 'Terms of Service',
   description: 'Terms of service for Trading Academy.',
 }
 

@@ -21,8 +21,6 @@ export async function POST(
     }
 
     const { id: courseId } = params;
-    const body = await request.json();
-    const { paymentMethod = 'free' } = body;
 
     // Get course details
     const { data: course, error: courseError } = await supabase
@@ -88,34 +86,18 @@ export async function POST(
       );
     }
 
-    // For now, allow direct enrollment (you can integrate Stripe later)
-    // In production, you'd verify payment before creating enrollment
-    const { data: enrollment, error: enrollError } = await supabase
-      .from('course_enrollments')
-      .insert([
-        {
-          user_id: user.id,
-          course_id: courseId,
-          purchase_price: course.price || 0,
-          payment_method: paymentMethod,
-          status: 'active',
-        },
-      ])
-      .select()
-      .single();
-
-    if (enrollError) {
-      console.error('Error creating enrollment:', enrollError);
-      return NextResponse.json(
-        { error: 'Failed to enroll in course' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      enrollment,
-      message: 'Successfully enrolled in course',
-    });
+    // Paid courses are never granted here: there is no course checkout yet,
+    // and enrollments for paid courses must only be created after payment
+    // (Stripe webhook or an admin). Previously this inserted an active
+    // enrollment for free.
+    return NextResponse.json(
+      {
+        error: 'This course requires a purchase',
+        code: 'PAYMENT_REQUIRED',
+        price: course.price ?? null,
+      },
+      { status: 402 }
+    );
   } catch (error) {
     console.error('Unexpected error in POST /api/courses/[id]/enroll:', error);
     return NextResponse.json(

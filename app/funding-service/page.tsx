@@ -63,19 +63,19 @@ export default function FundingServicePage() {
               <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100 mb-4">
                 <Shield className="h-6 w-6 text-blue-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Structured, rules-compliant evaluation strategy</h3>
+              <p className="text-lg font-semibold text-gray-900">Structured, rules-compliant evaluation strategy</p>
             </div>
             <div className="text-center">
               <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-green-100 mb-4">
                 <TrendingUp className="h-6 w-6 text-green-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Daily risk limits and max drawdown guardrails</h3>
+              <p className="text-lg font-semibold text-gray-900">Daily risk limits and max drawdown guardrails</p>
             </div>
             <div className="text-center">
               <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-purple-100 mb-4">
                 <Clock className="h-6 w-6 text-purple-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">Fast onboarding with live progress updates</h3>
+              <p className="text-lg font-semibold text-gray-900">Fast onboarding with live progress updates</p>
             </div>
           </div>
         </div>

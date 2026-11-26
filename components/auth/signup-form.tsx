@@ -75,9 +75,18 @@ export function SignUpForm() {
 
     try {
       // Create user account
+      const refParam = searchParams.get('ref')
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          // handle_new_user() reads name/full_name from metadata when it creates the profile
+          data: {
+            name: formData.name,
+            full_name: formData.name,
+            ...(refParam ? { referral_code_used: refParam } : {}),
+          },
+        },
       })
 
       if (authError) {
@@ -91,49 +100,27 @@ export function SignUpForm() {
       }
 
       if (authData.user) {
-        const refParam = searchParams.get('ref')
-        let referrerId: string | null = null
-
-        if (refParam) {
-          const { data: refProfile } = await supabase
+        // The profile row is created by the handle_new_user() trigger (role
+        // 'member'). Here we only fill in the referral code, best effort: when
+        // email confirmation is on there is no session yet, and /api/referrals
+        // creates the code lazily on first visit instead.
+        if (authData.session) {
+          const { error: profileError } = await supabase
             .from('profiles')
-            .select('id')
-            .eq('referral_code', refParam)
-            .single()
-          referrerId = refProfile?.id || null
-        }
+            .update({ name: formData.name, referral_code: buildReferralCode(authData.user.id) })
+            .eq('id', authData.user.id)
+          if (profileError) {
+            console.error('Profile update error:', profileError)
+          }
 
-        const referral_code = buildReferralCode(authData.user.id)
-
-        // Create profile record
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: authData.user.id,
-              email: formData.email,
-              name: formData.name,
-              role: 'MEMBER',
-              referral_code,
-              created_at: new Date().toISOString(),
-            },
-          ])
-
-        if (profileError) {
-          console.error('Profile creation error:', profileError)
-          // Don't fail the signup if profile creation fails, just log it
-        }
-
-        if (referrerId) {
-          await supabase.from('referrals').insert([{ referrer_id: referrerId, referred_id: authData.user.id }])
-          await supabase.from('notifications').insert([
-            {
-              user_id: referrerId,
-              type: 'referral',
-              title: '🎉 New Referral Joined!',
-              message: `${formData.email} joined using your link.`,
-            },
-          ])
+          if (refParam) {
+            // Server records the referral and notifies the referrer
+            await fetch('/api/referral-track', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ referral_code: refParam }),
+            }).catch((err) => console.error('Referral tracking error:', err))
+          }
         }
 
         await addXP(supabase, authData.user.id, 10, 'sign up')
@@ -166,9 +153,9 @@ export function SignUpForm() {
         <div className="mx-auto h-12 w-12 bg-gradient-to-r from-gold-500 to-gold-600 rounded-lg flex items-center justify-center mb-4">
           <span className="text-black font-bold text-lg">TA</span>
         </div>
-        <h2 className="text-3xl font-bold text-white">
+        <h1 className="text-3xl font-bold text-white">
           Create your account
-        </h2>
+        </h1>
         <p className="mt-2 text-sm text-gray-300">
           Start your trading journey today
         </p>
@@ -248,6 +235,8 @@ export function SignUpForm() {
               type="button"
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
             >
               {showPassword ? (
                 <EyeOff className="h-5 w-5 text-gray-400" />
@@ -281,6 +270,8 @@ export function SignUpForm() {
               type="button"
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+              aria-pressed={showConfirmPassword}
             >
               {showConfirmPassword ? (
                 <EyeOff className="h-5 w-5 text-gray-400" />

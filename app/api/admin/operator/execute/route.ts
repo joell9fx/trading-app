@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '../../auth'
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,10 +11,12 @@ export async function POST(req: NextRequest) {
   if (auth.error) return auth.error
   const { supabase } = auth.ctx!
 
-  const { id, action } = await req.json()
-  if (!id || !action) {
-    return NextResponse.json({ error: 'Missing id or action' }, { status: 400 })
-  }
+  const body = await parseBody(
+    req,
+    z.object({ id: idSchema, action: z.enum(['approve', 'dismiss', 'execute']) }),
+  )
+  if (body.error) return body.error
+  const { id, action } = body.data
 
   let status = 'pending'
   if (action === 'approve') status = 'approved'
@@ -25,7 +30,7 @@ export async function POST(req: NextRequest) {
 
   const { error } = await supabase.from('business_actions').update(update).eq('id', id)
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'admin/operator/execute', 400)
   }
 
   return NextResponse.json({ message: 'Updated' })

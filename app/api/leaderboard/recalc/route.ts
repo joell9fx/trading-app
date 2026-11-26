@@ -1,10 +1,12 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextResponse, type NextRequest } from 'next/server'
+import { requireAdminOrInternal } from '@/lib/api/internal-auth'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST() {
-  const supabase = createClient()
+export async function POST(req: NextRequest) {
+  const { error: authError, supabase } = await requireAdminOrInternal(req)
+  if (authError || !supabase) return authError
 
   const { data: users, error } = await supabase
     .from('profiles')
@@ -12,7 +14,7 @@ export async function POST() {
     .order('xp', { ascending: false })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'leaderboard/recalc', 400)
   }
 
   if (!users) return NextResponse.json({ success: true, updated: 0 })

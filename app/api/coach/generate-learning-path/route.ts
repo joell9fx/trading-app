@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,11 +14,19 @@ export async function POST(req: NextRequest) {
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const limited = rateLimitResponse(`ai:${user.id}`)
+  if (limited) return limited
 
   try {
-    const { user_id, pattern_type, sentiment } = await req.json()
-    if (!user_id || !pattern_type) {
-      return NextResponse.json({ error: 'user_id and pattern_type required' }, { status: 400 })
+    const input = await req.json().catch(() => null)
+    const { pattern_type, sentiment } = input ?? {}
+    // Members can only create learning paths for themselves.
+    if (input?.user_id && input.user_id !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+    const user_id = user.id
+    if (!pattern_type || typeof pattern_type !== 'string') {
+      return NextResponse.json({ error: 'pattern_type required' }, { status: 400 })
     }
 
     if (!process.env.OPENAI_API_KEY) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isActiveRecord, requireAdmin } from '../utils';
+import { serverError } from '@/lib/api/errors'
 
 export async function GET(request: NextRequest) {
   const { error, ctx } = await requireAdmin();
@@ -16,13 +17,13 @@ export async function GET(request: NextRequest) {
     .from('profiles')
     .select('id, email, name, full_name, role, created_at, updated_at');
 
-  if (role) profileQuery = profileQuery.eq('role', role);
+  if (role) profileQuery = profileQuery.eq('role', role.toLowerCase());
   if (joinedFrom) profileQuery = profileQuery.gte('created_at', joinedFrom);
   if (joinedTo) profileQuery = profileQuery.lte('created_at', joinedTo);
 
   const { data: profiles, error: profileError } = await profileQuery;
   if (profileError) {
-    return NextResponse.json({ error: 'Failed to load users', details: profileError.message }, { status: 500 });
+    return serverError(profileError, 'admin/community/users', 500, 'Failed to load users');
   }
 
   const [{ data: bans }, { data: mutes }] = await Promise.all([

@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { addXP } from '@/lib/xp-utils'
 import { requireServiceAccess } from '@/lib/api/require-service-access'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   const access = await requireServiceAccess('signals')
   if (access.error) return access.error
+  const limited = rateLimitResponse(`ai:${access.ctx.userId}`)
+  if (limited) return limited
   const { supabase, userId } = access.ctx
 
   try {
-    const { message } = await req.json()
-    if (!message || typeof message !== 'string') {
-      return NextResponse.json({ error: 'message is required' }, { status: 400 })
+    const { message } = (await req.json().catch(() => ({}))) ?? {}
+    if (!message || typeof message !== 'string' || message.length > 4000) {
+      return NextResponse.json({ error: 'message is required (max 4000 characters)' }, { status: 400 })
     }
 
     const [{ data: trades }, { data: stats }, { data: patterns }, { data: lessons }, { data: memories }, { data: lastJournal }] =

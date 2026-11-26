@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { LockClosedIcon, TrophyIcon, ClockIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { SampleDataNotice } from '@/components/ui/sample-data-notice'
 
 /** Progress stats: start, current, target (numeric for calculations). */
 export type G2GProgressStats = {
@@ -141,6 +142,7 @@ export function GoldToGlory({ hasAccess = false }: GoldToGloryProps) {
 
   return (
     <div className="space-y-6">
+      <SampleDataNotice what="the Gold to Glory challenge progress, updates and timeline" />
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-2">
           <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">Challenge</p>

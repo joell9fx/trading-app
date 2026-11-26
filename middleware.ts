@@ -11,6 +11,16 @@ const PROTECTED_PREFIXES = ['/dashboard', '/admin', '/superadmin'];
 
 const isDev = process.env.NODE_ENV !== 'production';
 
+// Developer/diagnostic pages and endpoints: available locally, 404 in production.
+const DEV_ONLY_PATHS = [
+  '/test',
+  '/preview',
+  '/local-preview',
+  '/api/test-supabase',
+  '/api/community/test-db',
+  '/api/community/check-schema',
+];
+
 const securityHeaders = new Headers();
 securityHeaders.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
 securityHeaders.set('X-Frame-Options', 'DENY');
@@ -52,6 +62,10 @@ export async function middleware(request: NextRequest) {
   const response = withSecurityHeaders(NextResponse.next());
   const { pathname } = request.nextUrl;
   const isSuperAdminRoute = pathname.startsWith('/superadmin');
+
+  if (!isDev && DEV_ONLY_PATHS.some((path) => pathname === path || pathname.startsWith(path + '/'))) {
+    return withSecurityHeaders(new NextResponse('Not found', { status: 404 }));
+  }
 
   // Skip assets and API routes
   if (

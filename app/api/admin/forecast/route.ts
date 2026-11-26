@@ -50,7 +50,7 @@ export async function GET() {
       {
         role: 'system',
         content: `
-You are an AI data analyst for VisionEdge FX.
+You are an AI data analyst for Trading Academy.
 Create a concise forecast for next 7, 30, 90 days.
 Base predictions on user growth, ad ROI, revenue, and referrals.
 Tone: confident, data-driven, strategic.

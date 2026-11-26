@@ -1,7 +1,7 @@
 import { SignInContent } from '@/components/auth/signin-content'
 
 export const metadata = {
-  title: 'Sign In - Trading Academy',
+  title: 'Sign In',
   description: 'Sign in to your Trading Academy account to access courses, community, and mentoring.',
 }
 

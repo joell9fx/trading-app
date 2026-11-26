@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { accessColumnForService, deriveAccessFromProfile, AccessModuleKey } from '@/lib/access-flags'
 import { requireAdmin } from '../../../auth'
 import { updateUserTier } from '@/lib/tier-utils'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,7 +17,7 @@ export async function GET(
   if (auth.error) {
     return auth.error
   }
-  const { supabase } = auth.ctx!
+  const supabase = createAdminClient() // service role: cross-user write, caller already verified
 
   const { data, error } = await supabase
     .from('profiles')
@@ -22,7 +26,7 @@ export async function GET(
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'admin/users/[userId]/services', 400)
   }
 
   return NextResponse.json({ access: deriveAccessFromProfile(data) })
@@ -33,12 +37,14 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
   if (auth.error) {
     return auth.error
   }
-  const { supabase } = auth.ctx!
+  const supabase = createAdminClient() // service role: cross-user write, caller already verified
 
-  const { service_key, is_unlocked } = await req.json()
-  if (!service_key) {
-    return NextResponse.json({ error: 'service_key is required' }, { status: 400 })
-  }
+  const body = await parseBody(
+    req,
+    z.object({ service_key: z.string().trim().min(1).max(64), is_unlocked: z.boolean() }),
+  )
+  if (body.error) return body.error
+  const { service_key, is_unlocked } = body.data
 
   const column = accessColumnForService(service_key as AccessModuleKey)
   if (!column && service_key !== 'community') {
@@ -52,7 +58,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
       .eq('id', params.userId)
 
     if (updateError) {
-      return NextResponse.json({ error: updateError.message }, { status: 400 })
+      return serverError(updateError, 'admin/users/[userId]/services', 400)
     }
   }
 
@@ -77,7 +83,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'admin/users/[userId]/services', 400)
   }
 
   try {

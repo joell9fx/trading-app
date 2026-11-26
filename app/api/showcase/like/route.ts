@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,16 +17,17 @@ export async function POST(req: NextRequest) {
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const limited = rateLimitResponse(`showcase-like:${user.id}`, { limit: 30, windowMs: 60_000 })
+  if (limited) return limited
 
   try {
-    const { post_id } = await req.json()
-    if (!post_id) {
-      return NextResponse.json({ error: 'post_id is required' }, { status: 400 })
-    }
+    const body = await parseBody(req, z.object({ post_id: idSchema }))
+    if (body.error) return body.error
+    const { post_id } = body.data
 
     const { error } = await supabase.rpc('increment_field', { table_name: 'user_showcase_posts', field_name: 'likes', row_id: post_id })
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'showcase/like', 400)
     }
 
     return NextResponse.json({ success: true })

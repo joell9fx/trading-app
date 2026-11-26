@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,10 +19,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { reward_id } = await req.json()
-    if (!reward_id) {
-      return NextResponse.json({ error: 'reward_id is required' }, { status: 400 })
-    }
+    const body = await parseBody(req, z.object({ reward_id: idSchema }))
+    if (body.error) return body.error
+    const { reward_id } = body.data
 
     const { error } = await supabase
       .from('referral_rewards')
@@ -28,7 +30,7 @@ export async function POST(req: NextRequest) {
       .eq('user_id', user.id)
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return serverError(error, 'referrals/redeem', 400)
     }
 
     return NextResponse.json({ success: true })

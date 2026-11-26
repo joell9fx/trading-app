@@ -1,11 +1,13 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextResponse, type NextRequest } from 'next/server'
+import { requireAdminOrInternal } from '@/lib/api/internal-auth'
 import { addXP } from '@/lib/xp-utils'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST() {
-  const supabase = createClient()
+export async function POST(req: NextRequest) {
+  const { error: authError, supabase } = await requireAdminOrInternal(req)
+  if (authError || !supabase) return authError
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
   const { data: stats, error } = await supabase
@@ -14,7 +16,7 @@ export async function POST() {
     .gte('created_at', sevenDaysAgo)
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+    return serverError(error, 'community/leaderboard/weekly', 400)
   }
 
   if (!stats || stats.length === 0) {

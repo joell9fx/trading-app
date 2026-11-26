@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { z } from 'zod'
+import { rateLimitResponse } from '@/lib/api/rate-limit'
+
+const BodySchema = z.object({
+  message: z.string().trim().min(1).max(4000),
+  conversationHistory: z
+    .array(z.object({ role: z.string(), content: z.string().max(8000) }))
+    .max(500)
+    .optional()
+    .default([])
+    // Only user/assistant turns from the client; never let it inject system prompts.
+    .transform((h) =>
+      h
+        .filter((m): m is { role: 'user' | 'assistant'; content: string } => m.role === 'user' || m.role === 'assistant')
+        .slice(-10),
+    ),
+})
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,23 +38,26 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    const { data: { session } } = await supabase.auth.getSession()
-    
-    if (!session) {
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const { message, conversationHistory } = await request.json()
+    const limited = rateLimitResponse(`ai:${user.id}`)
+    if (limited) return limited
 
-    if (!message) {
+    const parsed = BodySchema.safeParse(await request.json().catch(() => null))
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Message is required' },
+        { error: 'Message is required (max 4000 characters)' },
         { status: 400 }
       )
     }
+    const { message, conversationHistory } = parsed.data
 
     // Check if OpenAI API key is configured
     if (!process.env.OPENAI_API_KEY) {
@@ -83,7 +103,7 @@ Never:
 
     const messages = [
       { role: 'system', content: systemPrompt },
-      ...(conversationHistory || []).slice(-10), // Keep last 10 messages for context
+      ...conversationHistory, // last 10 user/assistant turns
       { role: 'user', content: message },
     ]
 

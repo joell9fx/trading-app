@@ -163,7 +163,7 @@ export default function PricingPage() {
               }`}
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
+                <h2 className="text-lg font-semibold text-foreground">{plan.name}</h2>
                 {plan.priceLabel ? (
                   <span className="text-[10px] uppercase tracking-wide rounded-full px-2 py-1 bg-elevated text-muted-foreground">
                     {plan.priceLabel}

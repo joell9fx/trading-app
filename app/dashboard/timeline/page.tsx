@@ -32,7 +32,7 @@ export default async function TimelinePage() {
     {
       date: created_at,
       type: 'start',
-      title: 'Joined VisionEdge',
+      title: 'Joined Trading Academy',
       description: '',
       icon: '🚀',
     },

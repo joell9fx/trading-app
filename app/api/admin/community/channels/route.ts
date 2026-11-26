@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '../utils';
+import { z } from 'zod'
+import { parseBody } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 function slugify(value: string) {
   return value
@@ -19,7 +22,7 @@ export async function GET() {
     .select('id, name, description, slug, category, is_private, created_at, updated_at, archived_at');
 
   if (channelError) {
-    return NextResponse.json({ error: 'Failed to load channels', details: channelError.message }, { status: 500 });
+    return serverError(channelError, 'admin/community/channels', 500, 'Failed to load channels');
   }
 
   // Compute member counts per channel (messages authors)
@@ -49,12 +52,17 @@ export async function POST(request: NextRequest) {
   if (error || !ctx) return error!;
   const { supabase } = ctx;
 
-  const body = await request.json();
-  const { name, description, category = 'general', is_private = false } = body;
-
-  if (!name || typeof name !== 'string' || name.length < 2) {
-    return NextResponse.json({ error: 'Channel name is required' }, { status: 400 });
-  }
+  const body = await parseBody(
+    request,
+    z.object({
+      name: z.string().trim().min(2, 'Channel name is required').max(80),
+      description: z.string().trim().max(500).nullable().optional(),
+      category: z.string().trim().min(1).max(40).default('general'),
+      is_private: z.boolean().default(false),
+    }),
+  );
+  if (body.error) return body.error;
+  const { name, description, category, is_private } = body.data;
 
   const slug = slugify(name);
   const insertPayload = {
@@ -72,7 +80,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (insertError) {
-    return NextResponse.json({ error: 'Failed to save channel', details: insertError.message }, { status: 500 });
+    return serverError(insertError, 'admin/community/channels', 500, 'Failed to save channel');
   }
 
   return NextResponse.json({ channel }, { status: 201 });

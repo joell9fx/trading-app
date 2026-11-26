@@ -29,7 +29,7 @@ export async function GET() {
       {
         role: 'system',
         content:
-          'You are a business intelligence analyst for VisionEdge FX. Summarize performance trends and give 3 concise recommendations. Tone: analytical + motivational.',
+          'You are a business intelligence analyst for Trading Academy. Summarize performance trends and give 3 concise recommendations. Tone: analytical + motivational.',
       },
       {
         role: 'user',

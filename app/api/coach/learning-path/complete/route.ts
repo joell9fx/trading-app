@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { addXP } from '@/lib/xp-utils'
 import { assignBadges } from '@/lib/badges'
+import { z } from 'zod'
+import { parseBody, idSchema } from '@/lib/api/parse-body'
+import { serverError } from '@/lib/api/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,8 +20,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { id } = await req.json()
-    if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    const body = await parseBody(req, z.object({ id: idSchema }))
+    if (body.error) return body.error
+    const { id } = body.data
 
     const { error } = await supabase
       .from('learning_paths')
@@ -26,7 +30,7 @@ export async function POST(req: NextRequest) {
       .eq('id', id)
       .eq('user_id', user.id)
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    if (error) return serverError(error, 'coach/learning-path/complete', 400)
 
     try {
       await addXP(supabase, user.id, 30, 'Lesson Completed')
