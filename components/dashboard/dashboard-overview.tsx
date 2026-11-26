@@ -22,6 +22,8 @@ import { ALL_SERVICES, type ServiceKey } from '@/lib/services-list';
 import { MembershipCard } from './MembershipCard';
 import { MembershipTier, computeTier } from '@/lib/tier-utils';
 import { ACCESS_DEFAULTS, countUnlocked, type AccessModuleKey } from '@/lib/access-flags';
+import { buildOnboardingSteps } from '@/lib/onboarding';
+import { GettingStartedChecklist } from './getting-started-checklist';
 
 interface DashboardOverviewProps {
   user: { email?: string; id?: string; [key: string]: unknown };
@@ -60,6 +62,7 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
     winRatePct: null as number | null,
   });
   const [loading, setLoading] = useState(true);
+  const [statsLoaded, setStatsLoaded] = useState(false);
   const supabase = useMemo(() => createSupabaseClient(), []);
   const { handleCheckout } = useCheckout();
   const openUpgrade = () => router.push('/dashboard/upgrade');
@@ -72,16 +75,7 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
     }
     const fetchStats = async () => {
       try {
-        const [
-          { count: totalCoursesCount },
-          { count: completedLessonsCount },
-          { count: postsCount },
-          { count: communityPostsCount },
-          { count: bookingsCount },
-          { data: progressData },
-          { count: journalCount },
-          { data: journalRows },
-        ] = await Promise.all([
+        const results = await Promise.all([
           supabase.from('courses').select('*', { count: 'exact', head: true }).eq('is_published', true),
           supabase.from('progress').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('completed', true),
           supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
@@ -91,6 +85,18 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
           supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
           supabase.from('journal_entries').select('result_r').eq('user_id', user.id),
         ]);
+        const [
+          { count: totalCoursesCount },
+          { count: completedLessonsCount },
+          { count: postsCount },
+          { count: communityPostsCount },
+          { count: bookingsCount },
+          { data: progressData },
+          { count: journalCount },
+          { data: journalRows },
+        ] = results;
+        // Only trust the counts (e.g. for onboarding) when the core queries succeeded.
+        const coreFailed = [results[1], results[2], results[3], results[6]].some((r) => r.error);
         let activeCourses = 0;
         if (progressData?.length) {
           const lessonIds = progressData.map((p) => p.lesson_id);
@@ -114,6 +120,7 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
           journalEntries: journalCount ?? 0,
           winRatePct,
         });
+        setStatsLoaded(!coreFailed);
       } catch (e) {
         console.error('Overview stats', e);
       } finally {
@@ -153,6 +160,15 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   const signalsActive = Boolean(access?.signals);
+  const onboardingSteps = buildOnboardingSteps({
+    bio: user?.bio,
+    avatarUrl: user?.avatar_url,
+    completedLessons: stats.completedLessons,
+    activeCourses: stats.activeCourses,
+    communityPosts: stats.communityPosts,
+    journalEntries: stats.journalEntries,
+    signalsUnlocked: signalsActive,
+  });
 
   return (
     <div className="space-y-8">
@@ -188,6 +204,14 @@ export default function DashboardOverview({ user, access, unlockedCount: unlocke
           <ArrowRightIcon className="h-4 w-4 ml-2" />
         </Button>
       </div>
+
+      {statsLoaded && user?.id && (
+        <GettingStartedChecklist
+          userId={String(user.id)}
+          steps={onboardingSteps}
+          onNavigate={(section) => router.push(`/dashboard?section=${section}`)}
+        />
+      )}
 
       {/* Primary shortcuts: 8 items */}
       <div>
