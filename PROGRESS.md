@@ -17,13 +17,13 @@
 | Local `.env.local` | Supabase keys only. No Stripe, OpenAI or Resend keys. |
 | Migration test DB | Local Docker image `public.ecr.aws/supabase/postgres:17.6.1.159` is available. See `supabase/tests/README.md`. |
 
-## Health check (2026-11-26, after batch 8)
+## Health check (2026-11-26, after batch 9)
 | Check | Result |
 |---|---|
 | `npx tsc --noEmit` | ✅ pass (if you get TS6053 errors for `.next/types`, run `rm -rf .next/types`) |
 | `npx next lint` | ✅ 0 errors, 0 warnings. `rules-of-hooks` is enforced again. |
-| `npm test` | ✅ 71/71 (6 suites) |
-| CI | `.github/workflows/ci.yml` runs tsc, lint (`--max-warnings 0`) and jest on PRs. Not yet seen running on GitHub. |
+| `npm test` | ✅ 73/73 (7 suites) |
+| CI | `.github/workflows/ci.yml` runs tsc, lint (`--max-warnings 0`) and jest on PRs. First run on PR #1 passed. |
 | `npx next build` | ✅ 100 pages |
 | Prod smoke test (`next start`) | ✅ Dev routes 404; protected API routes 401 without a session; bad candles input 400; cross-origin auth sync 403; `/support` 200 |
 | `supabase/tests/046_rls_test.sql` | ✅ 24/24 on a throwaway Supabase Postgres; 046 applies twice cleanly |
@@ -84,6 +84,12 @@
 - **Server-derived profile fields** (tier, badges, has_*_access after a validated unlock): `lib/privileged-profile.ts`.
 
 ## Fixed this session
+**Batch 9:**
+- ~70 API responses no longer include raw database error text (`lib/api/errors.ts` `serverError()` logs server-side, returns a generic message, keeps status codes).
+- 046: the privileged-column guard now allows filling a missing role as `member`, matching `prevent_profile_role_change` (re-tested 24/24; 047 13/13).
+- Learning paths, showcase, performance leaderboard, referrals, campaigns, marketing stats and courses show a retryable error instead of a misleading empty state. Referral link no longer shows `ref=undefined` and is always absolute.
+- Accessibility: labelled mobile menu and password toggles, one h1 per public page, heading order fixed; custom audit clean on 16 public pages.
+
 **Batch 8:**
 - Public profile pages (`/u/[username]`) always returned a blank 500: the page fetched its own API with a relative URL. Now it loads the profile directly.
 - Branded `not-found`, `error` and `global-error` pages (there were none, so failures were blank pages).
@@ -234,11 +240,11 @@
 - ⛔ Set `NEXT_PUBLIC_SUPPORT_EMAIL` in production.
 
 ## Next 5
-1. Check CI's first run on PR #1 and fix anything environment-specific.
-2. Audit the other public and dashboard data loaders for the same "silent empty state on failure" pattern as the leaderboard.
-3. Move `role-provider.tsx`'s browser-side profile insert/role write to the server (needed once 046 is applied).
-4. Stop API routes returning raw database error text (e.g. `leaderboard` returns "TypeError: fetch failed").
-5. Accessibility pass on the public pages (headings, focus states, contrast).
+1. Admin pages: same load-error treatment (ModerationLog, community panels, referrals, wallet, operator, security).
+2. Colour-contrast check on the public pages (not covered by the custom audit).
+3. Update PR #1's title/description to reflect the full scope (owner's call).
+4. Keyboard focus styles review across the dashboard (needs a login).
+5. Re-verify signed-in flows end to end once Supabase is restored.
 
 ## Session log
 - **2026-11-19:** Local dev server set up. Public pages walked through. PR #1 opened: dev pages hidden in production, `/prices` redirect, titles, favicon.
@@ -252,6 +258,7 @@
   - Signup flow fixed.
   - `/admin/users`, `/superadmin/logs` and `/support` added; dead links fixed.
   - `.gitignore` `logs/` scoped to the repo root.
+- **2026-11-26, batch 9:** CI's first run passed; raw DB errors removed from API responses; 046 role-guard fix; load-error states in 7 member sections; accessibility pass on public pages. Health check and smoke test green.
 - **2026-11-26, batch 8:** CI workflow; recordReferral tests; found and fixed the public-profile crash; error/404 pages; leaderboard error state; onboarding checklist; Trader Mission sync + migration 047 (tested, not applied). Health check and smoke test green.
 - **2026-11-20, batch 7:** hook order fixed and the lint rule restored; trade-feedback ownership hole closed; email notes escaped; more rate limits; zod across the remaining admin, superadmin and AI routes; 24 new tests; lint fully clean. Health check and smoke test green.
 - **2026-11-20, batch 6:** candles validation; auth sync same-origin check and pending referral; coach routes self-only; AI rate limit and `ai/chat` input validation; `parseBody` + zod on 12 routes; 13 new tests. Health check and smoke test green.
