@@ -153,9 +153,9 @@ export function SignUpForm() {
         <div className="mx-auto h-12 w-12 bg-gradient-to-r from-gold-500 to-gold-600 rounded-lg flex items-center justify-center mb-4">
           <span className="text-black font-bold text-lg">TA</span>
         </div>
-        <h2 className="text-3xl font-bold text-white">
+        <h1 className="text-3xl font-bold text-white">
           Create your account
-        </h2>
+        </h1>
         <p className="mt-2 text-sm text-gray-300">
           Start your trading journey today
         </p>
@@ -235,6 +235,8 @@ export function SignUpForm() {
               type="button"
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
             >
               {showPassword ? (
                 <EyeOff className="h-5 w-5 text-gray-400" />
@@ -268,6 +270,8 @@ export function SignUpForm() {
               type="button"
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+              aria-pressed={showConfirmPassword}
             >
               {showConfirmPassword ? (
                 <EyeOff className="h-5 w-5 text-gray-400" />

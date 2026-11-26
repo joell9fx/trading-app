@@ -64,9 +64,9 @@ export function ForgotPasswordForm() {
           <div className="mx-auto h-16 w-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-4">
             <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Check your email
-          </h2>
+          </h1>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
             We've sent a password reset link to <strong>{email}</strong>
           </p>
@@ -94,9 +94,9 @@ export function ForgotPasswordForm() {
         <div className="mx-auto h-12 w-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mb-4">
           <span className="text-white font-bold text-lg">TA</span>
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Forgot password?
-        </h2>
+        </h1>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
           Enter your email address and we'll send you a link to reset your password.
         </p>

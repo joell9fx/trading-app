@@ -47,9 +47,9 @@ export function Hero() {
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gold-500/20 border border-gold-500/30">
                   <Users className="h-6 w-6 text-gold-400" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">
+                <p className="mt-4 text-lg font-semibold text-white">
                   10,000+ Students
-                </h3>
+                </p>
                 <p className="mt-2 text-sm text-gray-400">
                   Join our growing community
                 </p>
@@ -59,9 +59,9 @@ export function Hero() {
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gold-500/20 border border-gold-500/30">
                   <Award className="h-6 w-6 text-gold-400" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">
+                <p className="mt-4 text-lg font-semibold text-white">
                   50+ Expert Mentors
-                </h3>
+                </p>
                 <p className="mt-2 text-sm text-gray-400">
                   Learn from the best
                 </p>
@@ -71,9 +71,9 @@ export function Hero() {
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gold-500/20 border border-gold-500/30">
                   <TrendingUp className="h-6 w-6 text-gold-400" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">
+                <p className="mt-4 text-lg font-semibold text-white">
                   95% Success Rate
-                </h3>
+                </p>
                 <p className="mt-2 text-sm text-gray-400">
                   Proven strategies that work
                 </p>

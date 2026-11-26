@@ -44,7 +44,9 @@ export function LeaderboardClient() {
   return (
     <Card className="bg-black border border-gold-500/40 p-6 rounded-2xl space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl text-gold-400 font-bold">🏆 Trading Academy Leaderboard</h2>
+        <h1 className="text-2xl text-gold-400 font-bold">
+          <span aria-hidden="true">🏆 </span>Trading Academy Leaderboard
+        </h1>
         <div className="flex gap-2 text-sm">
           {(['xp', 'consistency', 'lessons', 'referrals'] as const).map((m) => (
             <Button
