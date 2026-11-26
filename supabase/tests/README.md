@@ -1,6 +1,7 @@
 # Migration tests
 
 `046_rls_test.sql` checks that migration 046 blocks privilege escalation and free unlocks.
+`047_trader_missions_test.sql` checks that members can only read and write their own Trader Missions.
 Each line prints PASS or FAIL. Run it against a **throwaway** Supabase Postgres, never the live project:
 
 ```bash
@@ -9,5 +10,7 @@ export PGPASSWORD=postgres
 for f in supabase/migrations/0*.sql; do psql -h 127.0.0.1 -p 54329 -U postgres -q -f "$f" >/dev/null 2>&1; done   # 001-045 are best-effort (several fail; see PROGRESS.md)
 psql -h 127.0.0.1 -p 54329 -U postgres -v ON_ERROR_STOP=1 -f supabase/migrations/046_security_hardening.sql
 psql -h 127.0.0.1 -p 54329 -U postgres -f supabase/tests/046_rls_test.sql
+psql -h 127.0.0.1 -p 54329 -U postgres -v ON_ERROR_STOP=1 -f supabase/migrations/047_trader_missions.sql
+psql -h 127.0.0.1 -p 54329 -U postgres -f supabase/tests/047_trader_missions_test.sql
 docker rm -f ta-migtest
 ```
